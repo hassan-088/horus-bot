@@ -10,7 +10,7 @@ import gemImage from '@/assets/gem.jpg';
 const arLabels = [
   { id: 1, x: '20%', y: '30%', textEn: 'Ancient Vase — 300 BC', textAr: 'إناء قديم — 300 ق.م' },
   { id: 2, x: '60%', y: '45%', textEn: 'Golden Mask — Tutankhamun', textAr: 'القناع الذهبي — توت عنخ آمون' },
-  { id: 3, x: '40%', y: '70%', textEn: 'Robot Guide — Moving to Hall B', textAr: 'الروبوت المرشد — متجه للقاعة ب' },
+  { id: 3, x: '40%', y: '70%', textEn: 'Horus-Bot Guide — Moving to Hall B', textAr: 'حورس-بوت المرشد — متجه للقاعة ب' },
 ];
 
 export default function ARViewScreen() {

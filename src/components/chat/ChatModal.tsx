@@ -153,7 +153,7 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
             </div>
             <div>
               <h2 className="font-semibold">{t('chatTitle', language)}</h2>
-              <p className="text-xs text-muted-foreground">Ankhu / آنخو</p>
+              <p className="text-xs text-muted-foreground">Horus-Bot / حورس-بوت</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">

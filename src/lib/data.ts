@@ -184,7 +184,7 @@ export const quizQuestions: QuizQuestion[] = [
 export const liveTranscriptLines = {
   en: [
     "Welcome to the Egyptian Museum's Hall A...",
-    "Here we see the magnificent Golden Mask of Tutankhamun...",
+    "Horus-Bot here, showing you the magnificent Golden Mask of Tutankhamun...",
     "Crafted over 3,000 years ago from solid gold...",
     "The mask weighs approximately 11 kilograms...",
     "Notice the intricate inlay work with lapis lazuli...",
@@ -194,7 +194,7 @@ export const liveTranscriptLines = {
   ],
   ar: [
     "مرحباً بكم في القاعة أ بالمتحف المصري...",
-    "هنا نرى قناع توت عنخ آمون الذهبي الرائع...",
+    "حورس-بوت هنا، يعرض لكم قناع توت عنخ آمون الذهبي الرائع...",
     "صُنع منذ أكثر من 3000 عام من الذهب الخالص...",
     "يزن القناع حوالي 11 كيلوجراماً...",
     "لاحظوا أعمال الترصيع الدقيقة باللازورد...",

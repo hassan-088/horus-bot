@@ -164,9 +164,9 @@ export default function HomeScreen() {
             onMenuClick={() => setMenuOpen(!menuOpen)}
             leftIcon={
               <div className="flex items-center gap-2">
-                <img src={ankhImage} alt="Ankhu" className="w-7 h-7" />
+                <img src={ankhImage} alt="Horus-Bot" className="w-7 h-7" />
                 <span className="font-semibold text-lg">
-                  {language === 'ar' ? 'آنخو' : 'Ankhu'}
+                  {language === 'ar' ? 'حورس-بوت' : 'Horus-Bot'}
                 </span>
               </div>
             }

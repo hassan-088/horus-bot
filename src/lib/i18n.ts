@@ -13,19 +13,19 @@ export const translations = {
     the: 'The',
     egyptian: 'Egyptian',
     museums: 'Museums',
-    splashTagline: 'Explore Egypt with your Ankhu and its app.',
+    splashTagline: 'Explore Egypt with your Horus-Bot and its app.',
     
     // Onboarding
-    meetAnkhu: 'Meet Ankhu',
-    meetAnkhuDesc: 'Ankhu is your Robo-Guide, working with the app before, during, and after the tour.',
+    meetAnkhu: 'Meet Horus-Bot',
+    meetAnkhuDesc: 'Horus-Bot is your Robo-Guide, working with the app before, during, and after the tour.',
     automaticTour: 'Automatic Tour Mode',
-    automaticTourDesc: 'When the tour starts, Ankhu mode turns on automatically with extra tour features.',
+    automaticTourDesc: 'When the tour starts, Horus-Bot mode turns on automatically with extra tour features.',
     exploreLearn: 'Explore & Learn',
-    exploreLearnDesc: 'Listen to explanations, ask Ankhu questions, and take quizzes in the app.',
-    startWithAnkhu: 'Start with Ankhu',
+    exploreLearnDesc: 'Listen to explanations, ask Horus-Bot questions, and take quizzes in the app.',
+    startWithAnkhu: 'Start with Horus-Bot',
     
     // Home
-    talkToAnkhu: 'Talk to Ankhu',
+    talkToAnkhu: 'Talk to Horus-Bot',
     explore: 'Explore',
     exhibits: 'Exhibits',
     quiz: 'Quiz',
@@ -46,7 +46,7 @@ export const translations = {
     // Map
     museumMap: 'Museum Map',
     entrance: 'Entrance',
-    robotLocation: 'Robot Location',
+    robotLocation: 'Horus-Bot Location',
     yourLocation: 'Your Location',
     visitedExhibit: 'Visited Exhibit',
     notVisited: 'Not Visited',
@@ -68,10 +68,10 @@ export const translations = {
     gallery: 'Gallery',
     
     // Chat
-    chatTitle: 'Chat with Ankhu',
-    chatGreeting: "Hi, I'm Ankhu, your personal museum guide! How can I help you today?",
+    chatTitle: 'Chat with Horus-Bot',
+    chatGreeting: "Hi, I'm Horus-Bot, your personal museum guide! How can I help you today?",
     typeMessage: 'Type a message...',
-    ankhuTyping: 'Ankhu is typing...',
+    ankhuTyping: 'Horus-Bot is typing...',
     
     // Quiz
     quizTitle: 'Knowledge Quiz',
@@ -152,19 +152,19 @@ export const translations = {
     the: '',
     egyptian: 'المتاحف',
     museums: 'المصرية',
-    splashTagline: 'استكشف مصر مع آنخو وتطبيقه.',
+    splashTagline: 'استكشف مصر مع حورس-بوت وتطبيقه.',
     
     // Onboarding
-    meetAnkhu: 'تعرف على آنخو',
-    meetAnkhuDesc: 'آنخو هو مرشدك الآلي، يعمل مع التطبيق قبل وأثناء وبعد الجولة.',
+    meetAnkhu: 'تعرف على حورس-بوت',
+    meetAnkhuDesc: 'حورس-بوت هو مرشدك الآلي، يعمل مع التطبيق قبل وأثناء وبعد الجولة.',
     automaticTour: 'وضع الجولة التلقائي',
-    automaticTourDesc: 'عندما تبدأ الجولة، يتم تشغيل وضع آنخو تلقائياً مع ميزات إضافية.',
+    automaticTourDesc: 'عندما تبدأ الجولة، يتم تشغيل وضع حورس-بوت تلقائياً مع ميزات إضافية.',
     exploreLearn: 'استكشف وتعلم',
-    exploreLearnDesc: 'استمع للشروحات، اطرح أسئلة على آنخو، وخض الاختبارات في التطبيق.',
-    startWithAnkhu: 'ابدأ مع آنخو',
+    exploreLearnDesc: 'استمع للشروحات، اطرح أسئلة على حورس-بوت، وخض الاختبارات في التطبيق.',
+    startWithAnkhu: 'ابدأ مع حورس-بوت',
     
     // Home
-    talkToAnkhu: 'تحدث مع آنخو',
+    talkToAnkhu: 'تحدث مع حورس-بوت',
     explore: 'استكشف',
     exhibits: 'المعروضات',
     quiz: 'الاختبار',
@@ -185,7 +185,7 @@ export const translations = {
     // Map
     museumMap: 'خريطة المتحف',
     entrance: 'المدخل',
-    robotLocation: 'موقع الروبوت',
+    robotLocation: 'موقع حورس-بوت',
     yourLocation: 'موقعك',
     visitedExhibit: 'معروض تمت زيارته',
     notVisited: 'لم تتم زيارته',
@@ -207,10 +207,10 @@ export const translations = {
     gallery: 'القاعة',
     
     // Chat
-    chatTitle: 'تحدث مع آنخو',
-    chatGreeting: 'مرحباً، أنا آنخو، مرشدك الشخصي في المتحف! كيف يمكنني مساعدتك اليوم؟',
+    chatTitle: 'تحدث مع حورس-بوت',
+    chatGreeting: 'مرحباً، أنا حورس-بوت، مرشدك الشخصي في المتحف! كيف يمكنني مساعدتك اليوم؟',
     typeMessage: 'اكتب رسالة...',
-    ankhuTyping: 'آنخو يكتب...',
+    ankhuTyping: 'حورس-بوت يكتب...',
     
     // Quiz
     quizTitle: 'اختبار المعلومات',
