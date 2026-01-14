@@ -17,12 +17,8 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40">
-      {/* Glass background */}
-      <div className="absolute inset-0 glass-premium border-t border-border/30" />
-      
-      {/* Nav content */}
-      <div className="relative flex items-center justify-around h-18 max-w-lg mx-auto pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border pb-safe shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)]">
+      <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
         {navItems.map(({ path, icon: Icon, labelKey }) => {
           const isActive = location.pathname === path;
           
@@ -32,49 +28,39 @@ export function BottomNav() {
               to={path}
               replace
               className={cn(
-                'flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-2xl transition-all duration-300 min-w-[60px] relative group press-effect',
+                'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all duration-300 min-w-[64px] relative group press-effect',
                 isActive
                   ? 'text-primary'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              {/* Active background pill */}
+              {/* Active indicator dot */}
               <div className={cn(
-                'absolute inset-0 rounded-2xl transition-all duration-300',
-                isActive 
-                  ? 'bg-primary/10 scale-100 opacity-100' 
-                  : 'bg-primary/5 scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100'
+                'absolute -top-1 w-1 h-1 rounded-full bg-primary transition-all duration-300',
+                isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
               )} />
               
-              {/* Icon container */}
-              <div className="relative z-10">
+              <div className="relative">
                 <Icon 
                   className={cn(
                     'w-5 h-5 transition-all duration-300',
-                    isActive && 'scale-110'
+                    isActive && 'scale-110 drop-shadow-[0_0_8px_hsl(var(--primary)/0.4)]'
                   )} 
                   strokeWidth={isActive ? 2.5 : 2}
                 />
-                
-                {/* Active glow */}
-                {isActive && (
-                  <div className="absolute inset-0 rounded-full bg-primary/30 blur-md -z-10" />
-                )}
+                {/* Hover glow effect */}
+                <div className={cn(
+                  'absolute inset-0 rounded-full bg-primary/20 blur-md transition-opacity duration-300',
+                  isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'
+                )} />
               </div>
               
-              {/* Label */}
               <span className={cn(
-                'relative z-10 text-2xs transition-all duration-300',
+                'text-xs transition-all duration-300',
                 isActive ? 'font-semibold' : 'font-medium'
               )}>
                 {t(labelKey, language)}
               </span>
-              
-              {/* Active indicator dot */}
-              <div className={cn(
-                'absolute -top-1 w-1.5 h-1.5 rounded-full bg-primary transition-all duration-300',
-                isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-              )} />
             </NavLink>
           );
         })}
