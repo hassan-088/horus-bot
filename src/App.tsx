@@ -3,24 +3,55 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { AppProvider } from "@/contexts/AppContext";
+
+import SplashScreen from "./pages/SplashScreen";
+import OnboardingScreen from "./pages/OnboardingScreen";
+import HomeScreen from "./pages/HomeScreen";
+import MapScreen from "./pages/MapScreen";
+import ExhibitsScreen from "./pages/ExhibitsScreen";
+import ExhibitDetailsScreen from "./pages/ExhibitDetailsScreen";
+import QuizScreen from "./pages/QuizScreen";
+import ProgressScreen from "./pages/ProgressScreen";
+import LiveTourScreen from "./pages/LiveTourScreen";
+import TicketsScreen from "./pages/TicketsScreen";
+import MyTicketsScreen from "./pages/MyTicketsScreen";
+import QRScanScreen from "./pages/QRScanScreen";
+import SettingsScreen from "./pages/SettingsScreen";
+import ARViewScreen from "./pages/ARViewScreen";
+import FeedbackScreen from "./pages/FeedbackScreen";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AppProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<SplashScreen />} />
+            <Route path="/onboarding" element={<OnboardingScreen />} />
+            <Route path="/home" element={<HomeScreen />} />
+            <Route path="/map" element={<MapScreen />} />
+            <Route path="/exhibits" element={<ExhibitsScreen />} />
+            <Route path="/exhibit_details" element={<ExhibitDetailsScreen />} />
+            <Route path="/quiz" element={<QuizScreen />} />
+            <Route path="/progress" element={<ProgressScreen />} />
+            <Route path="/live_tour" element={<LiveTourScreen />} />
+            <Route path="/tickets" element={<TicketsScreen />} />
+            <Route path="/my_tickets" element={<MyTicketsScreen />} />
+            <Route path="/qr_scan" element={<QRScanScreen />} />
+            <Route path="/settings" element={<SettingsScreen />} />
+            <Route path="/ar_view" element={<ARViewScreen />} />
+            <Route path="/feedback" element={<FeedbackScreen />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AppProvider>
   </QueryClientProvider>
 );
 
