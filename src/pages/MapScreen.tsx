@@ -116,24 +116,29 @@ export default function MapScreen() {
           </div>
 
           {/* Exhibit Markers */}
-          {exhibits.map((exhibit) => {
+          {exhibits.map((exhibit, index) => {
             const isVisited = visitedExhibits.includes(exhibit.id);
             return (
               <button
                 key={exhibit.id}
                 onClick={() => handleExhibitClick(exhibit.id)}
-                className="absolute flex flex-col items-center group"
-                style={{ left: exhibit.x, top: exhibit.y }}
+                className={`absolute flex flex-col items-center group opacity-0 animate-pop-in`}
+                style={{ 
+                  left: exhibit.x, 
+                  top: exhibit.y,
+                  animationDelay: `${index * 100}ms`,
+                  animationFillMode: 'forwards'
+                }}
               >
                 <div
                   className={cn(
-                    'w-6 h-6 rounded-full flex items-center justify-center transition-transform group-hover:scale-125',
-                    isVisited ? 'bg-teal' : 'bg-muted-foreground'
+                    'w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-150 group-hover:shadow-lg',
+                    isVisited ? 'bg-teal hover-glow' : 'bg-muted-foreground'
                   )}
                 >
-                  <div className="w-2 h-2 bg-white rounded-full" />
+                  <div className="w-2 h-2 bg-white rounded-full transition-transform duration-300 group-hover:scale-110" />
                 </div>
-                <span className="mt-1 text-2xs font-medium text-foreground/80 whitespace-nowrap">
+                <span className="mt-1 text-2xs font-medium text-foreground/80 whitespace-nowrap transition-all duration-300 group-hover:text-primary group-hover:font-semibold">
                   {language === 'ar' ? exhibit.nameAr.slice(0, 15) : exhibit.nameEn.slice(0, 15)}
                   {(exhibit.nameEn.length > 15 || exhibit.nameAr.length > 15) && '...'}
                 </span>
@@ -166,22 +171,22 @@ export default function MapScreen() {
       </div>
 
       {/* Legend */}
-      <div className="fixed bottom-24 left-4 glass rounded-2xl p-3 shadow-card">
+      <div className="fixed bottom-24 left-4 glass rounded-2xl p-3 shadow-card animate-slide-up-fade">
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-primary" />
-            <span className="text-xs">{t('robotLocation', language)}</span>
+          <div className="flex items-center gap-2 group cursor-default">
+            <div className="w-3 h-3 rounded-full bg-primary transition-transform duration-200 group-hover:scale-125" />
+            <span className="text-xs transition-colors duration-200 group-hover:text-primary">{t('robotLocation', language)}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-destructive" />
-            <span className="text-xs">{t('yourLocation', language)}</span>
+          <div className="flex items-center gap-2 group cursor-default">
+            <div className="w-3 h-3 rounded-full bg-destructive transition-transform duration-200 group-hover:scale-125" />
+            <span className="text-xs transition-colors duration-200 group-hover:text-destructive">{t('yourLocation', language)}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-teal" />
-            <span className="text-xs">{t('visitedExhibit', language)}</span>
+          <div className="flex items-center gap-2 group cursor-default">
+            <div className="w-3 h-3 rounded-full bg-teal transition-transform duration-200 group-hover:scale-125" />
+            <span className="text-xs transition-colors duration-200 group-hover:text-teal">{t('visitedExhibit', language)}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-muted-foreground" />
+          <div className="flex items-center gap-2 group cursor-default">
+            <div className="w-3 h-3 rounded-full bg-muted-foreground transition-transform duration-200 group-hover:scale-125" />
             <span className="text-xs">{t('notVisited', language)}</span>
           </div>
         </div>
