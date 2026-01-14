@@ -1,14 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Circle, Clock, Trophy } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { FloatingChatButton } from '@/components/chat/FloatingChatButton';
 import { Progress } from '@/components/ui/progress';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { exhibits } from '@/lib/data';
+
 
 export default function ProgressScreen() {
   const navigate = useNavigate();
@@ -107,9 +106,7 @@ export default function ProgressScreen() {
           </div>
         )}
       </div>
-
-      <FloatingChatButton />
-      <BottomNav />
     </PageContainer>
   );
 }
+

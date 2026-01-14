@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Radio } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { FloatingChatButton } from '@/components/chat/FloatingChatButton';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { exhibits, liveTranscriptLines } from '@/lib/data';
 import exhibitGoldenMask from '@/assets/exhibit-golden-mask.jpg';
+
 
 export default function LiveTourScreen() {
   const { language } = useApp();
@@ -100,9 +99,7 @@ export default function LiveTourScreen() {
             : 'You can mute the robot and read the live transcript'}
         </p>
       </div>
-
-      <FloatingChatButton />
-      <BottomNav />
     </PageContainer>
   );
 }
+

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Check, X } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
+
 import { Progress } from '@/components/ui/progress';
 import {
   Dialog,
@@ -162,8 +162,7 @@ export default function QuizScreen() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <BottomNav />
     </PageContainer>
   );
 }
+

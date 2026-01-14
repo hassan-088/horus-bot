@@ -1,11 +1,11 @@
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
+
 
 export default function SettingsScreen() {
   const { language, setLanguage, themeMode, setThemeMode, highContrast, setHighContrast, fontScale, setFontScale } = useApp();
@@ -47,7 +47,7 @@ export default function SettingsScreen() {
         </div>
         <p className="text-xs text-center text-muted-foreground px-4">{t('settingsNote', language)}</p>
       </div>
-      <BottomNav />
     </PageContainer>
   );
 }
+

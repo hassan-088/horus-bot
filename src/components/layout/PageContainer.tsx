@@ -4,14 +4,12 @@ import { cn } from '@/lib/utils';
 interface PageContainerProps {
   children: ReactNode;
   className?: string;
-  withBottomNav?: boolean;
   background?: 'default' | 'home' | 'map';
 }
 
 export function PageContainer({
   children,
   className,
-  withBottomNav = true,
   background = 'default',
 }: PageContainerProps) {
   const bgClass = {
@@ -23,9 +21,8 @@ export function PageContainer({
   return (
     <main
       className={cn(
-        'min-h-screen',
+        'min-h-screen museum-texture',
         bgClass,
-        withBottomNav && 'pb-20',
         className
       )}
     >
