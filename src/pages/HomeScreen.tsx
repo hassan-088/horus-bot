@@ -98,7 +98,7 @@ export default function HomeScreen() {
         {/* Side Menu */}
         <div
           className={cn(
-            'fixed top-0 bottom-0 z-30 w-72 transition-all duration-500 ease-out',
+            'fixed top-0 bottom-0 z-50 w-72 transition-all duration-500 ease-out',
             language === 'ar' ? 'right-0' : 'left-0',
             menuOpen
               ? 'translate-x-0'
