@@ -175,16 +175,16 @@ export default function HomeScreen() {
           {/* Hero Section */}
           <div className="px-4 py-6">
             <div
-              className="relative h-48 rounded-3xl overflow-hidden shadow-card cursor-pointer"
+              className="relative h-48 rounded-3xl overflow-hidden shadow-card cursor-pointer group hover-lift"
               onClick={() => navigate('/map')}
             >
               <img
                 src={gemImage}
                 alt="Museum"
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/70" />
+              <div className="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover:translate-y-[-2px]">
                 <h2 className="text-white text-xl font-bold">
                   {language === 'ar' ? 'استكشف المتحف' : 'Explore the Museum'}
                 </h2>
@@ -192,22 +192,29 @@ export default function HomeScreen() {
                   {language === 'ar' ? 'اكتشف القطع الأثرية الرائعة' : 'Discover amazing artifacts'}
                 </p>
               </div>
+              {/* Animated arrow indicator */}
+              <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </div>
           </div>
 
           {/* Quick Actions Grid */}
           <div className="px-4 pb-6">
             <div className="grid grid-cols-2 gap-3">
-              {menuItems.map(({ icon: Icon, labelKey, path }) => (
+              {menuItems.map(({ icon: Icon, labelKey, path }, index) => (
                 <button
                   key={path}
                   onClick={() => navigate(path)}
-                  className="flex flex-col items-center justify-center gap-2 p-5 bg-card rounded-2xl shadow-soft hover:shadow-card transition-all duration-200 hover:-translate-y-0.5"
+                  className={`flex flex-col items-center justify-center gap-2 p-5 bg-card rounded-2xl shadow-soft hover-lift press-effect group opacity-0 animate-slide-up-fade stagger-${index + 1}`}
+                  style={{ animationFillMode: 'forwards' }}
                 >
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
+                    <Icon className="w-6 h-6 text-primary transition-transform duration-300 group-hover:scale-110" />
                   </div>
-                  <span className="font-medium text-sm">{t(labelKey, language)}</span>
+                  <span className="font-medium text-sm transition-colors duration-200 group-hover:text-primary">{t(labelKey, language)}</span>
                 </button>
               ))}
             </div>
@@ -217,16 +224,26 @@ export default function HomeScreen() {
           <div className="px-4 pb-6">
             <button
               onClick={() => navigate('/ar_view')}
-              className="w-full p-4 bg-gradient-to-r from-primary to-accent rounded-2xl shadow-card text-left hover:shadow-elevated transition-shadow"
+              className="w-full p-4 bg-gradient-to-r from-primary to-accent rounded-2xl shadow-card text-left hover-lift press-effect group relative overflow-hidden"
             >
-              <h3 className="text-primary-foreground font-bold text-lg">
+              {/* Shimmer effect overlay */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              </div>
+              <h3 className="text-primary-foreground font-bold text-lg relative z-10">
                 {language === 'ar' ? 'جرب الواقع المعزز' : 'Try AR Experience'}
               </h3>
-              <p className="text-primary-foreground/80 text-sm mt-1">
+              <p className="text-primary-foreground/80 text-sm mt-1 relative z-10">
                 {language === 'ar'
                   ? 'وجه كاميرتك نحو المعروضات'
                   : 'Point your camera at exhibits'}
               </p>
+              {/* Floating icon */}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 group-hover:opacity-50 transition-opacity">
+                <svg className="w-16 h-16 text-white animate-float" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
             </button>
           </div>
         </div>

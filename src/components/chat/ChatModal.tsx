@@ -139,16 +139,16 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-foreground/20 backdrop-blur-sm"
+        className="absolute inset-0 bg-foreground/20 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg h-[80vh] max-h-[600px] bg-card rounded-2xl shadow-elevated flex flex-col overflow-hidden animate-scale-in">
+      <div className="relative w-full max-w-lg h-[80vh] max-h-[600px] bg-card rounded-2xl shadow-elevated flex flex-col overflow-hidden animate-bounce-in">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-card to-muted/30">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center animate-glow-pulse">
               <Bot className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -156,7 +156,12 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
               <p className="text-xs text-muted-foreground">Horus-Bot / حورس-بوت</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose} 
+            className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors duration-300"
+          >
             <X className="w-5 h-5" />
           </Button>
         </div>
@@ -231,7 +236,7 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
         )}
 
         {/* Input */}
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border bg-gradient-to-r from-card to-muted/20">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -244,15 +249,18 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={t('typeMessage', language)}
-              className="flex-1 rounded-full bg-muted border-0"
+              className="flex-1 rounded-full bg-muted border-0 transition-shadow duration-300 focus:shadow-[0_0_0_2px_hsl(var(--primary)/0.3)]"
             />
             <Button
               type="submit"
               size="icon"
-              className="rounded-full h-10 w-10"
+              className={cn(
+                "rounded-full h-10 w-10 transition-all duration-300",
+                input.trim() ? "hover:scale-110 hover:shadow-lg" : ""
+              )}
               disabled={!input.trim()}
             >
-              <Send className={cn('w-4 h-4', isRTL && 'rotate-180')} />
+              <Send className={cn('w-4 h-4 transition-transform duration-200', isRTL && 'rotate-180', input.trim() && 'hover:translate-x-0.5')} />
             </Button>
           </form>
         </div>
