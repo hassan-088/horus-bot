@@ -1,13 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Landmark } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { FloatingChatButton } from '@/components/chat/FloatingChatButton';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { exhibits } from '@/lib/data';
 import { cn } from '@/lib/utils';
+
 
 export default function ExhibitsScreen() {
   const navigate = useNavigate();
@@ -45,9 +44,7 @@ export default function ExhibitsScreen() {
           </button>
         ))}
       </div>
-
-      <FloatingChatButton />
-      <BottomNav />
     </PageContainer>
   );
 }
+

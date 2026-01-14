@@ -578,6 +578,21 @@
   }
 
   /* Smooth page transitions */
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-page-enter {
+    animation: page-enter 0.3s ease-out forwards;
+  }
+
   .page-enter {
     opacity: 0;
     transform: translateX(20px);
@@ -596,4 +611,37 @@
   .icon-spin-hover:hover {
     transform: rotate(360deg);
   }
+
+  /* Museum texture overlay - subtle papyrus feel */
+  .museum-texture {
+    background-image: 
+      radial-gradient(circle at 20% 80%, hsl(var(--primary) / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsl(var(--accent) / 0.03) 0%, transparent 50%);
+  }
+
+  /* Premium card style */
+  .premium-card {
+    @apply bg-card rounded-2xl shadow-soft transition-all duration-300;
+    background: linear-gradient(
+      135deg,
+      hsl(var(--card)) 0%,
+      hsl(var(--card)) 50%,
+      hsl(var(--secondary) / 0.5) 100%
+    );
+  }
+  .premium-card:hover {
+    @apply shadow-card -translate-y-0.5;
+  }
+
+  /* Subtle background pattern for depth */
+  .bg-pattern {
+    background-image: 
+      linear-gradient(135deg, hsl(var(--muted) / 0.3) 25%, transparent 25%),
+      linear-gradient(225deg, hsl(var(--muted) / 0.3) 25%, transparent 25%),
+      linear-gradient(45deg, hsl(var(--muted) / 0.3) 25%, transparent 25%),
+      linear-gradient(315deg, hsl(var(--muted) / 0.3) 25%, transparent 25%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 0, 10px -10px, 0 10px;
+  }
 }
+

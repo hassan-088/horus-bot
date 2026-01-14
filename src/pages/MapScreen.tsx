@@ -1,9 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { FloatingChatButton } from '@/components/chat/FloatingChatButton';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -191,9 +189,7 @@ export default function MapScreen() {
           </div>
         </div>
       </div>
-
-      <FloatingChatButton />
-      <BottomNav />
     </PageContainer>
   );
 }
+

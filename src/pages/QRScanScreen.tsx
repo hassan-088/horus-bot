@@ -1,9 +1,9 @@
 import { QrCode, Camera } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
+
 
 export default function QRScanScreen() {
   const { language } = useApp();
@@ -20,7 +20,7 @@ export default function QRScanScreen() {
         <h2 className="text-xl font-semibold mb-2">{t('scanQRCode', language)}</h2>
         <p className="text-muted-foreground">{t('pointCamera', language)}</p>
       </div>
-      <BottomNav />
     </PageContainer>
   );
 }
+

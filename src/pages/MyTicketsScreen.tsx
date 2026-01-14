@@ -1,9 +1,9 @@
 import { Ticket } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
+
 
 export default function MyTicketsScreen() {
   const { language, tickets } = useApp();
@@ -30,7 +30,7 @@ export default function MyTicketsScreen() {
           ))
         )}
       </div>
-      <BottomNav />
     </PageContainer>
   );
 }
+

@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Map, Layers, Brain, Radio, MessageSquare, Globe } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { FloatingChatButton } from '@/components/chat/FloatingChatButton';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -357,10 +355,8 @@ export default function HomeScreen() {
             </button>
           </div>
         </div>
-
-        <FloatingChatButton />
-        <BottomNav />
       </PageContainer>
+
 
       {/* Privacy Dialog */}
       <Dialog open={showPrivacy} onOpenChange={setShowPrivacy}>

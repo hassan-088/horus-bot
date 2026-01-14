@@ -2,8 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 import SplashScreen from "./pages/SplashScreen";
 import OnboardingScreen from "./pages/OnboardingScreen";
@@ -24,6 +25,33 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function AppRoutes() {
+  const location = useLocation();
+  
+  return (
+    <MainLayout key={location.pathname}>
+      <Routes location={location}>
+        <Route path="/" element={<SplashScreen />} />
+        <Route path="/onboarding" element={<OnboardingScreen />} />
+        <Route path="/home" element={<HomeScreen />} />
+        <Route path="/map" element={<MapScreen />} />
+        <Route path="/exhibits" element={<ExhibitsScreen />} />
+        <Route path="/exhibit_details" element={<ExhibitDetailsScreen />} />
+        <Route path="/quiz" element={<QuizScreen />} />
+        <Route path="/progress" element={<ProgressScreen />} />
+        <Route path="/live_tour" element={<LiveTourScreen />} />
+        <Route path="/tickets" element={<TicketsScreen />} />
+        <Route path="/my_tickets" element={<MyTicketsScreen />} />
+        <Route path="/qr_scan" element={<QRScanScreen />} />
+        <Route path="/settings" element={<SettingsScreen />} />
+        <Route path="/ar_view" element={<ARViewScreen />} />
+        <Route path="/feedback" element={<FeedbackScreen />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </MainLayout>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
@@ -31,24 +59,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<SplashScreen />} />
-            <Route path="/onboarding" element={<OnboardingScreen />} />
-            <Route path="/home" element={<HomeScreen />} />
-            <Route path="/map" element={<MapScreen />} />
-            <Route path="/exhibits" element={<ExhibitsScreen />} />
-            <Route path="/exhibit_details" element={<ExhibitDetailsScreen />} />
-            <Route path="/quiz" element={<QuizScreen />} />
-            <Route path="/progress" element={<ProgressScreen />} />
-            <Route path="/live_tour" element={<LiveTourScreen />} />
-            <Route path="/tickets" element={<TicketsScreen />} />
-            <Route path="/my_tickets" element={<MyTicketsScreen />} />
-            <Route path="/qr_scan" element={<QRScanScreen />} />
-            <Route path="/settings" element={<SettingsScreen />} />
-            <Route path="/ar_view" element={<ARViewScreen />} />
-            <Route path="/feedback" element={<FeedbackScreen />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
         </BrowserRouter>
       </TooltipProvider>
     </AppProvider>
@@ -56,3 +67,4 @@ const App = () => (
 );
 
 export default App;
+

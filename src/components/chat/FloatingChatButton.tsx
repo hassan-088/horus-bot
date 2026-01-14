@@ -16,7 +16,8 @@ export function FloatingChatButton() {
         onClick={() => setIsOpen(true)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="fixed bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-full shadow-elevated transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95 group animate-glow-pulse"
+        className="fixed bottom-[88px] right-4 z-40 flex items-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-full shadow-elevated transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95 group animate-glow-pulse"
+        style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         {/* Pulsing ring effect */}
         <div className="absolute inset-0 rounded-full bg-primary/30 animate-pulse-ring pointer-events-none" />
@@ -25,7 +26,7 @@ export function FloatingChatButton() {
           "w-5 h-5 transition-transform duration-300",
           isHovered && "animate-wiggle"
         )} />
-        <span className="text-sm font-medium">{t('talkToAnkhu', language)}</span>
+        <span className="text-sm font-medium whitespace-nowrap">{t('talkToAnkhu', language)}</span>
         
         {/* Tooltip on hover */}
         <div className={cn(

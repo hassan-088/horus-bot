@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Minus, Plus, Calendar } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -10,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { ticketPrices } from '@/lib/data';
+
 
 export default function TicketsScreen() {
   const navigate = useNavigate();
@@ -90,7 +90,7 @@ export default function TicketsScreen() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <BottomNav />
     </PageContainer>
   );
 }
+

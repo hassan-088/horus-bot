@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Bookmark, Play, Pause, MapPin, Plus, Globe, Clock } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
-import { BottomNav } from '@/components/layout/BottomNav';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { FloatingChatButton } from '@/components/chat/FloatingChatButton';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
@@ -15,6 +13,7 @@ import gemImage from '@/assets/gem.jpg';
 import exhibitGoldenMask from '@/assets/exhibit-golden-mask.jpg';
 import exhibitRosetta from '@/assets/exhibit-rosetta.jpg';
 import exhibitVase from '@/assets/exhibit-vase.jpg';
+
 
 const exhibitImages: Record<string, string> = {
   'golden-mask': exhibitGoldenMask,
@@ -176,9 +175,7 @@ export default function ExhibitDetailsScreen() {
           </Button>
         </div>
       </div>
-
-      <FloatingChatButton />
-      <BottomNav />
     </PageContainer>
   );
 }
+
