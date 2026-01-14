@@ -85,17 +85,20 @@ export default function HomeScreen() {
     <>
       <PageContainer background="home" className="relative overflow-hidden">
         {/* Side Menu Overlay */}
-        {menuOpen && (
-          <div
-            className="fixed inset-0 z-40 bg-foreground/20"
-            onClick={() => setMenuOpen(false)}
-          />
-        )}
+        <div
+          className={cn(
+            'fixed inset-0 z-40 transition-all duration-300',
+            menuOpen 
+              ? 'bg-foreground/30 backdrop-blur-[2px] pointer-events-auto' 
+              : 'bg-transparent pointer-events-none'
+          )}
+          onClick={() => setMenuOpen(false)}
+        />
 
         {/* Side Menu */}
         <div
           className={cn(
-            'fixed top-0 bottom-0 z-30 w-64 bg-gradient-to-b from-white to-secondary p-6 pt-16 transition-transform duration-300',
+            'fixed top-0 bottom-0 z-30 w-72 transition-all duration-500 ease-out',
             language === 'ar' ? 'right-0' : 'left-0',
             menuOpen
               ? 'translate-x-0'
@@ -104,46 +107,149 @@ export default function HomeScreen() {
               : '-translate-x-full'
           )}
         >
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+          {/* Glass background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-white/90 to-secondary/80 backdrop-blur-xl" />
+          
+          {/* Decorative gradient orb */}
+          <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 -right-10 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
+          
+          {/* Menu content */}
+          <div className="relative h-full flex flex-col p-6 pt-8">
+            {/* Profile section */}
+            <div className={cn(
+              'flex items-center gap-3 mb-8 opacity-0 transition-all duration-500',
+              menuOpen && 'opacity-100 translate-y-0',
+              !menuOpen && '-translate-y-4'
+            )} style={{ transitionDelay: menuOpen ? '150ms' : '0ms' }}>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">G</span>
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">
+                  {language === 'ar' ? 'مرحباً، ضيف' : 'Hello, Guest'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {language === 'ar' ? 'استمتع بجولتك' : 'Enjoy your tour'}
+                </p>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className={cn(
+              'h-px bg-gradient-to-r from-transparent via-border to-transparent mb-6 transition-all duration-500',
+              menuOpen ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+            )} style={{ transitionDelay: menuOpen ? '200ms' : '0ms' }} />
+
+            {/* Explore section */}
+            <div className="mb-6">
+              <h3 className={cn(
+                'text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 transition-all duration-500',
+                menuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+              )} style={{ transitionDelay: menuOpen ? '100ms' : '0ms' }}>
                 {t('explore', language)}
               </h3>
               <div className="space-y-1">
-                {menuItems.map(({ icon: Icon, labelKey, path }) => (
+                {menuItems.map(({ icon: Icon, labelKey, path }, index) => (
                   <button
                     key={path}
                     onClick={() => {
                       setMenuOpen(false);
                       navigate(path);
                     }}
-                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-foreground hover:bg-primary/10 transition-colors"
+                    className={cn(
+                      'flex items-center gap-3 w-full px-4 py-3 rounded-xl text-foreground transition-all duration-300 group relative overflow-hidden',
+                      'hover:bg-primary/10 hover:shadow-sm',
+                      menuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+                    )}
+                    style={{ transitionDelay: menuOpen ? `${150 + index * 50}ms` : '0ms' }}
                   >
-                    <Icon className="w-5 h-5 text-primary" />
-                    <span className="font-medium">{t(labelKey, language)}</span>
+                    {/* Hover highlight */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    <div className="relative w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
+                      <Icon className="w-5 h-5 text-primary transition-transform duration-300 group-hover:scale-110" />
+                    </div>
+                    <span className="relative font-medium transition-colors duration-200 group-hover:text-primary">
+                      {t(labelKey, language)}
+                    </span>
+                    
+                    {/* Arrow indicator */}
+                    <svg 
+                      className={cn(
+                        "w-4 h-4 text-muted-foreground/50 ml-auto transition-all duration-300 opacity-0 group-hover:opacity-100",
+                        language === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'
+                      )} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 ))}
               </div>
             </div>
 
+            {/* Settings section */}
             <div>
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+              <h3 className={cn(
+                'text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 transition-all duration-500',
+                menuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+              )} style={{ transitionDelay: menuOpen ? '350ms' : '0ms' }}>
                 {t('settings', language)}
               </h3>
               <div className="space-y-1">
-                {settingsItems.map(({ icon: Icon, labelKey, path }) => (
+                {settingsItems.map(({ icon: Icon, labelKey, path }, index) => (
                   <button
                     key={path}
                     onClick={() => {
                       setMenuOpen(false);
                       navigate(path);
                     }}
-                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-foreground hover:bg-primary/10 transition-colors"
+                    className={cn(
+                      'flex items-center gap-3 w-full px-4 py-3 rounded-xl text-foreground transition-all duration-300 group relative overflow-hidden',
+                      'hover:bg-primary/10 hover:shadow-sm',
+                      menuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+                    )}
+                    style={{ transitionDelay: menuOpen ? `${400 + index * 50}ms` : '0ms' }}
                   >
-                    <Icon className="w-5 h-5 text-primary" />
-                    <span className="font-medium">{t(labelKey, language)}</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    <div className="relative w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
+                      <Icon className="w-5 h-5 text-primary transition-transform duration-300 group-hover:scale-110" />
+                    </div>
+                    <span className="relative font-medium transition-colors duration-200 group-hover:text-primary">
+                      {t(labelKey, language)}
+                    </span>
+                    
+                    <svg 
+                      className={cn(
+                        "w-4 h-4 text-muted-foreground/50 ml-auto transition-all duration-300 opacity-0 group-hover:opacity-100",
+                        language === 'ar' ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'
+                      )} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Spacer */}
+            <div className="flex-1" />
+
+            {/* Footer */}
+            <div className={cn(
+              'pt-4 border-t border-border/50 transition-all duration-500',
+              menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            )} style={{ transitionDelay: menuOpen ? '500ms' : '0ms' }}>
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <span>Powered by</span>
+                <span className="font-semibold gradient-text">Horus-Bot</span>
               </div>
             </div>
           </div>
@@ -152,10 +258,14 @@ export default function HomeScreen() {
         {/* Main Content */}
         <div
           className={cn(
-            'transition-all duration-300',
-            menuOpen && 'scale-[0.82] rounded-3xl shadow-elevated overflow-hidden',
-            menuOpen && (language === 'ar' ? '-translate-x-[62%]' : 'translate-x-[62%]')
+            'transition-all duration-500 ease-out origin-center',
+            menuOpen && 'scale-[0.85] rounded-[2rem] shadow-2xl overflow-hidden pointer-events-none',
+            menuOpen && (language === 'ar' ? '-translate-x-[65%]' : 'translate-x-[65%]'),
+            menuOpen && 'ring-1 ring-white/20'
           )}
+          style={{
+            filter: menuOpen ? 'brightness(0.95)' : 'brightness(1)',
+          }}
         >
           <AppBar
             title=""
