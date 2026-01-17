@@ -1,7 +1,9 @@
 import { cn } from '@/lib/utils';
+import { exhibits } from '@/lib/data';
+import { useMemo } from 'react';
 
 interface Floor {
-  id: string;
+  id: 'ground' | 'floor-1' | 'floor-2';
   label: string;
   labelAr: string;
 }
@@ -19,6 +21,14 @@ interface FloorSelectorProps {
 }
 
 export function FloorSelector({ language, activeFloor, onFloorChange }: FloorSelectorProps) {
+  const floorCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    floors.forEach(floor => {
+      counts[floor.id] = exhibits.filter(e => e.floor === floor.id).length;
+    });
+    return counts;
+  }, []);
+
   return (
     <div className="fixed left-4 top-1/2 -translate-y-1/2 glass rounded-2xl p-1.5 shadow-card z-30">
       <div className="flex flex-col gap-1">
@@ -27,13 +37,23 @@ export function FloorSelector({ language, activeFloor, onFloorChange }: FloorSel
             key={floor.id}
             onClick={() => onFloorChange(floor.id)}
             className={cn(
-              'px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200',
+              'px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-2',
               activeFloor === floor.id
                 ? 'bg-primary text-primary-foreground shadow-sm'
                 : 'text-foreground/70 hover:bg-muted hover:text-foreground'
             )}
           >
-            {language === 'ar' ? floor.labelAr : floor.label}
+            <span>{language === 'ar' ? floor.labelAr : floor.label}</span>
+            {floorCounts[floor.id] > 0 && (
+              <span className={cn(
+                'w-5 h-5 rounded-full text-2xs flex items-center justify-center',
+                activeFloor === floor.id
+                  ? 'bg-primary-foreground/20 text-primary-foreground'
+                  : 'bg-muted text-muted-foreground'
+              )}>
+                {floorCounts[floor.id]}
+              </span>
+            )}
           </button>
         ))}
       </div>
