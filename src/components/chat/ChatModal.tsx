@@ -1,16 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, Bot, User, ArrowDown } from 'lucide-react';
+import { X, Send, Bot, User, ArrowDown, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { QuickReplies } from './QuickReplies';
+import { ExhibitCard } from './ExhibitCard';
 
 interface Message {
   id: string;
   text: string;
   isBot: boolean;
   timestamp: Date;
+  exhibitId?: string; // For rich media cards
 }
 
 interface ChatModalProps {
@@ -18,12 +23,33 @@ interface ChatModalProps {
   onClose: () => void;
 }
 
+// Detect if message mentions an exhibit
+function detectExhibitMention(text: string): string | null {
+  const mentions: Record<string, string[]> = {
+    'golden-mask': ['tutankhamun', 'golden mask', 'قناع', 'توت عنخ', 'hall a', 'القاعة أ'],
+    'rosetta-stone': ['rosetta', 'رشيد', 'hall b', 'القاعة ب', 'hieroglyph'],
+    'ancient-vase': ['vase', 'ceremonial', 'إناء', 'hall c', 'القاعة ج'],
+    'scarab-amulet': ['scarab', 'amulet', 'جعران', 'تميمة', 'khepri'],
+    'papyrus-scroll': ['papyrus', 'book of the dead', 'بردية', 'كتاب الموتى'],
+  };
+
+  const lowerText = text.toLowerCase();
+  for (const [exhibitId, keywords] of Object.entries(mentions)) {
+    if (keywords.some(keyword => lowerText.includes(keyword))) {
+      return exhibitId;
+    }
+  }
+  return null;
+}
+
 export function ChatModal({ isOpen, onClose }: ChatModalProps) {
   const { language, isRTL } = useApp();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<{role: string; content: string}[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -68,50 +94,13 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   };
 
-  const getBotResponse = (userMessage: string): string => {
-    const msg = userMessage.toLowerCase();
-    
-    if (msg.includes('bathroom') || msg.includes('toilet') || msg.includes('restroom') || msg.includes('حمام')) {
-      return language === 'ar'
-        ? 'دورات المياه تقع بالقرب من المدخل الرئيسي على اليسار.'
-        : 'The restrooms are located near the main entrance, on the left side.';
-    }
-    
-    if (msg.includes('ticket') || msg.includes('price') || msg.includes('تذكرة') || msg.includes('سعر')) {
-      return language === 'ar'
-        ? 'يمكنك شراء التذاكر من قسم التذاكر في التطبيق. البالغون: 200 جنيه، الطلاب: 100 جنيه، الأطفال: 50 جنيه.'
-        : 'You can purchase tickets from the Tickets section in the app. Adults: 200 EGP, Students: 100 EGP, Children: 50 EGP.';
-    }
-    
-    if (msg.includes('open') || msg.includes('hour') || msg.includes('time') || msg.includes('ساعات') || msg.includes('مفتوح')) {
-      return language === 'ar'
-        ? 'المتحف مفتوح يومياً من 9 صباحاً حتى 6 مساءً.'
-        : 'The museum is open daily from 9 AM to 6 PM.';
-    }
-    
-    if (msg.includes('cafe') || msg.includes('food') || msg.includes('eat') || msg.includes('كافيه') || msg.includes('طعام')) {
-      return language === 'ar'
-        ? 'يوجد كافيه في الطابق الأرضي بالقرب من متجر الهدايا.'
-        : 'There is a café on the ground floor near the gift shop.';
-    }
-
-    if (msg.includes('tutankhamun') || msg.includes('mask') || msg.includes('توت') || msg.includes('قناع')) {
-      return language === 'ar'
-        ? 'قناع توت عنخ آمون الذهبي موجود في القاعة أ. إنه من أشهر القطع الأثرية في العالم!'
-        : 'The Golden Mask of Tutankhamun is in Hall A. It\'s one of the most famous artifacts in the world!';
-    }
-    
-    return language === 'ar'
-      ? 'أنا هنا للمساعدة! يمكنك سؤالي عن المعروضات، أوقات العمل، أو المرافق.'
-      : 'I\'m here to help! You can ask me about exhibits, opening hours, or facilities.';
-  };
-
-  const sendMessage = () => {
-    if (!input.trim()) return;
+  const sendMessage = async (messageText?: string) => {
+    const text = messageText || input.trim();
+    if (!text) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: input,
+      text,
       isBot: false,
       timestamp: new Date(),
     };
@@ -120,17 +109,62 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
     setInput('');
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
+    // Update conversation history
+    const newHistory = [...conversationHistory, { role: 'user', content: text }];
+    setConversationHistory(newHistory);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('horus-chat', {
+        body: { messages: newHistory },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      const botResponse = data.response;
+      const exhibitId = detectExhibitMention(botResponse);
+
+      // Update conversation history with bot response
+      setConversationHistory(prev => [...prev, { role: 'assistant', content: botResponse }]);
+
       setIsTyping(false);
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(input),
+        text: botResponse,
+        isBot: true,
+        timestamp: new Date(),
+        exhibitId,
+      };
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setIsTyping(false);
+      
+      // Fallback response
+      const fallbackMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: language === 'ar' 
+          ? 'عذراً، حدث خطأ. يرجى المحاولة مرة أخرى.' 
+          : 'Sorry, something went wrong. Please try again.',
         isBot: true,
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, botMessage]);
-    }, 1500);
+      setMessages(prev => [...prev, fallbackMessage]);
+      
+      toast({
+        variant: 'destructive',
+        description: error instanceof Error ? error.message : 'Failed to get response',
+      });
+    }
+  };
+
+  const handleQuickReply = (message: string) => {
+    sendMessage(message);
   };
 
   if (!isOpen) return null;
@@ -152,8 +186,13 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
               <Bot className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold">{t('chatTitle', language)}</h2>
-              <p className="text-xs text-muted-foreground">Horus-Bot / حورس-بوت</p>
+              <h2 className="font-semibold flex items-center gap-1.5">
+                {t('chatTitle', language)}
+                <Sparkles className="w-4 h-4 text-warning" />
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                {language === 'ar' ? 'مدعوم بالذكاء الاصطناعي' : 'AI-Powered'}
+              </p>
             </div>
           </div>
           <Button 
@@ -173,34 +212,42 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
           className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide"
         >
           {messages.map((message, index) => (
-            <div
-              key={message.id}
-              className={cn(
-                'flex items-end gap-2',
-                message.isBot ? (isRTL ? 'flex-row-reverse' : 'flex-row') : (isRTL ? 'flex-row' : 'flex-row-reverse'),
-                index === messages.length - 1 && (message.isBot ? 'animate-slide-in-left' : 'animate-slide-in-right')
-              )}
-            >
-              <div className={cn(
-                'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0',
-                message.isBot ? 'bg-primary/10' : 'bg-muted'
-              )}>
-                {message.isBot ? (
-                  <Bot className="w-4 h-4 text-primary" />
-                ) : (
-                  <User className="w-4 h-4 text-muted-foreground" />
-                )}
-              </div>
+            <div key={message.id}>
               <div
                 className={cn(
-                  'max-w-[75%] px-4 py-2.5 rounded-2xl',
-                  message.isBot
-                    ? 'bg-muted text-foreground rounded-bl-sm'
-                    : 'bg-primary text-primary-foreground rounded-br-sm'
+                  'flex items-end gap-2',
+                  message.isBot ? (isRTL ? 'flex-row-reverse' : 'flex-row') : (isRTL ? 'flex-row' : 'flex-row-reverse'),
+                  index === messages.length - 1 && !isTyping && (message.isBot ? 'animate-slide-in-left' : 'animate-slide-in-right')
                 )}
               >
-                <p className="text-sm leading-relaxed">{message.text}</p>
+                <div className={cn(
+                  'w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0',
+                  message.isBot ? 'bg-primary/10' : 'bg-muted'
+                )}>
+                  {message.isBot ? (
+                    <Bot className="w-4 h-4 text-primary" />
+                  ) : (
+                    <User className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </div>
+                <div
+                  className={cn(
+                    'max-w-[75%] px-4 py-2.5 rounded-2xl',
+                    message.isBot
+                      ? 'bg-muted text-foreground rounded-bl-sm'
+                      : 'bg-primary text-primary-foreground rounded-br-sm'
+                  )}
+                >
+                  <p className="text-sm leading-relaxed">{message.text}</p>
+                </div>
               </div>
+              
+              {/* Rich media card for exhibits */}
+              {message.isBot && message.exhibitId && (
+                <div className={cn('mt-2', isRTL ? 'mr-9' : 'ml-9')}>
+                  <ExhibitCard exhibitId={message.exhibitId} language={language} />
+                </div>
+              )}
             </div>
           ))}
 
@@ -229,11 +276,18 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
             variant="secondary"
             size="icon"
             onClick={scrollToBottom}
-            className="absolute bottom-20 right-4 rounded-full shadow-md h-8 w-8"
+            className="absolute bottom-36 right-4 rounded-full shadow-md h-8 w-8"
           >
             <ArrowDown className="w-4 h-4" />
           </Button>
         )}
+
+        {/* Quick Replies */}
+        <QuickReplies 
+          language={language} 
+          onSelect={handleQuickReply}
+          disabled={isTyping}
+        />
 
         {/* Input */}
         <div className="p-4 border-t border-border bg-gradient-to-r from-card to-muted/20">
@@ -249,6 +303,7 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={t('typeMessage', language)}
+              disabled={isTyping}
               className="flex-1 rounded-full bg-muted border-0 transition-shadow duration-300 focus:shadow-[0_0_0_2px_hsl(var(--primary)/0.3)]"
             />
             <Button
@@ -258,9 +313,9 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
                 "rounded-full h-10 w-10 transition-all duration-300",
                 input.trim() ? "hover:scale-110 hover:shadow-lg" : ""
               )}
-              disabled={!input.trim()}
+              disabled={!input.trim() || isTyping}
             >
-              <Send className={cn('w-4 h-4 transition-transform duration-200', isRTL && 'rotate-180', input.trim() && 'hover:translate-x-0.5')} />
+              <Send className={cn('w-4 h-4 transition-transform duration-200', isRTL && 'rotate-180')} />
             </Button>
           </form>
         </div>
