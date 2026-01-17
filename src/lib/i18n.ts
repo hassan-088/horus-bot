@@ -144,6 +144,18 @@ export const translations = {
     favorites: 'Favorites',
     achievements: 'Achievements',
     events: 'Events',
+    
+    // Map
+    searchExhibits: 'Search exhibits...',
+    noResults: 'No results found',
+    floor: 'Floor',
+    ground: 'Ground',
+    hallA: 'Hall A',
+    hallB: 'Hall B',
+    hallC: 'Hall C',
+    hallD: 'Hall D',
+    lobby: 'Lobby',
+    all: 'All',
   },
   ar: {
     // Navigation
@@ -288,6 +300,18 @@ export const translations = {
     favorites: 'المفضلة',
     achievements: 'الإنجازات',
     events: 'الفعاليات',
+    
+    // Map
+    searchExhibits: 'ابحث عن معروض...',
+    noResults: 'لا توجد نتائج',
+    floor: 'الطابق',
+    ground: 'الأرضي',
+    hallA: 'القاعة أ',
+    hallB: 'القاعة ب',
+    hallC: 'القاعة ج',
+    hallD: 'القاعة د',
+    lobby: 'الردهة',
+    all: 'الكل',
   },
 } as const;
 
