@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Map, Layers, Brain, Radio, MessageSquare, Globe, Trophy, Heart, Calendar } from 'lucide-react';
+import { Map, Layers, Brain, Radio, MessageSquare, Globe, Trophy, Heart, Calendar, User } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import ankhImage from '@/assets/ankh.png';
@@ -52,6 +53,7 @@ export default function HomeScreen() {
     acceptPrivacy,
     showTourAlert,
   } = useApp();
+  const { user, profile } = useAuth();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -124,12 +126,21 @@ export default function HomeScreen() {
               menuOpen && 'opacity-100 translate-y-0',
               !menuOpen && '-translate-y-4'
             )} style={{ transitionDelay: menuOpen ? '150ms' : '0ms' }}>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">G</span>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg overflow-hidden">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-white font-bold text-lg">
+                    {user ? (profile?.display_name?.[0] || user.email?.[0] || 'U').toUpperCase() : 'G'}
+                  </span>
+                )}
               </div>
               <div>
                 <p className="font-semibold text-foreground">
-                  {language === 'ar' ? 'مرحباً، ضيف' : 'Hello, Guest'}
+                  {user 
+                    ? (language === 'ar' ? `مرحباً، ${profile?.display_name || user.email?.split('@')[0]}` : `Hello, ${profile?.display_name || user.email?.split('@')[0]}`)
+                    : (language === 'ar' ? 'مرحباً، ضيف' : 'Hello, Guest')
+                  }
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {language === 'ar' ? 'استمتع بجولتك' : 'Enjoy your tour'}
