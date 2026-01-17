@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { useApp } from '@/contexts/AppContext';
@@ -23,6 +23,7 @@ const ROBOT_POS = { x: 200, y: 160 };
 
 export default function MapScreen() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { language, visitedExhibits, savedExhibits } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -39,6 +40,26 @@ export default function MapScreen() {
 
   // Touch support
   const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
+
+  // Auto-select exhibit from URL param
+  useEffect(() => {
+    const exhibitId = searchParams.get('exhibit');
+    if (exhibitId) {
+      const exhibit = exhibits.find(e => e.id === exhibitId);
+      if (exhibit) {
+        setSelectedExhibit(exhibit);
+        // Center on the exhibit
+        setPosition({
+          x: -(exhibit.x - 200),
+          y: -(exhibit.y - 200),
+        });
+        setScale(1.5);
+        // Set the hall
+        const hall = exhibit.galleryEn.toLowerCase().replace(' ', '-');
+        setSelectedHall(hall);
+      }
+    }
+  }, [searchParams]);
 
   // Mouse/touch handlers
   const handleStart = useCallback((clientX: number, clientY: number) => {
