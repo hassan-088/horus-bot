@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function QuizScreen() {
   const navigate = useNavigate();
-  const { language } = useApp();
+  const { language, completeQuiz } = useApp();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
@@ -46,6 +46,11 @@ export default function QuizScreen() {
       setCurrentIndex((i) => i + 1);
       setSelectedAnswer(null);
     } else {
+      // Save quiz completion to context
+      const finalScore = selectedAnswer === question.correctAnswer 
+        ? correctCount + 1 
+        : correctCount;
+      completeQuiz(finalScore);
       setShowResult(true);
     }
   };

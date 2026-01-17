@@ -16,6 +16,8 @@ interface AppState {
   tickets: Ticket[];
   privacyAccepted: boolean;
   tourAlertShown: boolean;
+  quizCompleted: boolean;
+  quizScore: number;
 }
 
 interface AppContextType extends AppState {
@@ -29,6 +31,7 @@ interface AppContextType extends AppState {
   addTickets: (tickets: Ticket[]) => void;
   acceptPrivacy: () => void;
   showTourAlert: () => void;
+  completeQuiz: (score: number) => void;
   isRTL: boolean;
 }
 
@@ -43,6 +46,8 @@ const defaultState: AppState = {
   tickets: [],
   privacyAccepted: false,
   tourAlertShown: false,
+  quizCompleted: false,
+  quizScore: 0,
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -104,6 +109,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const completeOnboarding = () => setState(s => ({ ...s, onboardingCompleted: true }));
   const acceptPrivacy = () => setState(s => ({ ...s, privacyAccepted: true }));
   const showTourAlert = () => setState(s => ({ ...s, tourAlertShown: true }));
+  const completeQuiz = (score: number) => setState(s => ({ ...s, quizCompleted: true, quizScore: score }));
 
   const toggleSavedExhibit = (exhibitId: string): boolean => {
     const isSaved = state.savedExhibits.includes(exhibitId);
@@ -148,6 +154,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         addTickets,
         acceptPrivacy,
         showTourAlert,
+        completeQuiz,
         isRTL,
       }}
     >

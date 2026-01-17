@@ -139,6 +139,10 @@ export const translations = {
     feedbackPlaceholder: 'Tell us about your experience...',
     submitFeedback: 'Submit Feedback',
     feedbackThanks: 'Thank you for your feedback!',
+    
+    // Favorites & Achievements
+    favorites: 'Favorites',
+    achievements: 'Achievements',
   },
   ar: {
     // Navigation
@@ -278,6 +282,10 @@ export const translations = {
     feedbackPlaceholder: 'أخبرنا عن تجربتك...',
     submitFeedback: 'إرسال الملاحظات',
     feedbackThanks: 'شكراً لملاحظاتك!',
+    
+    // Favorites & Achievements
+    favorites: 'المفضلة',
+    achievements: 'الإنجازات',
   },
 } as const;
 
