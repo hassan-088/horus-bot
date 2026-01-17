@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Map, Layers, Brain, Radio, MessageSquare, Globe, Trophy, Heart, Calendar, User, Route } from 'lucide-react';
+import { Map, Layers, Brain, Radio, MessageSquare, Globe, Trophy, Heart, Calendar, User, Route, History, LogIn, LogOut } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
@@ -37,10 +37,12 @@ const menuItems = [
 ];
 
 const settingsItems = [
+  { icon: User, labelKey: 'profile' as const, path: '/profile' },
   { icon: Route, labelKey: 'tourPlanner' as const, path: '/tour_planner' },
   { icon: Calendar, labelKey: 'events' as const, path: '/events' },
   { icon: Trophy, labelKey: 'achievements' as const, path: '/achievements' },
   { icon: Heart, labelKey: 'favorites' as const, path: '/favorites' },
+  { icon: History, labelKey: 'visitHistory' as const, path: '/visit_history' },
   { icon: Globe, labelKey: 'language' as const, path: '/settings' },
   { icon: MessageSquare, labelKey: 'feedback' as const, path: '/feedback' },
 ];

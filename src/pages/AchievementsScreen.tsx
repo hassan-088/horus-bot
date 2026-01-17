@@ -1,6 +1,8 @@
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCloudSync } from '@/hooks/useCloudSync';
 import { exhibits, quizQuestions } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { 
@@ -13,7 +15,9 @@ import {
   Ticket,
   Camera,
   Award,
-  Lock
+  Lock,
+  Flame,
+  Cloud
 } from 'lucide-react';
 
 interface Achievement {
@@ -30,6 +34,9 @@ interface Achievement {
     quizCompleted: boolean;
     quizScore: number;
     tickets: any[];
+    chatCount: number;
+    arUsed: boolean;
+    streakDays: number;
   }) => boolean;
   getProgress?: (state: any) => { current: number; total: number };
 }
@@ -102,21 +109,23 @@ const achievements: Achievement[] = [
     id: 'chatty',
     nameEn: 'Chatty',
     nameAr: 'الثرثار',
-    descriptionEn: 'Talk to Horus-Bot',
-    descriptionAr: 'تحدث مع حورس-بوت',
+    descriptionEn: 'Talk to Horus-Bot 5 times',
+    descriptionAr: 'تحدث مع حورس-بوت 5 مرات',
     icon: MessageCircle,
     color: 'bg-cyan-500',
-    checkUnlocked: () => false, // Would need chat tracking
+    checkUnlocked: (s) => s.chatCount >= 5,
+    getProgress: (s) => ({ current: Math.min(s.chatCount, 5), total: 5 }),
   },
   {
-    id: 'ticket-holder',
-    nameEn: 'Ticket Holder',
-    nameAr: 'حامل التذكرة',
-    descriptionEn: 'Purchase museum tickets',
-    descriptionAr: 'اشترِ تذاكر المتحف',
-    icon: Ticket,
+    id: 'streak-3',
+    nameEn: '3-Day Streak',
+    nameAr: 'سلسلة 3 أيام',
+    descriptionEn: 'Visit the app 3 days in a row',
+    descriptionAr: 'زُر التطبيق 3 أيام متتالية',
+    icon: Flame,
     color: 'bg-orange-500',
-    checkUnlocked: (s) => s.tickets.length > 0,
+    checkUnlocked: (s) => s.streakDays >= 3,
+    getProgress: (s) => ({ current: Math.min(s.streakDays, 3), total: 3 }),
   },
   {
     id: 'ar-explorer',
@@ -126,19 +135,25 @@ const achievements: Achievement[] = [
     descriptionAr: 'استخدم ميزة الواقع المعزز',
     icon: Camera,
     color: 'bg-rose-500',
-    checkUnlocked: () => false, // Would need AR tracking
+    checkUnlocked: (s) => s.arUsed,
   },
 ];
 
 export default function AchievementsScreen() {
   const { language, visitedExhibits, savedExhibits, tickets, quizCompleted, quizScore } = useApp();
+  const { user } = useAuth();
+  const { progress, favorites, isLoading } = useCloudSync();
 
+  // Merge local and cloud state (prefer cloud if logged in)
   const state = {
-    visitedExhibits,
-    savedExhibits,
-    quizCompleted: quizCompleted || false,
-    quizScore: quizScore || 0,
+    visitedExhibits: user && progress ? progress.visited_exhibits : visitedExhibits,
+    savedExhibits: user ? favorites : savedExhibits,
+    quizCompleted: user && progress ? progress.quiz_completed : (quizCompleted || false),
+    quizScore: user && progress ? progress.quiz_score : (quizScore || 0),
     tickets,
+    chatCount: progress?.chat_count || 0,
+    arUsed: progress?.ar_used || false,
+    streakDays: progress?.streak_days || 0,
   };
 
   const unlockedCount = achievements.filter(a => a.checkUnlocked(state)).length;
@@ -148,6 +163,13 @@ export default function AchievementsScreen() {
       <AppBar 
         title={language === 'ar' ? 'الإنجازات' : 'Achievements'} 
         showBack 
+        rightContent={
+          user && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Cloud className="w-4 h-4 text-success" />
+            </div>
+          )
+        }
       />
 
       <div className="p-4 space-y-6">
@@ -170,6 +192,16 @@ export default function AchievementsScreen() {
               style={{ width: `${(unlockedCount / achievements.length) * 100}%` }}
             />
           </div>
+
+          {/* Streak Badge */}
+          {state.streakDays > 0 && (
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 rounded-full">
+              <Flame className="w-5 h-5 text-orange-500" />
+              <span className="font-semibold text-orange-600">
+                {state.streakDays} {language === 'ar' ? 'يوم متتالي' : 'day streak'}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Achievements Grid */}
@@ -248,6 +280,15 @@ export default function AchievementsScreen() {
             : 'Explore the museum to unlock more achievements!'
           }
         </p>
+
+        {!user && (
+          <p className="text-center text-xs text-muted-foreground bg-muted/50 rounded-xl p-3">
+            {language === 'ar' 
+              ? 'سجل الدخول لحفظ إنجازاتك ومزامنتها'
+              : 'Sign in to save and sync your achievements'
+            }
+          </p>
+        )}
       </div>
     </PageContainer>
   );
