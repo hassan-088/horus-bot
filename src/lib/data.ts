@@ -12,6 +12,7 @@ export interface Exhibit {
   periodAr: string;
   galleryEn: string;
   galleryAr: string;
+  floor: 'ground' | 'floor-1' | 'floor-2';
   visited?: boolean;
 }
 
@@ -50,6 +51,7 @@ export const exhibits: Exhibit[] = [
     periodAr: 'المملكة الحديثة',
     galleryEn: 'Hall A',
     galleryAr: 'القاعة أ',
+    floor: 'ground',
     visited: true,
   },
   {
@@ -66,6 +68,7 @@ export const exhibits: Exhibit[] = [
     periodAr: 'العصر البطلمي',
     galleryEn: 'Hall B',
     galleryAr: 'القاعة ب',
+    floor: 'ground',
     visited: false,
   },
   {
@@ -80,8 +83,9 @@ export const exhibits: Exhibit[] = [
     originAr: 'مصر القديمة',
     periodEn: 'New Kingdom',
     periodAr: 'المملكة الحديثة',
-    galleryEn: 'Hall A',
-    galleryAr: 'القاعة أ',
+    galleryEn: 'Hall C',
+    galleryAr: 'القاعة ج',
+    floor: 'floor-1',
     visited: false,
   },
   {
@@ -96,8 +100,9 @@ export const exhibits: Exhibit[] = [
     originAr: 'مصر القديمة',
     periodEn: 'Middle Kingdom',
     periodAr: 'المملكة الوسطى',
-    galleryEn: 'Hall C',
-    galleryAr: 'القاعة ج',
+    galleryEn: 'Hall D',
+    galleryAr: 'القاعة د',
+    floor: 'floor-1',
     visited: true,
   },
   {
@@ -106,7 +111,7 @@ export const exhibits: Exhibit[] = [
     nameAr: 'بردية كتاب الموتى',
     descriptionEn: 'A rare and well-preserved section of the Book of the Dead, containing spells and instructions to help the deceased navigate the afterlife. The colorful illustrations show the journey through the underworld.',
     descriptionAr: 'قسم نادر ومحفوظ جيداً من كتاب الموتى، يحتوي على تعاويذ وتعليمات لمساعدة المتوفى في رحلته للآخرة.',
-    x: 500,
+    x: 280,
     y: 280,
     originEn: 'Ancient Egypt',
     originAr: 'مصر القديمة',
@@ -114,6 +119,7 @@ export const exhibits: Exhibit[] = [
     periodAr: 'المملكة الحديثة',
     galleryEn: 'Hall B',
     galleryAr: 'القاعة ب',
+    floor: 'floor-2',
     visited: false,
   },
 ];

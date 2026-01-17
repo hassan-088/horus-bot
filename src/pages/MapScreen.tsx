@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -41,12 +41,19 @@ export default function MapScreen() {
   // Touch support
   const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
 
+  // Filter exhibits by floor
+  const floorExhibits = useMemo(() => {
+    return exhibits.filter(e => e.floor === activeFloor);
+  }, [activeFloor]);
+
   // Auto-select exhibit from URL param
   useEffect(() => {
     const exhibitId = searchParams.get('exhibit');
     if (exhibitId) {
       const exhibit = exhibits.find(e => e.id === exhibitId);
       if (exhibit) {
+        // Switch to the exhibit's floor first
+        setActiveFloor(exhibit.floor);
         setSelectedExhibit(exhibit);
         // Center on the exhibit
         setPosition({
@@ -237,8 +244,8 @@ export default function MapScreen() {
             </span>
           </div>
 
-          {/* Exhibit Markers */}
-          {exhibits.map((exhibit, index) => {
+          {/* Exhibit Markers - filtered by floor */}
+          {floorExhibits.map((exhibit, index) => {
             const isVisited = visitedExhibits.includes(exhibit.id);
             const isSaved = savedExhibits.includes(exhibit.id);
             const isSelected = selectedExhibit?.id === exhibit.id;
