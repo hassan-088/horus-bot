@@ -13,6 +13,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCloudSync } from '@/hooks/useCloudSync';
 import { useShare } from '@/hooks/useShare';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -21,7 +23,9 @@ import { useNavigate } from 'react-router-dom';
 
 export default function QuizScreen() {
   const navigate = useNavigate();
-  const { language, completeQuiz } = useApp();
+  const { language, completeQuiz: completeQuizLocal } = useApp();
+  const { user } = useAuth();
+  const { completeQuiz: completeQuizCloud } = useCloudSync();
   const { shareQuizScore } = useShare();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -47,11 +51,14 @@ export default function QuizScreen() {
       setCurrentIndex((i) => i + 1);
       setSelectedAnswer(null);
     } else {
-      // Save quiz completion to context
+      // Save quiz completion to context and cloud
       const finalScore = selectedAnswer === question.correctAnswer 
         ? correctCount + 1 
         : correctCount;
-      completeQuiz(finalScore);
+      completeQuizLocal(finalScore);
+      if (user) {
+        completeQuizCloud(finalScore);
+      }
       setShowResult(true);
     }
   };

@@ -145,6 +145,10 @@ export const translations = {
     achievements: 'Achievements',
     events: 'Events',
     tourPlanner: 'Tour Planner',
+    profile: 'Profile',
+    visitHistory: 'Visit History',
+    signIn: 'Sign In',
+    signOut: 'Sign Out',
     
     // Map
     searchExhibits: 'Search exhibits...',
@@ -302,6 +306,10 @@ export const translations = {
     achievements: 'الإنجازات',
     events: 'الفعاليات',
     tourPlanner: 'خطط جولتك',
+    profile: 'الملف الشخصي',
+    visitHistory: 'سجل الزيارات',
+    signIn: 'تسجيل الدخول',
+    signOut: 'تسجيل الخروج',
     
     // Map
     searchExhibits: 'ابحث عن معروض...',

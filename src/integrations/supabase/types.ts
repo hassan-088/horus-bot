@@ -44,6 +44,93 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorites: {
+        Row: {
+          created_at: string
+          exhibit_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exhibit_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exhibit_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          ar_used: boolean | null
+          chat_count: number | null
+          created_at: string
+          id: string
+          last_visit_date: string | null
+          quiz_completed: boolean | null
+          quiz_score: number | null
+          streak_days: number | null
+          total_visits: number | null
+          updated_at: string
+          user_id: string
+          visited_exhibits: string[] | null
+        }
+        Insert: {
+          ar_used?: boolean | null
+          chat_count?: number | null
+          created_at?: string
+          id?: string
+          last_visit_date?: string | null
+          quiz_completed?: boolean | null
+          quiz_score?: number | null
+          streak_days?: number | null
+          total_visits?: number | null
+          updated_at?: string
+          user_id: string
+          visited_exhibits?: string[] | null
+        }
+        Update: {
+          ar_used?: boolean | null
+          chat_count?: number | null
+          created_at?: string
+          id?: string
+          last_visit_date?: string | null
+          quiz_completed?: boolean | null
+          quiz_score?: number | null
+          streak_days?: number | null
+          total_visits?: number | null
+          updated_at?: string
+          user_id?: string
+          visited_exhibits?: string[] | null
+        }
+        Relationships: []
+      }
+      visit_history: {
+        Row: {
+          exhibit_id: string
+          id: string
+          user_id: string
+          visited_at: string
+        }
+        Insert: {
+          exhibit_id: string
+          id?: string
+          user_id: string
+          visited_at?: string
+        }
+        Update: {
+          exhibit_id?: string
+          id?: string
+          user_id?: string
+          visited_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
