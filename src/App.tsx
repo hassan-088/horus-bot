@@ -4,10 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 
 import SplashScreen from "./pages/SplashScreen";
 import OnboardingScreen from "./pages/OnboardingScreen";
+import AuthScreen from "./pages/AuthScreen";
 import HomeScreen from "./pages/HomeScreen";
 import MapScreen from "./pages/MapScreen";
 import ExhibitsScreen from "./pages/ExhibitsScreen";
@@ -36,6 +38,7 @@ function AppRoutes() {
       <Routes location={location}>
         <Route path="/" element={<SplashScreen />} />
         <Route path="/onboarding" element={<OnboardingScreen />} />
+        <Route path="/auth" element={<AuthScreen />} />
         <Route path="/home" element={<HomeScreen />} />
         <Route path="/map" element={<MapScreen />} />
         <Route path="/exhibits" element={<ExhibitsScreen />} />
@@ -61,13 +64,15 @@ function AppRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </AppProvider>
   </QueryClientProvider>
 );
