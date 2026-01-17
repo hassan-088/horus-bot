@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Bookmark, Play, Pause, MapPin, Plus, Globe, Clock } from 'lucide-react';
+import { Bookmark, Play, Pause, MapPin, Plus, Globe, Clock, Share2 } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useShare } from '@/hooks/useShare';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -28,10 +29,16 @@ export default function ExhibitDetailsScreen() {
 
   const { language, savedExhibits, toggleSavedExhibit, isRTL } = useApp();
   const { toast } = useToast();
+  const { shareExhibit } = useShare();
   const [isPlaying, setIsPlaying] = useState(false);
 
   const isSaved = savedExhibits.includes(exhibit.id);
   const image = exhibitImages[exhibit.id] || gemImage;
+  const exhibitName = language === 'ar' ? exhibit.nameAr : exhibit.nameEn;
+
+  const handleShare = () => {
+    shareExhibit(exhibitName, exhibit.id);
+  };
 
   const handleBookmark = () => {
     const nowSaved = toggleSavedExhibit(exhibit.id);
@@ -81,16 +88,26 @@ export default function ExhibitDetailsScreen() {
             showBack
             className="bg-transparent border-0 p-0 h-auto"
             rightContent={
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleBookmark}
-                className="h-9 w-9 rounded-full bg-black/30 hover:bg-black/50 text-white"
-              >
-                <Bookmark
-                  className={cn('w-5 h-5', isSaved && 'fill-white')}
-                />
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleShare}
+                  className="h-9 w-9 rounded-full bg-black/30 hover:bg-black/50 text-white"
+                >
+                  <Share2 className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleBookmark}
+                  className="h-9 w-9 rounded-full bg-black/30 hover:bg-black/50 text-white"
+                >
+                  <Bookmark
+                    className={cn('w-5 h-5', isSaved && 'fill-white')}
+                  />
+                </Button>
+              </div>
             }
           />
         </div>
