@@ -21,6 +21,8 @@ import QRScanScreen from "./pages/QRScanScreen";
 import SettingsScreen from "./pages/SettingsScreen";
 import ARViewScreen from "./pages/ARViewScreen";
 import FeedbackScreen from "./pages/FeedbackScreen";
+import FavoritesScreen from "./pages/FavoritesScreen";
+import AchievementsScreen from "./pages/AchievementsScreen";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +48,8 @@ function AppRoutes() {
         <Route path="/settings" element={<SettingsScreen />} />
         <Route path="/ar_view" element={<ARViewScreen />} />
         <Route path="/feedback" element={<FeedbackScreen />} />
+        <Route path="/favorites" element={<FavoritesScreen />} />
+        <Route path="/achievements" element={<AchievementsScreen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </MainLayout>
