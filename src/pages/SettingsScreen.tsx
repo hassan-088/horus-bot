@@ -1,25 +1,101 @@
+import { useNavigate } from 'react-router-dom';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { t } from '@/lib/i18n';
-import { Eye, Type, Palette, Globe, Volume2, Hand } from 'lucide-react';
+import { Eye, Type, Palette, Globe, Volume2, Hand, User, LogOut, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function SettingsScreen() {
+  const navigate = useNavigate();
   const { language, setLanguage, themeMode, setThemeMode, highContrast, setHighContrast, fontScale, setFontScale, isRTL } = useApp();
+  const { user, profile, signOut } = useAuth();
+  
   const fontScaleValues = { sm: 0, md: 1, lg: 2, xl: 3 };
   const fontScaleKeys = ['sm', 'md', 'lg', 'xl'] as const;
   const fontScaleLabels = ['Small', 'Medium', 'Large', 'Extra Large'];
   const fontScaleLabelsAr = ['صغير', 'متوسط', 'كبير', 'كبير جداً'];
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success(language === 'ar' ? 'تم تسجيل الخروج' : 'Signed out successfully');
+  };
   
   return (
     <PageContainer>
       <AppBar title={t('settingsTitle', language)} showBack />
       
       <div className="p-4 space-y-6">
+        {/* Account Section */}
+        <div>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <User className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              {language === 'ar' ? 'الحساب' : 'Account'}
+            </h2>
+          </div>
+          
+          {user ? (
+            <div className="p-4 bg-card rounded-2xl shadow-soft space-y-4">
+              <div className={cn('flex items-center gap-3', isRTL && 'flex-row-reverse')}>
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    <User className="w-6 h-6 text-primary" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <span className="font-medium block">
+                    {profile?.display_name || user.email?.split('@')[0]}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{user.email}</span>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full gap-2" 
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4" />
+                {language === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}
+              </Button>
+            </div>
+          ) : (
+            <div className="p-4 bg-card rounded-2xl shadow-soft">
+              <div className={cn('flex items-center justify-between', isRTL && 'flex-row-reverse')}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <User className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <span className="font-medium block">
+                      {language === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {language === 'ar' ? 'احفظ تقدمك ومفضلاتك' : 'Save your progress & favorites'}
+                    </span>
+                  </div>
+                </div>
+                <Button 
+                  size="sm" 
+                  onClick={() => navigate('/auth')}
+                  className="gap-1"
+                >
+                  <LogIn className="w-4 h-4" />
+                  {language === 'ar' ? 'دخول' : 'Login'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Accessibility Section */}
         <div>
           <div className="flex items-center gap-2 mb-3 px-1">
