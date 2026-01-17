@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Bookmark, Play, Pause, MapPin, Plus, Globe, Clock, Share2 } from 'lucide-react';
+import { Bookmark, MapPin, Plus, Globe, Clock, Share2 } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
+import { AudioGuidePlayer } from '@/components/exhibits/AudioGuidePlayer';
 import { useToast } from '@/hooks/use-toast';
 import { useShare } from '@/hooks/useShare';
 import { useApp } from '@/contexts/AppContext';
@@ -14,7 +14,6 @@ import gemImage from '@/assets/gem.jpg';
 import exhibitGoldenMask from '@/assets/exhibit-golden-mask.jpg';
 import exhibitRosetta from '@/assets/exhibit-rosetta.jpg';
 import exhibitVase from '@/assets/exhibit-vase.jpg';
-
 
 const exhibitImages: Record<string, string> = {
   'golden-mask': exhibitGoldenMask,
@@ -31,11 +30,11 @@ export default function ExhibitDetailsScreen() {
   const { language, savedExhibits, toggleSavedExhibit, isRTL } = useApp();
   const { toast } = useToast();
   const { shareExhibit } = useShare();
-  const [isPlaying, setIsPlaying] = useState(false);
 
   const isSaved = savedExhibits.includes(exhibit.id);
   const image = exhibitImages[exhibit.id] || gemImage;
   const exhibitName = language === 'ar' ? exhibit.nameAr : exhibit.nameEn;
+  const description = language === 'ar' ? exhibit.descriptionAr : exhibit.descriptionEn;
 
   const handleShare = () => {
     shareExhibit(exhibitName, exhibit.id);
@@ -48,13 +47,6 @@ export default function ExhibitDetailsScreen() {
         ? t('addedToList', language)
         : t('removedFromList', language),
     });
-  };
-
-  const handlePlayAudio = () => {
-    setIsPlaying(!isPlaying);
-    if (!isPlaying) {
-      toast({ description: t('playingAudio', language) });
-    }
   };
 
   const handleAddToRoute = () => {
@@ -123,29 +115,11 @@ export default function ExhibitDetailsScreen() {
 
       {/* Content */}
       <div className="p-4 space-y-6 -mt-4 relative bg-background rounded-t-3xl">
-        {/* Audio Guide Card */}
-        <button
-          onClick={handlePlayAudio}
-          className="flex items-center gap-4 w-full p-4 bg-card rounded-2xl shadow-soft hover:shadow-card transition-shadow"
-        >
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-            {isPlaying ? (
-              <Pause className="w-6 h-6 text-primary" />
-            ) : (
-              <Play className="w-6 h-6 text-primary" />
-            )}
-          </div>
-          <div className={cn('flex-1', isRTL ? 'text-right' : 'text-left')}>
-            <h3 className="font-semibold">
-              {language === 'ar' ? 'الدليل الصوتي' : 'Audio Guide'}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {isPlaying
-                ? language === 'ar' ? 'يتم التشغيل...' : 'Playing...'
-                : language === 'ar' ? 'اضغط للاستماع' : 'Tap to listen'}
-            </p>
-          </div>
-        </button>
+        {/* Audio Guide Player */}
+        <AudioGuidePlayer 
+          text={description} 
+          lang={language} 
+        />
 
         {/* Fact Chips */}
         <div className="flex flex-wrap gap-2">

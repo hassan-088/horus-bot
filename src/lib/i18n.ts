@@ -144,6 +144,7 @@ export const translations = {
     favorites: 'Favorites',
     achievements: 'Achievements',
     events: 'Events',
+    tourPlanner: 'Tour Planner',
     
     // Map
     searchExhibits: 'Search exhibits...',
@@ -300,6 +301,7 @@ export const translations = {
     favorites: 'المفضلة',
     achievements: 'الإنجازات',
     events: 'الفعاليات',
+    tourPlanner: 'خطط جولتك',
     
     // Map
     searchExhibits: 'ابحث عن معروض...',

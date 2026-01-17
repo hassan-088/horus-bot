@@ -26,6 +26,7 @@ import FeedbackScreen from "./pages/FeedbackScreen";
 import FavoritesScreen from "./pages/FavoritesScreen";
 import AchievementsScreen from "./pages/AchievementsScreen";
 import EventsScreen from "./pages/EventsScreen";
+import TourPlannerScreen from "./pages/TourPlannerScreen";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ function AppRoutes() {
         <Route path="/favorites" element={<FavoritesScreen />} />
         <Route path="/achievements" element={<AchievementsScreen />} />
         <Route path="/events" element={<EventsScreen />} />
+        <Route path="/tour_planner" element={<TourPlannerScreen />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </MainLayout>
