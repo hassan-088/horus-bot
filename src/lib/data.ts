@@ -209,3 +209,82 @@ export const ticketPrices = {
   student: 100,
   child: 50,
 };
+
+// Events data
+export interface MuseumEvent {
+  id: string;
+  type: 'exhibition' | 'tour' | 'workshop';
+  titleEn: string;
+  titleAr: string;
+  descriptionEn: string;
+  descriptionAr: string;
+  date: string;
+  time: string;
+  locationEn: string;
+  locationAr: string;
+  featured?: boolean;
+}
+
+export const museumEvents: MuseumEvent[] = [
+  {
+    id: 'evt-1',
+    type: 'exhibition',
+    titleEn: 'Treasures of the Nile',
+    titleAr: 'كنوز النيل',
+    descriptionEn: 'A special exhibition featuring newly discovered artifacts from recent excavations along the Nile.',
+    descriptionAr: 'معرض خاص يضم قطعاً أثرية مكتشفة حديثاً من الحفريات على ضفاف النيل.',
+    date: '2026-02-15',
+    time: '10:00 AM - 6:00 PM',
+    locationEn: 'Hall D',
+    locationAr: 'القاعة د',
+    featured: true,
+  },
+  {
+    id: 'evt-2',
+    type: 'tour',
+    titleEn: 'Guided Tour: Royal Mummies',
+    titleAr: 'جولة إرشادية: المومياوات الملكية',
+    descriptionEn: 'Join our expert Egyptologist for an in-depth tour of the Royal Mummies collection.',
+    descriptionAr: 'انضم إلى عالم المصريات لجولة متعمقة في مجموعة المومياوات الملكية.',
+    date: '2026-01-20',
+    time: '2:00 PM',
+    locationEn: 'Hall B',
+    locationAr: 'القاعة ب',
+  },
+  {
+    id: 'evt-3',
+    type: 'workshop',
+    titleEn: 'Hieroglyphics Workshop',
+    titleAr: 'ورشة الهيروغليفية',
+    descriptionEn: 'Learn to read and write basic hieroglyphics in this hands-on workshop for all ages.',
+    descriptionAr: 'تعلم قراءة وكتابة الهيروغليفية الأساسية في ورشة عمل عملية لجميع الأعمار.',
+    date: '2026-01-25',
+    time: '11:00 AM',
+    locationEn: 'Education Center',
+    locationAr: 'مركز التعليم',
+  },
+  {
+    id: 'evt-4',
+    type: 'tour',
+    titleEn: 'Sunset Tour: Tutankhamun Gallery',
+    titleAr: 'جولة الغروب: معرض توت عنخ آمون',
+    descriptionEn: 'Experience the golden treasures of Tutankhamun in a special evening tour.',
+    descriptionAr: 'استمتع بكنوز توت عنخ آمون الذهبية في جولة مسائية خاصة.',
+    date: '2026-01-28',
+    time: '5:00 PM',
+    locationEn: 'Hall A',
+    locationAr: 'القاعة أ',
+  },
+  {
+    id: 'evt-5',
+    type: 'workshop',
+    titleEn: 'Mummy Wrapping Demo',
+    titleAr: 'عرض تحنيط المومياء',
+    descriptionEn: 'Watch a live demonstration of ancient mummification techniques.',
+    descriptionAr: 'شاهد عرضاً حياً لتقنيات التحنيط القديمة.',
+    date: '2026-02-01',
+    time: '3:00 PM',
+    locationEn: 'Hall C',
+    locationAr: 'القاعة ج',
+  },
+];

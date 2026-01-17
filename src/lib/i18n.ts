@@ -143,6 +143,7 @@ export const translations = {
     // Favorites & Achievements
     favorites: 'Favorites',
     achievements: 'Achievements',
+    events: 'Events',
   },
   ar: {
     // Navigation
@@ -286,6 +287,7 @@ export const translations = {
     // Favorites & Achievements
     favorites: 'المفضلة',
     achievements: 'الإنجازات',
+    events: 'الفعاليات',
   },
 } as const;
 

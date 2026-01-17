@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Map, Layers, Brain, Radio, MessageSquare, Globe, Trophy, Heart } from 'lucide-react';
+import { Map, Layers, Brain, Radio, MessageSquare, Globe, Trophy, Heart, Calendar } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,7 @@ import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import ankhImage from '@/assets/ankh.png';
 import gemImage from '@/assets/gem.jpg';
+import { RecommendationsSection } from '@/components/home/RecommendationsSection';
 
 const menuItems = [
   { icon: Map, labelKey: 'map' as const, path: '/map' },
@@ -35,6 +36,7 @@ const menuItems = [
 ];
 
 const settingsItems = [
+  { icon: Calendar, labelKey: 'events' as const, path: '/events' },
   { icon: Trophy, labelKey: 'achievements' as const, path: '/achievements' },
   { icon: Heart, labelKey: 'favorites' as const, path: '/favorites' },
   { icon: Globe, labelKey: 'language' as const, path: '/settings' },
@@ -356,6 +358,9 @@ export default function HomeScreen() {
               </div>
             </button>
           </div>
+
+          {/* Recommendations Section */}
+          <RecommendationsSection />
         </div>
       </PageContainer>
 

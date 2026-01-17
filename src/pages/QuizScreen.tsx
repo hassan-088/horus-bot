@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Check, X } from 'lucide-react';
+import { Check, X, Share2 } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
-
 import { Progress } from '@/components/ui/progress';
 import {
   Dialog,
@@ -14,6 +13,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useApp } from '@/contexts/AppContext';
+import { useShare } from '@/hooks/useShare';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { quizQuestions } from '@/lib/data';
@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 export default function QuizScreen() {
   const navigate = useNavigate();
   const { language, completeQuiz } = useApp();
+  const { shareQuizScore } = useShare();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
@@ -157,13 +158,23 @@ export default function QuizScreen() {
                 : `You got ${correctCount} out of ${quizQuestions.length}`}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex-row gap-2 sm:justify-center">
-            <Button variant="outline" onClick={handleRetry} className="flex-1">
-              {t('retry', language)}
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button 
+              variant="outline" 
+              onClick={() => shareQuizScore(correctCount, quizQuestions.length)} 
+              className="w-full"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              {language === 'ar' ? 'شارك النتيجة' : 'Share Score'}
             </Button>
-            <Button onClick={handleFinish} className="flex-1">
-              {t('finish', language)}
-            </Button>
+            <div className="flex gap-2 w-full">
+              <Button variant="outline" onClick={handleRetry} className="flex-1">
+                {t('retry', language)}
+              </Button>
+              <Button onClick={handleFinish} className="flex-1">
+                {t('finish', language)}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
