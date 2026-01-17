@@ -1,113 +1,216 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
-import { exhibits } from '@/lib/data';
+import { exhibits, Exhibit } from '@/lib/data';
+
+// Map components
+import { MapFloorPlan } from '@/components/map/MapFloorPlan';
+import { ExhibitMarker } from '@/components/map/ExhibitMarker';
+import { RobotMarker } from '@/components/map/RobotMarker';
+import { MapLegend } from '@/components/map/MapLegend';
+import { MapControls } from '@/components/map/MapControls';
+import { MapSearch } from '@/components/map/MapSearch';
+import { FloorSelector } from '@/components/map/FloorSelector';
+import { ExhibitPreview } from '@/components/map/ExhibitPreview';
+
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 2.5;
+const ROBOT_POS = { x: 200, y: 160 };
 
 export default function MapScreen() {
   const navigate = useNavigate();
-  const { language, visitedExhibits } = useApp();
+  const { language, visitedExhibits, savedExhibits } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Map state
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  
+  // UI state
+  const [selectedExhibit, setSelectedExhibit] = useState<Exhibit | null>(null);
+  const [activeFloor, setActiveFloor] = useState('ground');
+  const [selectedHall, setSelectedHall] = useState<string | undefined>();
 
-  // Robot position (animated)
-  const [robotPos] = useState({ x: 280, y: 180 });
+  // Touch support
+  const [lastTouchDistance, setLastTouchDistance] = useState<number | null>(null);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  // Mouse/touch handlers
+  const handleStart = useCallback((clientX: number, clientY: number) => {
     setIsDragging(true);
-    setStartPos({ x: e.clientX - position.x, y: e.clientY - position.y });
-  };
+    setStartPos({ x: clientX - position.x, y: clientY - position.y });
+  }, [position]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMove = useCallback((clientX: number, clientY: number) => {
     if (!isDragging) return;
     setPosition({
-      x: e.clientX - startPos.x,
-      y: e.clientY - startPos.y,
+      x: clientX - startPos.x,
+      y: clientY - startPos.y,
     });
+  }, [isDragging, startPos]);
+
+  const handleEnd = useCallback(() => {
+    setIsDragging(false);
+    setLastTouchDistance(null);
+  }, []);
+
+  // Mouse events
+  const handleMouseDown = (e: React.MouseEvent) => handleStart(e.clientX, e.clientY);
+  const handleMouseMove = (e: React.MouseEvent) => handleMove(e.clientX, e.clientY);
+  const handleMouseUp = () => handleEnd();
+
+  // Touch events
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    } else if (e.touches.length === 2) {
+      const distance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      setLastTouchDistance(distance);
+    }
   };
 
-  const handleMouseUp = () => setIsDragging(false);
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    } else if (e.touches.length === 2 && lastTouchDistance !== null) {
+      const distance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const delta = distance - lastTouchDistance;
+      const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale + delta * 0.005));
+      setScale(newScale);
+      setLastTouchDistance(distance);
+    }
+  };
 
-  const handleWheel = (e: React.WheelEvent) => {
+  const handleTouchEnd = () => handleEnd();
+
+  // Wheel zoom
+  const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
-    const newScale = Math.max(0.5, Math.min(2, scale - e.deltaY * 0.001));
+    const delta = -e.deltaY * 0.002;
+    const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale + delta));
     setScale(newScale);
+  }, [scale]);
+
+  // Control handlers
+  const handleZoomIn = () => setScale(Math.min(MAX_SCALE, scale + 0.25));
+  const handleZoomOut = () => setScale(Math.max(MIN_SCALE, scale - 0.25));
+  const handleReset = () => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+    setSelectedExhibit(null);
+  };
+  const handleLocate = () => {
+    // Center on robot position
+    setPosition({ x: 0, y: 0 });
+    setScale(1.5);
   };
 
-  const handleExhibitClick = (exhibitId: string) => {
-    navigate(`/exhibit_details?id=${exhibitId}`);
+  // Exhibit handlers
+  const handleExhibitClick = (exhibit: Exhibit) => {
+    setSelectedExhibit(exhibit);
+    // Determine which hall the exhibit is in based on gallery
+    const hall = exhibit.galleryEn.toLowerCase().replace(' ', '-');
+    setSelectedHall(hall);
+  };
+
+  const handleNavigateToExhibit = () => {
+    if (selectedExhibit) {
+      // Center map on exhibit
+      setPosition({
+        x: -(selectedExhibit.x - 200),
+        y: -(selectedExhibit.y - 200),
+      });
+      setScale(1.5);
+    }
+  };
+
+  const handleViewDetails = () => {
+    if (selectedExhibit) {
+      navigate(`/exhibit_details?id=${selectedExhibit.id}`);
+    }
+  };
+
+  const handleSearchSelect = (exhibit: Exhibit) => {
+    setSelectedExhibit(exhibit);
+    // Center on selected exhibit
+    setPosition({
+      x: -(exhibit.x - 200),
+      y: -(exhibit.y - 200),
+    });
+    setScale(1.5);
   };
 
   return (
     <PageContainer background="map">
       <AppBar title={t('museumMap', language)} showBack />
+      
+      {/* Search */}
+      <MapSearch language={language} onSelectExhibit={handleSearchSelect} />
+      
+      {/* Floor Selector */}
+      <FloorSelector 
+        language={language} 
+        activeFloor={activeFloor} 
+        onFloorChange={setActiveFloor} 
+      />
+      
+      {/* Map Controls */}
+      <MapControls
+        scale={scale}
+        minScale={MIN_SCALE}
+        maxScale={MAX_SCALE}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onReset={handleReset}
+        onLocate={handleLocate}
+      />
 
+      {/* Main Map Area */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-hidden p-4"
+        className="flex-1 overflow-hidden pt-32 pb-4 touch-none"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onWheel={handleWheel}
       >
         {/* Map Container */}
         <div
-          className="relative w-full h-[500px] mx-auto max-w-[600px] bg-map-container/90 border-2 border-border rounded-3xl shadow-card overflow-hidden cursor-grab active:cursor-grabbing"
+          className={cn(
+            'relative w-full h-[480px] mx-auto max-w-[460px]',
+            'bg-map-container/90 border-2 border-border rounded-3xl shadow-card overflow-hidden',
+            isDragging ? 'cursor-grabbing' : 'cursor-grab'
+          )}
           style={{
             transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
             transformOrigin: 'center',
+            transition: isDragging ? 'none' : 'transform 0.2s ease-out',
           }}
         >
-          {/* Grid Lines */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none">
-            {/* Horizontal grid lines */}
-            {Array.from({ length: 10 }).map((_, i) => (
-              <line
-                key={`h-${i}`}
-                x1="0"
-                y1={i * 50}
-                x2="100%"
-                y2={i * 50}
-                className="map-grid-line"
-              />
-            ))}
-            {/* Vertical grid lines */}
-            {Array.from({ length: 12 }).map((_, i) => (
-              <line
-                key={`v-${i}`}
-                x1={i * 50}
-                y1="0"
-                x2={i * 50}
-                y2="100%"
-                className="map-grid-line"
-              />
-            ))}
-            {/* Center lines */}
-            <line
-              x1="50%"
-              y1="0"
-              x2="50%"
-              y2="100%"
-              className="map-grid-center"
-            />
-            <line
-              x1="0"
-              y1="50%"
-              x2="100%"
-              y2="50%"
-              className="map-grid-center"
-            />
-          </svg>
-
+          {/* Floor Plan */}
+          <MapFloorPlan 
+            language={language} 
+            selectedHall={selectedHall}
+            onHallSelect={setSelectedHall}
+          />
+          
           {/* Entrance Label */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary/10 rounded-full">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary/10 rounded-full z-20">
             <span className="text-xs font-semibold text-primary">
               {t('entrance', language)}
             </span>
@@ -116,80 +219,43 @@ export default function MapScreen() {
           {/* Exhibit Markers */}
           {exhibits.map((exhibit, index) => {
             const isVisited = visitedExhibits.includes(exhibit.id);
+            const isSaved = savedExhibits.includes(exhibit.id);
+            const isSelected = selectedExhibit?.id === exhibit.id;
+            
             return (
-              <button
+              <ExhibitMarker
                 key={exhibit.id}
-                onClick={() => handleExhibitClick(exhibit.id)}
-                className={`absolute flex flex-col items-center group opacity-0 animate-pop-in`}
-                style={{ 
-                  left: exhibit.x, 
-                  top: exhibit.y,
-                  animationDelay: `${index * 100}ms`,
-                  animationFillMode: 'forwards'
-                }}
-              >
-                <div
-                  className={cn(
-                    'w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-150 group-hover:shadow-lg',
-                    isVisited ? 'bg-teal hover-glow' : 'bg-muted-foreground'
-                  )}
-                >
-                  <div className="w-2 h-2 bg-white rounded-full transition-transform duration-300 group-hover:scale-110" />
-                </div>
-                <span className="mt-1 text-2xs font-medium text-foreground/80 whitespace-nowrap transition-all duration-300 group-hover:text-primary group-hover:font-semibold">
-                  {language === 'ar' ? exhibit.nameAr.slice(0, 15) : exhibit.nameEn.slice(0, 15)}
-                  {(exhibit.nameEn.length > 15 || exhibit.nameAr.length > 15) && '...'}
-                </span>
-              </button>
+                exhibit={exhibit}
+                language={language}
+                isVisited={isVisited}
+                isSaved={isSaved}
+                isSelected={isSelected}
+                isOnRoute={false}
+                onClick={() => handleExhibitClick(exhibit)}
+                animationDelay={index * 80}
+              />
             );
           })}
 
           {/* Robot Marker */}
-          <div
-            className="absolute flex flex-col items-center"
-            style={{ left: robotPos.x, top: robotPos.y }}
-          >
-            {/* Explaining bubble */}
-            <div className="absolute -top-8 px-2 py-1 bg-primary/20 rounded-full whitespace-nowrap">
-              <span className="text-2xs font-medium text-primary">
-                {t('explaining', language)}
-              </span>
-            </div>
-            
-            {/* Pulsing rings */}
-            <div className="absolute w-10 h-10 rounded-full border-2 border-warning/50 animate-pulse-ring" />
-            <div className="absolute w-10 h-10 rounded-full border-2 border-warning/30 animate-pulse-ring animation-delay-500" />
-            
-            {/* Robot dot */}
-            <div className="relative w-4 h-4 rounded-full bg-primary shadow-lg z-10">
-              <div className="absolute inset-1 rounded-full bg-white" />
-            </div>
-          </div>
+          <RobotMarker x={ROBOT_POS.x} y={ROBOT_POS.y} language={language} />
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="fixed bottom-24 left-4 glass rounded-2xl p-3 shadow-card animate-slide-up-fade">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 group cursor-default">
-            <div className="w-3 h-3 rounded-full bg-primary transition-transform duration-200 group-hover:scale-125" />
-            <span className="text-xs transition-colors duration-200 group-hover:text-primary">{t('robotLocation', language)}</span>
-          </div>
-          <div className="flex items-center gap-2 group cursor-default">
-            <div className="w-3 h-3 rounded-full bg-destructive transition-transform duration-200 group-hover:scale-125" />
-            <span className="text-xs transition-colors duration-200 group-hover:text-destructive">{t('yourLocation', language)}</span>
-          </div>
-          <div className="flex items-center gap-2 group cursor-default">
-            <div className="w-3 h-3 rounded-full bg-teal transition-transform duration-200 group-hover:scale-125" />
-            <span className="text-xs transition-colors duration-200 group-hover:text-teal">{t('visitedExhibit', language)}</span>
-          </div>
-          <div className="flex items-center gap-2 group cursor-default">
-            <div className="w-3 h-3 rounded-full bg-muted-foreground transition-transform duration-200 group-hover:scale-125" />
-            <span className="text-xs">{t('notVisited', language)}</span>
-          </div>
-        </div>
-      </div>
+      {/* Legend (hide when preview is open) */}
+      {!selectedExhibit && <MapLegend language={language} />}
+
+      {/* Exhibit Preview */}
+      {selectedExhibit && (
+        <ExhibitPreview
+          exhibit={selectedExhibit}
+          language={language}
+          isVisited={visitedExhibits.includes(selectedExhibit.id)}
+          onClose={() => setSelectedExhibit(null)}
+          onNavigate={handleNavigateToExhibit}
+          onViewDetails={handleViewDetails}
+        />
+      )}
     </PageContainer>
   );
 }
-
