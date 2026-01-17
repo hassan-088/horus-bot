@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Bookmark, Play, Pause, MapPin, Plus, Globe, Clock, Share2 } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
@@ -24,6 +24,7 @@ const exhibitImages: Record<string, string> = {
 
 export default function ExhibitDetailsScreen() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const exhibitId = searchParams.get('id') || exhibits[0].id;
   const exhibit = exhibits.find((e) => e.id === exhibitId) || exhibits[0];
 
@@ -61,7 +62,7 @@ export default function ExhibitDetailsScreen() {
   };
 
   const handleViewOnMap = () => {
-    toast({ description: t('openingMap', language) });
+    navigate(`/map?exhibit=${exhibit.id}`);
   };
 
   const facts = [
