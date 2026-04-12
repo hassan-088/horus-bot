@@ -220,8 +220,8 @@ export default function MapScreen() {
         {/* Map Container */}
         <div
           className={cn(
-            'relative w-full h-[480px] mx-auto max-w-[460px]',
-            'bg-map-container/90 border-2 border-border rounded-3xl shadow-card overflow-hidden',
+            'relative w-full h-[500px] mx-auto max-w-[600px]',
+            'bg-card/90 border-2 border-border rounded-3xl shadow-card overflow-hidden',
             isDragging ? 'cursor-grabbing' : 'cursor-grab'
           )}
           style={{
@@ -237,12 +237,8 @@ export default function MapScreen() {
             onHallSelect={setSelectedHall}
           />
           
-          {/* Entrance Label */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary/10 rounded-full z-20">
-            <span className="text-xs font-semibold text-primary">
-              {t('entrance', language)}
-            </span>
-          </div>
+          
+          {/* Map image already includes entrance labels */}
 
           {/* Exhibit Markers - filtered by floor */}
           {floorExhibits.map((exhibit, index) => {

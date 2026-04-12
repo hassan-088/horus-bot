@@ -14,7 +14,7 @@ export function useAudioGuide({ text, lang = 'en', rate = 0.9, pitch = 1 }: UseA
   const [isSupported, setIsSupported] = useState(true);
   
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     setIsSupported('speechSynthesis' in window);
