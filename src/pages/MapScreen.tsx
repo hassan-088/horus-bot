@@ -220,8 +220,8 @@ export default function MapScreen() {
         {/* Map Container */}
         <div
           className={cn(
-            'relative w-full h-[480px] mx-auto max-w-[460px]',
-            'bg-map-container/90 border-2 border-border rounded-3xl shadow-card overflow-hidden',
+            'relative w-full h-[500px] mx-auto max-w-[600px]',
+            'bg-card/90 border-2 border-border rounded-3xl shadow-card overflow-hidden',
             isDragging ? 'cursor-grabbing' : 'cursor-grab'
           )}
           style={{
