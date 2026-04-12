@@ -237,12 +237,8 @@ export default function MapScreen() {
             onHallSelect={setSelectedHall}
           />
           
-          {/* Entrance Label */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary/10 rounded-full z-20">
-            <span className="text-xs font-semibold text-primary">
-              {t('entrance', language)}
-            </span>
-          </div>
+          
+          {/* Map image already includes entrance labels */}
 
           {/* Exhibit Markers - filtered by floor */}
           {floorExhibits.map((exhibit, index) => {
