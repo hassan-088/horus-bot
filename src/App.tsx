@@ -8,6 +8,13 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 
 import SplashScreen from "./pages/SplashScreen";
+import HomePage from "./pages/site/HomePage";
+import AboutPage from "./pages/site/AboutPage";
+import ExperiencePage from "./pages/site/ExperiencePage";
+import TicketsInfoPage from "./pages/site/TicketsInfoPage";
+import AppPage from "./pages/site/AppPage";
+import FaqPage from "./pages/site/FaqPage";
+import ContactPage from "./pages/site/ContactPage";
 import OnboardingScreen from "./pages/OnboardingScreen";
 import AuthScreen from "./pages/AuthScreen";
 import HomeScreen from "./pages/HomeScreen";
@@ -39,7 +46,16 @@ function AppRoutes() {
   return (
     <MainLayout key={location.pathname}>
       <Routes location={location}>
-        <Route path="/" element={<SplashScreen />} />
+        {/* Public marketing site */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/experience" element={<ExperiencePage />} />
+        <Route path="/tickets-info" element={<TicketsInfoPage />} />
+        <Route path="/app" element={<AppPage />} />
+        <Route path="/faq" element={<FaqPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        {/* App */}
+        <Route path="/launch" element={<SplashScreen />} />
         <Route path="/onboarding" element={<OnboardingScreen />} />
         <Route path="/auth" element={<AuthScreen />} />
         <Route path="/home" element={<HomeScreen />} />

@@ -2,6 +2,8 @@ import { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { BottomNav } from './BottomNav';
 import { FloatingChatButton } from '@/components/chat/FloatingChatButton';
+import { SiteHeader } from '@/components/site/SiteHeader';
+import { SiteFooter } from '@/components/site/SiteFooter';
 import { cn } from '@/lib/utils';
 
 interface MainLayoutProps {
@@ -11,32 +13,36 @@ interface MainLayoutProps {
   className?: string;
 }
 
-// Pages that should NOT show bottom navigation
-const noNavPages = ['/', '/onboarding', '/ar_view'];
+// Public marketing site routes — show SiteHeader/SiteFooter, hide app nav/chat
+const publicRoutes = ['/', '/about', '/experience', '/tickets-info', '/app', '/faq', '/contact'];
 
-// Pages that should NOT show the chat button
-const noChatPages = ['/', '/onboarding', '/ar_view', '/qr_scan'];
+// App-only pages that should NOT show bottom navigation
+const noNavPages = ['/launch', '/onboarding', '/ar_view'];
+
+// App-only pages that should NOT show the chat button
+const noChatPages = ['/launch', '/onboarding', '/ar_view', '/qr_scan'];
 
 export function MainLayout({ children, hideNav, hideChat, className }: MainLayoutProps) {
   const location = useLocation();
-  
+  const isPublic = publicRoutes.includes(location.pathname);
+
+  if (isPublic) {
+    return (
+      <div className={cn('relative min-h-screen flex flex-col bg-background', className)}>
+        <SiteHeader />
+        <main className="flex-1 animate-page-enter">{children}</main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   const shouldShowNav = !hideNav && !noNavPages.includes(location.pathname);
   const shouldShowChat = !hideChat && !noChatPages.includes(location.pathname);
 
   return (
     <div className={cn('relative min-h-screen', className)}>
-      {/* Page Content */}
-      <div className={cn(
-        'animate-page-enter',
-        shouldShowNav && 'pb-20'
-      )}>
-        {children}
-      </div>
-
-      {/* Floating Chat Button - positioned above nav */}
+      <div className={cn('animate-page-enter', shouldShowNav && 'pb-20')}>{children}</div>
       {shouldShowChat && <FloatingChatButton />}
-
-      {/* Bottom Navigation - fixed at bottom */}
       {shouldShowNav && <BottomNav />}
     </div>
   );
