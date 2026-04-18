@@ -1,11 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Museum context for the AI
 const SYSTEM_PROMPT = `You are Horus-Bot (حورس-بوت), a friendly and knowledgeable AI museum guide for the Egyptian Museum. You help visitors with:
 
 - Information about exhibits (Golden Mask of Tutankhamun in Hall A, Rosetta Stone Replica in Hall B, Ceremonial Vase, Sacred Scarab Amulet, Book of the Dead Papyrus)
@@ -25,14 +25,61 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    // --- Authentication ---
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    console.log("Calling AI gateway with messages:", JSON.stringify(messages));
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: authError } = await supabase.auth.getClaims(token);
+    if (authError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Invalid authentication" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // --- Input validation ---
+    const body = await req.json().catch(() => null);
+    if (!body || !Array.isArray(body.messages) || body.messages.length === 0 || body.messages.length > 20) {
+      return new Response(
+        JSON.stringify({ error: "Invalid messages format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const sanitized = body.messages
+      .filter((m: any) => m && typeof m === "object" && typeof m.content === "string")
+      .map((m: any) => ({
+        role: ["user", "assistant", "system"].includes(m.role) ? m.role : "user",
+        content: String(m.content).slice(0, 2000),
+      }));
+
+    if (sanitized.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Invalid messages format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "Service unavailable" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -44,7 +91,7 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
+          ...sanitized,
         ],
         max_tokens: 300,
         temperature: 0.7,
@@ -54,7 +101,7 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      
+
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Too many requests. Please try again in a moment." }),
@@ -67,7 +114,7 @@ serve(async (req) => {
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      
+
       return new Response(
         JSON.stringify({ error: "Failed to get response from AI" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -75,10 +122,8 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log("AI response received:", JSON.stringify(data));
-    
     const content = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that. Please try again.";
-    
+
     return new Response(
       JSON.stringify({ response: content }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -86,7 +131,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("Chat function error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error occurred" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
