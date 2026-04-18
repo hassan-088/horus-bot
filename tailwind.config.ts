@@ -78,7 +78,7 @@ export default {
   		},
   		fontFamily: {
   			sans: [
-  				'Work Sans',
+  				'Inter',
   				'ui-sans-serif',
   				'system-ui',
   				'-apple-system',
@@ -87,11 +87,10 @@ export default {
   				'Roboto',
   				'Helvetica Neue',
   				'Arial',
-  				'Noto Sans',
   				'sans-serif'
   			],
   			serif: [
-  				'Lora',
+  				'Cinzel',
   				'ui-serif',
   				'Georgia',
   				'Cambria',
@@ -99,6 +98,8 @@ export default {
   				'Times',
   				'serif'
   			],
+  			'heading-ar': ['Amiri', 'Cinzel', 'serif'],
+  			'body-ar': ['Noto Sans Arabic', 'Inter', 'sans-serif'],
   			mono: [
   				'Inconsolata',
   				'ui-monospace',
@@ -112,12 +113,9 @@ export default {
   			]
   		},
   		fontSize: {
-  			'2xs': [
-  				'0.625rem',
-  				{
-  					lineHeight: '0.875rem'
-  				}
-  			]
+  			'2xs': ['0.625rem', { lineHeight: '0.875rem' }],
+  			'hero': ['2.75rem', { lineHeight: '1.1', letterSpacing: '0.02em' }],
+  			'section': ['0.8125rem', { lineHeight: '1.1', letterSpacing: '0.08em' }]
   		},
   		spacing: {
   			'18': '4.5rem',
