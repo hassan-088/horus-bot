@@ -206,6 +206,49 @@
 }
 
 @layer utilities {
+  /* Editorial section label — uppercase gold */
+  .section-label {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: hsl(var(--primary));
+  }
+
+  [dir="rtl"] .section-label {
+    font-family: 'Amiri', 'Cinzel', serif;
+    letter-spacing: 0;
+  }
+
+  .text-hero {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+  }
+
+  [dir="rtl"] .text-hero {
+    font-family: 'Amiri', 'Cinzel', serif;
+    letter-spacing: 0;
+  }
+
+  /* Cinematic radial wash — gold glow over dark */
+  .bg-cinematic-hero {
+    background:
+      radial-gradient(ellipse at 50% 20%, hsl(41 70% 65% / 0.18) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, hsl(41 70% 65% / 0.08) 0%, transparent 50%),
+      hsl(var(--background));
+  }
+
+  .gold-border {
+    border: 1px solid hsl(var(--primary) / 0.3);
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 30px hsl(var(--primary) / 0.25);
+  }
+
   /* Glass morphism effect */
   .glass {
     background: hsl(var(--glass-bg));
