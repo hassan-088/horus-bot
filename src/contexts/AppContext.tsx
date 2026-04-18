@@ -37,7 +37,7 @@ interface AppContextType extends AppState {
 
 const defaultState: AppState = {
   language: 'en',
-  themeMode: 'light',
+  themeMode: 'dark',
   highContrast: false,
   fontScale: 'md',
   onboardingCompleted: false,
