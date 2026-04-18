@@ -33,7 +33,7 @@ export function AppBar({
 
   return (
     <header className={cn(
-      'sticky top-0 z-30 flex items-center justify-between h-14 px-4 bg-card/95 backdrop-blur-sm border-b border-border',
+      'sticky top-0 z-30 flex items-center justify-between h-14 px-4 bg-sidebar/95 backdrop-blur-md border-b border-white/5',
       className
     )}>
       <div className="flex items-center gap-2">
@@ -58,7 +58,7 @@ export function AppBar({
           </Button>
         )}
         {leftIcon}
-        <h1 className="text-lg font-semibold truncate">{title}</h1>
+        <h1 className="text-lg font-serif font-semibold truncate tracking-wide">{title}</h1>
       </div>
       
       <div className="flex items-center gap-1">

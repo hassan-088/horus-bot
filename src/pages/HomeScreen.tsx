@@ -298,34 +298,45 @@ export default function HomeScreen() {
             }
           />
 
-          {/* Hero Section */}
+          {/* Cinematic Hero */}
           <div className="px-4 py-6">
             <div
-              className="relative h-48 rounded-3xl overflow-hidden shadow-card cursor-pointer group hover-lift"
+              className="relative h-64 rounded-3xl overflow-hidden shadow-2xl cursor-pointer group hover-lift gold-border"
               onClick={() => navigate('/map')}
             >
               <img
                 src={gemImage}
-                alt="Museum"
+                alt="The Grand Egyptian Museum"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/70" />
-              <div className="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover:translate-y-[-2px]">
-                <h2 className="text-white text-xl font-bold">
+              {/* Cinematic dark + gold gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.25),transparent_60%)]" />
+
+              <div className="absolute bottom-5 left-5 right-5 transition-transform duration-300 group-hover:translate-y-[-2px]">
+                <span className="section-label mb-2">
+                  {language === 'ar' ? 'تجربة المتحف' : 'Museum Experience'}
+                </span>
+                <h2 className="text-hero text-foreground mt-2 font-serif">
                   {language === 'ar' ? 'استكشف المتحف' : 'Explore the Museum'}
                 </h2>
-                <p className="text-white/80 text-sm mt-1">
-                  {language === 'ar' ? 'اكتشف القطع الأثرية الرائعة' : 'Discover amazing artifacts'}
+                <p className="text-muted-foreground text-sm mt-2 max-w-xs">
+                  {language === 'ar' ? 'اكتشف القطع الأثرية الرائعة بصحبة حورس-بوت' : 'Discover timeless artifacts with Horus-Bot at your side'}
                 </p>
               </div>
-              {/* Animated arrow indicator */}
-              <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+            </div>
+
+            {/* Editorial CTAs */}
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <Button onClick={() => navigate('/tickets')} className="w-full">
+                {language === 'ar' ? 'احجز التذاكر' : 'Book Tickets'}
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/map')} className="w-full">
+                {language === 'ar' ? 'استكشف الخريطة' : 'Explore Map'}
+              </Button>
             </div>
           </div>
+
 
           {/* Quick Actions Grid */}
           <div className="px-4 pb-6">

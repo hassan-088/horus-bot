@@ -31,10 +31,13 @@ export default function SplashScreen() {
       {/* Gradient Overlay */}
       <div className="absolute inset-0 gradient-dark-overlay" />
 
+      {/* Gold radial wash */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.25),transparent_60%)]" />
+
       {/* Content */}
       <div className="relative z-10 text-center px-8 animate-fade-in-scale">
-        <h1 className="font-serif text-white">
-          <span className="block text-3xl opacity-90 mb-1">
+        <h1 className="font-serif text-foreground">
+          <span className="block text-3xl opacity-90 mb-1 tracking-widest uppercase text-primary">
             {t('the', language)}
           </span>
           <span className="block text-5xl font-bold mb-1">
@@ -45,7 +48,7 @@ export default function SplashScreen() {
           </span>
         </h1>
         
-        <p className="mt-6 text-white/70 text-lg max-w-xs mx-auto leading-relaxed">
+        <p className="mt-6 text-muted-foreground text-lg max-w-xs mx-auto leading-relaxed">
           {t('splashTagline', language)}
         </p>
       </div>
