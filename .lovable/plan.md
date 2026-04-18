@@ -1,63 +1,72 @@
 
-The user wants to rebrand the website to match a premium "cinematic museum" theme from their mobile app: dark charcoal + warm gold (#E6C068), Cinzel serif headings, Inter body, Amiri/Noto Sans Arabic for RTL. I'll align the global design system without rewriting every page — most components already consume CSS variables and Tailwind tokens, so updating those tokens will cascade brand-wide.
+The user wants to restructure the project so the **website** becomes a pre-visit marketing site (Home, About, Experience, Tickets, App, FAQ, Contact) while keeping the existing **app** experience intact for in-museum use. Same cinematic gold/dark brand, but spacious and editorial.
 
-## Plan: Adopt Cinematic Museum Theme
+## Plan: Build Pre-Visit Marketing Website
 
-### 1. Update design tokens (`src/index.css`)
-Replace existing HSL design variables with the cinematic palette:
-- `--background`: `#0F0F0F`, `--card`: `#1E1E1E`, `--popover`: `#262626`, `--secondary/section`: `#151515`
-- `--primary`: gold `#E6C068` with dark ink foreground `#1E1912`
-- `--foreground`: `#F5F1E8`, `--muted-foreground`: `rgba(255,255,255,0.58)`
-- `--border`: `rgba(255,255,255,0.05)`, `--destructive`: `#E54848`
-- Update `--home-bg`, `--map-bg`, `--map-container`, `--teal`, `--success`, `--warning` to harmonize with gold/dark
-- Update light theme to use warm museum surfaces (`#F7F2E8`, `#ECE7DD`)
-- Set default app to **dark mode** (museum cinematic feel) — add `class="dark"` on `<html>` in `index.html` or via root effect
-- Add gold-glow shadow tokens (`--shadow-glow`, `--shadow-card`)
-- Add radial-gradient + dark-overlay utility classes for hero sections
+### Architecture decision
+Split routing into two zones:
+- **Public website** (`/`, `/about`, `/experience`, `/tickets-info`, `/app`, `/faq`, `/contact`) — marketing, no bottom nav, no chat button, with a top **SiteHeader** + **SiteFooter**
+- **App** (existing `/home`, `/map`, `/exhibits`, etc.) — unchanged, keeps `MainLayout` with bottom nav + chat
 
-### 2. Update typography (`src/index.css` + `tailwind.config.ts` + `index.html`)
-- Add Google Fonts links in `index.html`: Cinzel, Inter, Amiri, Noto Sans Arabic
-- Replace `tailwind.config.ts` font families:
-  - `serif` → Cinzel (headings)
-  - `sans` → Inter (body)
-  - Add `font-heading-ar` (Amiri) and `font-body-ar` (Noto Sans Arabic)
-- Add base CSS rule: `[dir="rtl"]` switches font stacks to Arabic equivalents
-- Update body default to Inter; headings (`h1-h3`, `.font-serif`) to Cinzel with appropriate letter-spacing
-- Add font-size utilities: `text-hero` (44px/1.1), `text-section` (13px uppercase, 0.8px tracking)
+Update `MainLayout` to detect public routes and show `SiteHeader`/`SiteFooter` instead of bottom nav/chat. The existing `SplashScreen` at `/` becomes the new marketing **Home** page (or moves to `/launch`).
 
-### 3. Refine shared components for editorial feel
-- **Button** (`src/components/ui/button.tsx`): bump default size to height 52px, radius 16px, add gold-glow hover; primary uses gold bg + dark ink
-- **Card** (`src/components/ui/card.tsx`): default radius 24px, subtle 1px white/5% border, `shadow-card`; add `glass` variant (backdrop-blur + translucent dark)
-- **Input** (`src/components/ui/input.tsx`): rounded-2xl, dark fill `white/5`, gold focus ring
+### New components
+- `src/components/site/SiteHeader.tsx` — sticky dark nav: logo (Horus-Bot), links (Home/About/Experience/Tickets/App/FAQ/Contact), language toggle, "Book Tickets" gold CTA, "Open App" outline link → `/home`
+- `src/components/site/SiteFooter.tsx` — dark grounded footer: brand blurb, nav columns, contact, socials, legal
+- `src/components/site/SectionHero.tsx` — reusable cinematic hero band (radial gold wash, serif headline, subhead, CTAs)
+- `src/components/site/FeatureCard.tsx` — editorial card with icon, gold title, body
+- `src/components/site/StepCard.tsx` — numbered step with gold accent
 
-### 4. Hero & landing polish
-- **SplashScreen**: keep, but swap headline font to Cinzel and add gold radial wash overlay
-- **HomeScreen**: introduce cinematic dark hero band with gold serif headline, supportive muted subtitle, prominent "Book Tickets" (gold) + "Download App" (outline) CTAs; add editorial section chips (uppercase gold labels: "MISSION", "ROBOT", "TICKETS")
-- Add reusable `<SectionLabel>` component (uppercase, 13px, gold, 0.8px tracking) for editorial section headers
+### New pages (`src/pages/site/`)
+1. **`HomePage.tsx`** (`/`) — Hero (Book Tickets / Download App) → "What is this experience?" (4 features) → "How it works" (4 steps) → Experience Highlights (4 cards) → App Preview mockup → Final CTA → Footer
+2. **`AboutPage.tsx`** (`/about`) — Mission, Vision, The Idea (problem/solution), Team, Technology
+3. **`ExperiencePage.tsx`** (`/experience`) — Before Visit, At the Museum, During the Tour, Engagement (quizzes/rewards), Accessibility
+4. **`TicketsInfoPage.tsx`** (`/tickets-info`) — Marketing-style ticket options with prices, date/time picker preview, then redirects to actual booking flow at `/tickets` (existing)
+5. **`AppPage.tsx`** (`/app`) — What it does, key features, screenshots placeholder, App Store / Google Play buttons
+6. **`FaqPage.tsx`** (`/faq`) — Accordion of common questions
+7. **`ContactPage.tsx`** (`/contact`) — Email, phone, location, contact form (zod-validated)
 
-### 5. Navigation surfaces
-- **AppBar / BottomNav**: use `--color-nav` (`#141414`), gold active states, refined line icons
-- **Side menu** (in HomeScreen): dark glass panel with gold title accents
+### Routing changes (`src/App.tsx`)
+- `/` → new `HomePage` (marketing). Move splash to `/launch` or remove
+- Add public routes above app routes
+- Keep all existing app routes untouched
+- App entry from website: header "Open App" → `/home` (or `/onboarding` if first visit)
 
-### 6. RTL parity
-- Confirm `AppContext` toggles `dir="rtl"` on `<html>`; CSS rule swaps to Amiri/Noto Sans Arabic automatically
-- Audit any hardcoded `text-left`/`ml-*` usages in shared components — replace with logical `text-start`/`ms-*` where it matters
+### Layout changes (`src/components/layout/MainLayout.tsx`)
+- Add `publicRoutes` list. On public routes: render `<SiteHeader/>` + children + `<SiteFooter/>`, hide bottom nav and chat
+- On app routes: existing behavior
 
-### Out of scope (can follow up)
-- Rewriting every individual screen's layout (Tickets, Events, etc.) — they will inherit the new tokens automatically
-- New marketing pages (Mission/Team/Technology) — propose as separate task if desired
+### i18n
+- Add EN + AR strings for all new website copy in `src/lib/i18n.ts` (nav links, hero copy, section titles, FAQ, footer)
+- Header language toggle uses existing `AppContext`
+
+### Design alignment (already in place from prior work)
+- Reuse `SectionLabel`, `Card`, `Button`, cinematic tokens
+- More generous spacing on website (`py-24`, `gap-16`) vs app's compact rhythm
+- Larger hero typography (`text-hero` 44px, scale up to 64px on desktop)
+
+### Out of scope (separate follow-ups)
+- Real payment integration on Tickets page (existing checkout stays)
+- Blog/Partners pages (mentioned as optional)
+- Real team photos / app screenshots — placeholders for now
+- Email sending for contact form — form validates + shows toast; backend wiring later
+
+### Files to create
+- `src/components/site/SiteHeader.tsx`
+- `src/components/site/SiteFooter.tsx`
+- `src/components/site/SectionHero.tsx`
+- `src/components/site/FeatureCard.tsx`
+- `src/components/site/StepCard.tsx`
+- `src/pages/site/HomePage.tsx`
+- `src/pages/site/AboutPage.tsx`
+- `src/pages/site/ExperiencePage.tsx`
+- `src/pages/site/TicketsInfoPage.tsx`
+- `src/pages/site/AppPage.tsx`
+- `src/pages/site/FaqPage.tsx`
+- `src/pages/site/ContactPage.tsx`
 
 ### Files to edit
-- `src/index.css` (tokens, base typography, utilities)
-- `tailwind.config.ts` (fonts, colors, font sizes, shadows, radii)
-- `index.html` (Google Fonts, default dark class)
-- `src/components/ui/button.tsx`
-- `src/components/ui/card.tsx`
-- `src/components/ui/input.tsx`
-- `src/pages/HomeScreen.tsx` (hero band + CTAs)
-- `src/pages/SplashScreen.tsx` (font swap)
-- `src/components/layout/AppBar.tsx` + `BottomNav.tsx` (nav surface)
-- New: `src/components/ui/section-label.tsx`
-
-### Memory updates
-Save the new cinematic palette, fonts, and shadow tokens to `mem://style/design-system` so future work stays on-brand.
+- `src/App.tsx` (new routes)
+- `src/components/layout/MainLayout.tsx` (public vs app layout switching)
+- `src/lib/i18n.ts` (new EN/AR strings)
+- `src/pages/SplashScreen.tsx` (move to `/launch` or repurpose)
