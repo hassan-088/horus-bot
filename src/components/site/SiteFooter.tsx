@@ -18,8 +18,8 @@ export function SiteFooter() {
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isRTL
-                ? 'تجربة متحفية ذكية تجمع بين الروبوت والذكاء الاصطناعي.'
-                : 'A premium museum experience powered by AI and robotics.'}
+                ? 'نظام إرشاد متاحف يجمع روبوتاً ذاتي القيادة وتطبيقاً للزائر ومنصة لإدارة الجولات.'
+                : 'A museum guidance system combining an autonomous robot, a visitor app, and a tour management backend.'}
             </p>
           </div>
 

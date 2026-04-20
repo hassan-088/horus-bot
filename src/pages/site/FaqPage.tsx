@@ -7,20 +7,22 @@ export default function FaqPage() {
 
   const faqs = isRTL
     ? [
-        { q: 'هل أحتاج التطبيق؟', a: 'يُنصح به بشدة. التطبيق يعزز تجربتك بمرشد ذكي وخرائط تفاعلية.' },
-        { q: 'هل يمكنني الزيارة بدون حجز؟', a: 'الحجز المسبق مفضّل لضمان دخولك في الوقت المناسب.' },
-        { q: 'ما اللغات المدعومة؟', a: 'العربية والإنجليزية، مع دعم RTL كامل.' },
-        { q: 'هل الروبوت متوفر دائماً؟', a: 'نعم، خلال ساعات عمل المتحف.' },
-        { q: 'هل التجربة مناسبة للأطفال؟', a: 'بالطبع! لدينا اختبارات ومحتوى ممتع لكل الأعمار.' },
-        { q: 'هل المتحف مهيأ لذوي الاحتياجات الخاصة؟', a: 'نعم، مع مسارات ميسّرة وميزات إمكانية الوصول.' },
+        { q: 'هل يجب استخدام التطبيق؟', a: 'موصى به بشدة. بدون التطبيق ستحصل على المرافقة من الروبوت، لكن لن تتوفر الخريطة الداخلية والاختبارات والمكتبة التفصيلية للمعروضات.' },
+        { q: 'ماذا لو كانت كل الروبوتات مشغولة؟', a: 'يعمل في المتحف ما يصل إلى 8 روبوتات بالتوازي. يقوم النظام بتوجيهك إلى أول روبوت متاح، وعادة لا يتجاوز وقت الانتظار 5 دقائق في ساعات الذروة.' },
+        { q: 'ما اللغات المدعومة؟', a: 'العربية والإنجليزية بشكل كامل، صوتاً ونصاً، عبر الروبوت والتطبيق معاً، مع تخطيط RTL أصلي.' },
+        { q: 'هل التجربة مناسبة للأطفال؟', a: 'نعم. تتوفر جولة عائلية بمدة 45 دقيقة، بمحطات أقصر، ولغة أبسط، وألغاز قصيرة بعد كل قاعة.' },
+        { q: 'هل أحتاج إلى إنترنت؟', a: 'يوفر المتحف شبكة Wi-Fi مجانية، وهي مطلوبة للملاحة الداخلية والمحادثة مع نظام الجولة. تعمل بياناتك الخلوية أيضاً.' },
+        { q: 'هل المتحف مهيأ لذوي الاحتياجات الخاصة؟', a: 'نعم. كل المسارات التي يقودها الروبوت بدون درج ومناسبة للكراسي المتحركة، مع وضع وصف صوتي موسّع للزوار ضعاف البصر.' },
+        { q: 'هل يمكنني الإلغاء أو تغيير الموعد؟', a: 'يمكنك الإلغاء حتى 24 ساعة قبل وقت الدخول واسترداد المبلغ كاملاً، أو تغيير الموعد مجاناً من نفس رابط التذكرة في البريد.' },
       ]
     : [
-        { q: 'Do I need the app?', a: 'Highly recommended. It enhances your visit with a smart guide and interactive maps.' },
-        { q: 'Can I visit without booking?', a: 'Pre-booking is preferred to guarantee timed entry.' },
-        { q: 'What languages are supported?', a: 'English and Arabic, with full RTL support.' },
-        { q: 'Is the robot always available?', a: 'Yes, during museum operating hours.' },
-        { q: 'Is it suitable for kids?', a: 'Absolutely! We have quizzes and fun content for all ages.' },
-        { q: 'Is the museum accessible?', a: 'Yes, with accessible paths and accessibility features.' },
+        { q: 'Do I have to use the app?', a: 'Strongly recommended. Without it you still get the robot escort, but you lose the indoor map, the quizzes, and the detailed exhibit library.' },
+        { q: 'What if all robots are busy?', a: 'Up to 8 robots run in parallel. The system routes you to the next available one — wait time is typically under 5 minutes even at peak.' },
+        { q: 'Which languages are supported?', a: 'English and Arabic, fully — audio and text — through both the robot and the app, with native RTL layout.' },
+        { q: 'Is it suitable for children?', a: 'Yes. A 45-minute Family preset is available with shorter stops, simpler narration, and short puzzles after each hall.' },
+        { q: 'Do I need internet?', a: 'The museum provides free Wi-Fi, and it is required for live navigation and chat with the tour system. Your cellular data also works.' },
+        { q: 'Is the museum wheelchair accessible?', a: 'Yes. All robot-led routes are step-free and wheelchair friendly, and an extended audio description mode is available for low-vision visitors.' },
+        { q: 'Can I cancel or reschedule?', a: 'Cancel up to 24 hours before your slot for a full refund, or reschedule for free using the link in your ticket email.' },
       ];
 
   return (

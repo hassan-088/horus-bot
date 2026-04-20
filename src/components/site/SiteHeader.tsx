@@ -64,7 +64,7 @@ export function SiteHeader() {
             {isRTL ? 'افتح التطبيق' : 'Open App'}
           </Button>
           <Button size="sm" onClick={() => navigate('/tickets-info')}>
-            {isRTL ? 'احجز التذاكر' : 'Book Tickets'}
+            {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
           </Button>
         </div>
 
@@ -112,7 +112,7 @@ export function SiteHeader() {
                 {isRTL ? 'افتح التطبيق' : 'Open App'}
               </Button>
               <Button size="sm" onClick={() => { setOpen(false); navigate('/tickets-info'); }}>
-                {isRTL ? 'احجز التذاكر' : 'Book Tickets'}
+                {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
               </Button>
             </div>
           </nav>
