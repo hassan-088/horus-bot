@@ -1,4 +1,4 @@
-import { Target, Eye, Users, Cpu, MapOff, BookOpen, Languages, BatteryLow, Compass, Route, Volume2, Award } from 'lucide-react';
+import { Target, Eye, Users, Cpu, Map, BookOpen, Languages, BatteryLow, Compass, Route, Volume2, Award } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { SectionHero } from '@/components/site/SectionHero';
 import { FeatureCard } from '@/components/site/FeatureCard';
@@ -14,7 +14,7 @@ export default function AboutPage() {
   ];
 
   const problems = [
-    { icon: MapOff, title: isRTL ? 'الزوار يضيعون داخل القاعات' : 'Visitors get lost between halls', desc: isRTL ? 'المتاحف الكبيرة بدون لافتات واضحة تجعل التنقل مرهقاً.' : 'Large museums with unclear signage make moving around exhausting.' },
+    { icon: Map, title: isRTL ? 'الزوار يضيعون داخل القاعات' : 'Visitors get lost between halls', desc: isRTL ? 'المتاحف الكبيرة بدون لافتات واضحة تجعل التنقل مرهقاً.' : 'Large museums with unclear signage make moving around exhausting.' },
     { icon: BookOpen, title: isRTL ? 'كثرة المعلومات تربك الزائر' : 'Information overload', desc: isRTL ? 'لوحات نصية طويلة عند كل قطعة دون ترتيب أولويات.' : 'Long text panels at every piece, with no prioritization.' },
     { icon: Languages, title: isRTL ? 'حواجز اللغة' : 'Language barriers', desc: isRTL ? 'الشروحات متاحة بلغة واحدة، والمرشدون البشريون غير متوفرين دائماً.' : 'Captions are often single-language and human guides are not always available.' },
     { icon: BatteryLow, title: isRTL ? 'ضعف التفاعل' : 'Low engagement', desc: isRTL ? 'الجولات الذاتية تتحول بسرعة إلى مرور سريع بدون تذكر شيء.' : 'Self-guided visits often turn into a fast walk-through with little retained.' },
