@@ -1,62 +1,55 @@
 
-The user wants to restructure the project so the **website** becomes a pre-visit marketing site (Home, About, Experience, Tickets, App, FAQ, Contact) while keeping the existing **app** experience intact for in-museum use. Same cinematic gold/dark brand, but spacious and editorial.
+The user wants real, specific, product-focused EN+AR copy across all marketing pages. The site already exists (Home, About, Experience, Tickets info, App, FAQ, Contact) with bilingual ternaries. I'll rewrite copy in place — no new files, no architecture changes.
 
-## Plan: Build Pre-Visit Marketing Website
+## Plan: Rewrite Marketing Copy (EN + AR)
 
-### Architecture decision
-Split routing into two zones:
-- **Public website** (`/`, `/about`, `/experience`, `/tickets-info`, `/app`, `/faq`, `/contact`) — marketing, no bottom nav, no chat button, with a top **SiteHeader** + **SiteFooter**
-- **App** (existing `/home`, `/map`, `/exhibits`, etc.) — unchanged, keeps `MainLayout` with bottom nav + chat
+### Approach
+Replace placeholder/marketing copy in the 7 site pages and shared site components with the user-provided structure. Keep all existing layouts, components, and CSS — only swap text strings. Every English string gets a matching natural Modern Standard Arabic string via the existing `isRTL` ternary pattern.
 
-Update `MainLayout` to detect public routes and show `SiteHeader`/`SiteFooter` instead of bottom nav/chat. The existing `SplashScreen` at `/` becomes the new marketing **Home** page (or moves to `/launch`).
+### Content map per page
 
-### New components
-- `src/components/site/SiteHeader.tsx` — sticky dark nav: logo (Horus-Bot), links (Home/About/Experience/Tickets/App/FAQ/Contact), language toggle, "Book Tickets" gold CTA, "Open App" outline link → `/home`
-- `src/components/site/SiteFooter.tsx` — dark grounded footer: brand blurb, nav columns, contact, socials, legal
-- `src/components/site/SectionHero.tsx` — reusable cinematic hero band (radial gold wash, serif headline, subhead, CTAs)
-- `src/components/site/FeatureCard.tsx` — editorial card with icon, gold title, body
-- `src/components/site/StepCard.tsx` — numbered step with gold accent
+**`HomePage.tsx`**
+- Hero: headline "Smart Museum Tours, Powered by an Autonomous Robot and Companion App" / "جولات متاحف ذكية بقيادة روبوت ذاتي القيادة وتطبيق مرافق". Subhead explains robot + app + tour backend. CTAs: "Book Your Visit" / "احجز زيارتك", "Explore the System" / "اكتشف النظام"
+- Product Overview block: "A Complete Smart Museum System" / "منظومة متحف ذكية متكاملة" — explain 3 parts (robot, app, backend) and how they sync
+- Core Features (6 cards): Robot Navigation & Guidance, Interactive Mobile App, Real-Time Indoor Navigation, Multilingual Support (EN/AR), Personalized Tour Paths, Visitor Engagement — each with a real 1–2 line description
+- How It Works (4 steps): Book online & receive QR ticket → Scan QR at entrance, app pairs with robot → Robot greets you, app loads your tour → Follow guided path with live narration
+- App preview block + Final CTA "Start Your Smart Museum Experience" / "ابدأ تجربتك في المتحف الذكي"
 
-### New pages (`src/pages/site/`)
-1. **`HomePage.tsx`** (`/`) — Hero (Book Tickets / Download App) → "What is this experience?" (4 features) → "How it works" (4 steps) → Experience Highlights (4 cards) → App Preview mockup → Final CTA → Footer
-2. **`AboutPage.tsx`** (`/about`) — Mission, Vision, The Idea (problem/solution), Team, Technology
-3. **`ExperiencePage.tsx`** (`/experience`) — Before Visit, At the Museum, During the Tour, Engagement (quizzes/rewards), Accessibility
-4. **`TicketsInfoPage.tsx`** (`/tickets-info`) — Marketing-style ticket options with prices, date/time picker preview, then redirects to actual booking flow at `/tickets` (existing)
-5. **`AppPage.tsx`** (`/app`) — What it does, key features, screenshots placeholder, App Store / Google Play buttons
-6. **`FaqPage.tsx`** (`/faq`) — Accordion of common questions
-7. **`ContactPage.tsx`** (`/contact`) — Email, phone, location, contact form (zod-validated)
+**`AboutPage.tsx`**
+- Problem cards: getting lost, information overload, language barriers, low engagement (each 1 line, real)
+- Solution cards: indoor positioning + robot escort, curated 30/60/90-min paths, full EN/AR voice and text, quizzes + collectible badges
+- Mission: "Make every museum visit personally guided, well-paced, and understood in the visitor's own language." / Arabic equivalent
+- Vision: "Equip 50 museums across the region with autonomous guidance by 2030, reducing dependence on staffed tours and waiting lines." / Arabic equivalent
+- Team + Technology blocks: keep structure, tighten copy
 
-### Routing changes (`src/App.tsx`)
-- `/` → new `HomePage` (marketing). Move splash to `/launch` or remove
-- Add public routes above app routes
-- Keep all existing app routes untouched
-- App entry from website: header "Open App" → `/home` (or `/onboarding` if first visit)
+**`ExperiencePage.tsx`** — "What Happens During Your Visit" / "ما يحدث خلال زيارتك"
+- Before Visit: pick date/time, choose tour length, download app, receive QR
+- At the Museum: scan QR at gate, app pairs with nearest robot via Bluetooth, headphones recommended
+- During the Tour: robot leads between exhibits, app shows 3D map + ETA, tap any exhibit for deep info, ask questions in EN/AR
+- Engagement: per-exhibit quiz, badges saved to profile, photo capture spots flagged on the map
+- Accessibility: wheelchair-friendly paths, adjustable text size, audio descriptions
 
-### Layout changes (`src/components/layout/MainLayout.tsx`)
-- Add `publicRoutes` list. On public routes: render `<SiteHeader/>` + children + `<SiteFooter/>`, hide bottom nav and chat
-- On app routes: existing behavior
+**`TicketsInfoPage.tsx`**
+- Each tier explains what's actually included: robot-guided tour, full app access, interactive quizzes, exhibit AR overlays (Group adds a dedicated robot)
+- Trust strip: digital ticket via email, free cancellation up to 24h, payments encrypted (PCI-compliant processor)
 
-### i18n
-- Add EN + AR strings for all new website copy in `src/lib/i18n.ts` (nav links, hero copy, section titles, FAQ, footer)
-- Header language toggle uses existing `AppContext`
+**`AppPage.tsx`** — "The Control Center of Your Visit" / "مركز التحكم في زيارتك"
+- 4 features with real function: Indoor map with live position, exhibit info library (text + audio + images), chat with the tour system for questions, push notifications for live talks and tour updates
+- Screenshots placeholder section + store badges
 
-### Design alignment (already in place from prior work)
-- Reuse `SectionLabel`, `Card`, `Button`, cinematic tokens
-- More generous spacing on website (`py-24`, `gap-16`) vs app's compact rhythm
-- Larger hero typography (`text-hero` 44px, scale up to 64px on desktop)
+**`FaqPage.tsx`** — Replace generic Qs with realistic ones:
+- "Do I have to use the app?" — Recommended; without it you still get robot escort but no map/quizzes
+- "What if the robot is busy?" — Up to 8 robots run in parallel; the app routes you to the next available one
+- "Which languages?" — English and Arabic, with audio in both
+- "Is it suitable for children?" — Yes; Family tour preset (45 min) with shorter stops and puzzles
+- "Do I need internet?" — Museum Wi-Fi is provided and required for live navigation
+- "Wheelchair access?" — All robot-guided paths are step-free
 
-### Out of scope (separate follow-ups)
-- Real payment integration on Tickets page (existing checkout stays)
-- Blog/Partners pages (mentioned as optional)
-- Real team photos / app screenshots — placeholders for now
-- Email sending for contact form — form validates + shows toast; backend wiring later
+**`ContactPage.tsx`** — Tighten: support email for visitors, sales email for museum decision-makers, phone, location with map embed, contact form with subject options (Visitor support / Museum partnership / Press)
 
-### Files to create
-- `src/components/site/SiteHeader.tsx`
-- `src/components/site/SiteFooter.tsx`
-- `src/components/site/SectionHero.tsx`
-- `src/components/site/FeatureCard.tsx`
-- `src/components/site/StepCard.tsx`
+**`SiteHeader.tsx` / `SiteFooter.tsx`** — Verify nav labels are accurate ("Explore the System" CTA in header points to `/experience`); footer brand blurb rewritten to one realistic sentence in both languages.
+
+### Files to edit
 - `src/pages/site/HomePage.tsx`
 - `src/pages/site/AboutPage.tsx`
 - `src/pages/site/ExperiencePage.tsx`
@@ -64,9 +57,16 @@ Update `MainLayout` to detect public routes and show `SiteHeader`/`SiteFooter` i
 - `src/pages/site/AppPage.tsx`
 - `src/pages/site/FaqPage.tsx`
 - `src/pages/site/ContactPage.tsx`
+- `src/components/site/SiteHeader.tsx` (CTA labels)
+- `src/components/site/SiteFooter.tsx` (brand blurb)
 
-### Files to edit
-- `src/App.tsx` (new routes)
-- `src/components/layout/MainLayout.tsx` (public vs app layout switching)
-- `src/lib/i18n.ts` (new EN/AR strings)
-- `src/pages/SplashScreen.tsx` (move to `/launch` or repurpose)
+### Out of scope
+- New pages or sections
+- Layout/visual changes (cinematic theme stays as-is)
+- Real images (placeholders remain — propose follow-up)
+- Backend wiring for contact form
+
+### Tone & language guardrails I'll apply
+- No "revolutionary", "next-generation", "immersive journey", "amazing"
+- Every claim is concrete (numbers, actions, outcomes)
+- Arabic is Modern Standard, not literal — uses natural museum/visitor terminology
