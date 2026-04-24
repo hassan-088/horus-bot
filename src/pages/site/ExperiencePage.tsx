@@ -24,79 +24,79 @@ export default function ExperiencePage() {
       <SectionHero
         label={isRTL ? 'التجربة' : 'Experience'}
         title={isRTL ? 'ما يحدث خلال زيارتك' : 'What Happens During Your Visit'}
-        subtitle={isRTL ? 'تجربة خطوة بخطوة من الحجز وحتى نهاية جولتك.' : 'A step-by-step experience from booking to the end of your tour.'}
+        subtitle={isRTL ? 'رحلة خطوة بخطوة من الحجز وحتى نهاية جولتك الموجَّهة.' : 'A step-by-step journey from booking to the end of your guided tour.'}
       />
 
       <Stage
         label={isRTL ? 'قبل الزيارة' : 'Before Visit'}
-        title={isRTL ? 'تجهيز هادئ من المنزل' : 'Prepare calmly from home'}
+        title={isRTL ? 'تجهيز هادئ من المنزل' : 'Prepare Calmly from Home'}
         items={[
-          { icon: Ticket, title: isRTL ? 'اختر وقت زيارتك' : 'Choose your visit time', desc: isRTL ? 'احجز التجربة التي تناسب مجموعتك في الفترة التي تفضّلها.' : 'Reserve the experience that fits your group at the time you prefer.' },
-          { icon: Navigation, title: isRTL ? 'حدّد مدة الجولة' : 'Pick your tour length', desc: isRTL ? 'اختر المدة التي تناسب جدولك: قصيرة، متوسطة، أو موسَّعة.' : 'Pick the tour length that suits your schedule — short, standard, or extended.' },
-          { icon: Smartphone, title: isRTL ? 'حمّل التطبيق قبل الوصول' : 'Install the app before arrival', desc: isRTL ? 'حمّله مسبقاً لتتصل بالتجربة فور دخولك المتحف.' : 'Install it ahead of time so you connect with the experience the moment you walk in.' },
-          { icon: QrCode, title: isRTL ? 'تذكرتك على هاتفك' : 'Your QR ticket on your phone', desc: isRTL ? 'يصلك رمز QR مباشرةً على هاتفك لدخول سريع وسلس.' : 'Receive your QR ticket directly on your phone for quick, smooth entry.' },
+          { icon: Ticket, title: isRTL ? 'اختر وقت زيارتك' : 'Choose Your Visit Time', desc: isRTL ? 'احجز التجربة التي تناسب مجموعتك وجدولك المفضّل.' : 'Reserve the experience that fits your group and preferred schedule.' },
+          { icon: Navigation, title: isRTL ? 'حدّد مدة جولتك' : 'Pick Your Tour Length', desc: isRTL ? 'اختر طول الجولة الذي يناسب زيارتك — قصيرة، اعتيادية، أو موسَّعة.' : 'Choose the tour length that suits your visit — short, standard, or extended.' },
+          { icon: Smartphone, title: isRTL ? 'حمّل التطبيق قبل الوصول' : 'Install the App Before Arrival', desc: isRTL ? 'جهّز كل شيء قبل وصولك ليكون كل شيء جاهزاً عند دخولك.' : 'Get set up before you arrive so everything is ready when you walk in.' },
+          { icon: QrCode, title: isRTL ? 'تذكرة QR على هاتفك' : 'Your QR Ticket on Your Phone', desc: isRTL ? 'تصلك تذكرتك مباشرةً على هاتفك لدخول سريع وسلس.' : 'Receive your ticket instantly on your phone for fast, seamless entry.' },
         ]}
       />
 
       <div className="bg-sidebar/15">
         <Stage
           label={isRTL ? 'في المتحف' : 'At the Museum'}
-          title={isRTL ? 'الوصول وبدء جولتك' : 'Arrive and begin your tour'}
+          title={isRTL ? 'الوصول وبدء جولتك' : 'Arrive and Begin Your Tour'}
           items={[
-            { icon: QrCode, title: isRTL ? 'امسح عند البوابة' : 'Scan at the gate', desc: isRTL ? 'مسح رمز QR يفعّل تذكرتك ويبدأ تجربتك.' : 'Scanning your QR activates your ticket and starts your experience.' },
-            { icon: Bot, title: isRTL ? 'اتصل بالروبوت المخصَّص لك' : 'Connect with your assigned robot', desc: isRTL ? 'يعرض التطبيق روبوتك ويبدأ المسار في ثوانٍ معدودة.' : 'The app shows your assigned robot and your route starts within seconds.' },
-            { icon: Headphones, title: isRTL ? 'تجربة صوتية أكثر خصوصية' : 'A more personal audio experience', desc: isRTL ? 'للحصول على تجربة صوتية أهدأ وأكثر خصوصية، يُنصح باستخدام السماعات.' : 'For a more personal audio experience, headphones are recommended.' },
+            { icon: QrCode, title: isRTL ? 'امسح عند البوابة' : 'Scan at the Gate', desc: isRTL ? 'امسح رمز QR لتفعيل زيارتك فوراً.' : 'Scan your QR code to activate your visit instantly.' },
+            { icon: Bot, title: isRTL ? 'اتصل بالروبوت المخصَّص لك' : 'Connect with Your Assigned Robot', desc: isRTL ? 'يبدأ مسارك بمجرد الاتصال بالروبوت المخصَّص لك.' : 'Your route begins as you connect to your assigned robot.' },
+            { icon: Headphones, title: isRTL ? 'تجربة صوتية أكثر خصوصية' : 'A More Personal Audio Experience', desc: isRTL ? 'استخدم السمّاعات للحصول على تجربة استماع أكثر تركيزاً وخصوصية.' : 'Use headphones for a more focused and personal listening experience.' },
           ]}
         />
       </div>
 
       <Stage
         label={isRTL ? 'أثناء الجولة' : 'During the Tour'}
-        title={isRTL ? 'جولة طبيعية تتكيّف معك' : 'A natural tour that adapts to you'}
+        title={isRTL ? 'جولة طبيعية تتكيّف معك' : 'A Natural Tour That Adapts to You'}
         intro={isRTL
-          ? 'يقودك الروبوت بطبيعية بين القاعات، يتكيّف مع إيقاعك ويساعدك على التركيز على التجربة نفسها.'
-          : 'The robot guides you naturally through the museum, adapting to your pace and helping you focus on the experience.'}
+          ? 'يقود الروبوت الزوار عبر المتحف بإيقاع مريح، فيساعدهم على التركيز في المعروضات بدلاً من القلق حول إلى أين يذهبون بعد ذلك.'
+          : 'The robot guides visitors through the museum at a comfortable pace, helping them focus on the exhibits instead of worrying about where to go next.'}
         items={[
-          { icon: Bot, title: isRTL ? 'الروبوت يقود بين المعروضات' : 'The robot leads between exhibits', desc: isRTL ? 'تتبعه بهدوء، يتوقّف عند كل قطعة، ويستأنف عندما تكون مستعداً.' : 'You follow at a calm pace; it stops at each piece and resumes when you are ready.' },
-          { icon: Map, title: isRTL ? 'خريطة حية والمحطة التالية' : 'Live map and next stop', desc: isRTL ? 'ترى أين أنت، ما هي المحطة التالية، وكم تبقى من الجولة.' : 'You see where you are, what your next stop is, and how much of the tour remains.' },
-          { icon: MapPin, title: isRTL ? 'اضغط أي معروضة للتعمق' : 'Tap any exhibit for deeper information', desc: isRTL ? 'تحصل على صور إضافية، نص أطول، وملف صوتي مفصَّل عن القطعة.' : 'You get extra images, longer text, and a detailed audio track for the piece.' },
-          { icon: MessageSquare, title: isRTL ? 'اطرح أسئلة بالعربية أو الإنجليزية' : 'Ask questions in English or Arabic', desc: isRTL ? 'اطرح أي سؤال خلال الزيارة وتأتيك إجابة فورية باللغة التي اخترتها.' : 'Ask any question during your visit and get an instant answer in your chosen language.' },
+          { icon: Bot, title: isRTL ? 'الروبوت يقود بين المعروضات' : 'The Robot Leads Between Exhibits', desc: isRTL ? 'يقود الروبوت الزوار بسلاسة بين المعروضات بإيقاع مريح.' : 'The robot guides visitors smoothly between exhibits at a comfortable pace.' },
+          { icon: Map, title: isRTL ? 'خريطة حية والمحطة التالية' : 'Live Map and Next Stop', desc: isRTL ? 'تابع موقعك، المحطة التالية، وتقدّم الجولة في الوقت الفعلي.' : 'Track location, next stop, and tour progress in real time.' },
+          { icon: MapPin, title: isRTL ? 'استكشف أي معروضة بمزيد من التفاصيل' : 'Explore Any Exhibit in More Detail', desc: isRTL ? 'افتح محتوى موسَّعاً، صوراً، وتعليقاً صوتياً لأي معروضة.' : 'Open extended content, images, and audio for any exhibit.' },
+          { icon: MessageSquare, title: isRTL ? 'اطرح أسئلتك بلغتك' : 'Ask Questions in Your Language', desc: isRTL ? 'اطرح أسئلتك في أي وقت واحصل على إجابات بالعربية، العامية المصرية، الإنجليزية، أو لغات أخرى مدعومة وفقاً لإعداد المتحف.' : 'Ask questions at any time and receive answers in Arabic, Egyptian Arabic, English, or other supported languages depending on the museum setup.' },
         ]}
       />
 
       <div className="bg-sidebar/15">
         <Stage
           label={isRTL ? 'التفاعل' : 'Engagement'}
-          title={isRTL ? 'لحظات صغيرة تبقى معك' : 'Small moments that stay with you'}
+          title={isRTL ? 'لحظات صغيرة تبقى معك' : 'Small Moments That Stay With You'}
           items={[
-            { icon: Award, title: isRTL ? 'اختبارات قصيرة ممتعة' : 'Quick, playful quizzes', desc: isRTL ? 'تساعدك على تذكّر ما استكشفته للتو في كل قاعة.' : 'Quick quizzes help you remember what you just explored.' },
-            { icon: Award, title: isRTL ? 'إنجازاتك تبقى محفوظة' : 'Your achievements stay with you', desc: isRTL ? 'تُحفظ إنجازاتك في حسابك وترافقك عبر زياراتك القادمة.' : 'Your achievements stay saved in your profile across visits.' },
-            { icon: Camera, title: isRTL ? 'نقاط تصوير لأبرز اللحظات' : 'Photo points for the highlights', desc: isRTL ? 'نقاط مقترحة لتلتقط أجمل صور الزيارة دون أن تفوّت لقطة تستحق.' : 'Photo points help you capture the highlights worth remembering.' },
+            { icon: Award, title: isRTL ? 'اختبارات قصيرة' : 'Short Quizzes', desc: isRTL ? 'اختبارات قصيرة ترسّخ ما استكشفه الزوار للتو.' : 'Short quizzes reinforce what visitors just explored.' },
+            { icon: Award, title: isRTL ? 'تقدُّم محفوظ' : 'Saved Progress', desc: isRTL ? 'يبقى التقدّم والإنجازات محفوظَين عبر كل زياراتك.' : 'Progress and achievements stay saved across visits.' },
+            { icon: Camera, title: isRTL ? 'نقاط تصوير' : 'Photo Points', desc: isRTL ? 'التقط لحظات لا تُنسى عند نقاط تصوير منتقاة بعناية على طول الجولة.' : 'Capture memorable moments at curated photo spots throughout the tour.' },
           ]}
         />
       </div>
 
       <section className="mx-auto max-w-7xl px-4 md:px-8 py-16 md:py-20">
         <div className="section-label mb-4">{isRTL ? 'إمكانية الوصول' : 'Accessibility'}</div>
-        <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'تجربة لكل زائر' : 'An experience for every visitor'}</h2>
+        <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'تجربة لكل زائر' : 'An Experience for Every Visitor'}</h2>
         <p className="text-muted-foreground max-w-3xl mb-10 leading-relaxed">
-          {isRTL ? 'مصمَّمة لتكون قابلة للاستخدام من قِبَل كل زائر، أياً كانت قدراته.' : 'Designed to be usable by every visitor, regardless of ability.'}
+          {isRTL ? 'صُمِّمت لتجعل زيارة المتحف أكثر سلاسة وشمولاً لمختلف احتياجات الزوار.' : 'Created to make the museum experience smoother and more inclusive for different visitor needs.'}
         </p>
         <div className="grid gap-5 sm:grid-cols-3">
           <Card className="p-7">
             <Accessibility className="h-6 w-6 text-primary mb-4" />
-            <h3 className="font-serif text-lg mb-2">{isRTL ? 'مسارات بدون درج' : 'Step-free routes'}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{isRTL ? 'كل المسارات التي يقودها الروبوت متاحة للكراسي المتحركة وعربات الأطفال.' : 'Every robot-led route is wheelchair- and stroller-accessible.'}</p>
+            <h3 className="font-serif text-lg mb-2">{isRTL ? 'مسارات بدون درج' : 'Step-Free Routes'}</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">{isRTL ? 'كل المسارات مصمَّمة لتكون مناسبة للكراسي المتحركة وعربات الأطفال.' : 'All routes are designed to be wheelchair and stroller accessible.'}</p>
           </Card>
           <Card className="p-7">
             <Type className="h-6 w-6 text-primary mb-4" />
-            <h3 className="font-serif text-lg mb-2">{isRTL ? 'حجم نص قابل للتعديل' : 'Adjustable text size'}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{isRTL ? 'كبّر النصوص في التطبيق وفعّل وضع التباين العالي عند الحاجة.' : 'Scale up app text and enable a high-contrast mode when needed.'}</p>
+            <h3 className="font-serif text-lg mb-2">{isRTL ? 'حجم نص قابل للتعديل' : 'Adjustable Text Size'}</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">{isRTL ? 'عدِّل حجم النص وفعّل وضع التباين العالي عند الحاجة.' : 'Adjust text size and enable high-contrast mode when needed.'}</p>
           </Card>
           <Card className="p-7">
             <Volume2 className="h-6 w-6 text-primary mb-4" />
-            <h3 className="font-serif text-lg mb-2">{isRTL ? 'وصف صوتي موسَّع' : 'Extended audio descriptions'}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{isRTL ? 'نسخة صوتية موسَّعة تصف القطع البصرية للزوار ضعاف البصر.' : 'Extended audio that describes visual pieces for low-vision visitors.'}</p>
+            <h3 className="font-serif text-lg mb-2">{isRTL ? 'وصف صوتي موسَّع' : 'Extended Audio Descriptions'}</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">{isRTL ? 'وصف صوتي تفصيلي يدعم الزوار ضعاف البصر.' : 'Detailed audio descriptions support visitors with low vision.'}</p>
           </Card>
         </div>
       </section>
