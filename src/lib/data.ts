@@ -34,6 +34,8 @@ export interface Ticket {
   quantity: number;
   date: string;
   price: number;
+  museum?: string;
+  status?: 'active' | 'used' | 'expired';
 }
 
 export const exhibits: Exhibit[] = [

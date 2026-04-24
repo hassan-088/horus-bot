@@ -69,9 +69,23 @@ export const translations = {
     
     // Chat
     chatTitle: 'Chat with Horus-Bot',
-    chatGreeting: "Hi, I'm Horus-Bot, your personal museum guide! How can I help you today?",
+    chatGreeting: "Hi, I'm Horus-Bot 👋 I can help you with tickets, directions, exhibits, or your tour. What would you like to know?",
+    chatSubtitle: 'Museum guide',
+    chatErrorOnce: 'Something went wrong. Please try again.',
+    chatErrorRepeat: "Sorry, I'm having trouble right now. You can try again, or tap one of the options below.",
     typeMessage: 'Type a message...',
     ankhuTyping: 'Horus-Bot is typing...',
+    ticketCheckoutNote: "You'll receive your ticket instantly after checkout.",
+    successTitle: "🎉 You're all set!",
+    successSubtitle: 'Your tickets are ready.',
+    noTicketsTitle: 'No tickets yet',
+    noTicketsBody: 'You do not have any tickets yet. Book your visit to get started.',
+    bookAVisit: 'Book a visit',
+    statusActive: 'Active',
+    viewTicket: 'View Ticket',
+    addToWallet: 'Add to Wallet',
+    walletSoon: 'Wallet pass coming soon',
+    egyptianMuseum: 'Egyptian Museum',
     
     // Quiz
     quizTitle: 'Knowledge Quiz',
@@ -230,9 +244,23 @@ export const translations = {
     
     // Chat
     chatTitle: 'تحدث مع حورس-بوت',
-    chatGreeting: 'مرحباً، أنا حورس-بوت، مرشدك الشخصي في المتحف! كيف يمكنني مساعدتك اليوم؟',
+    chatGreeting: 'أهلاً، أنا حورس-بوت 👋 أقدر أساعدك في التذاكر، الاتجاهات، المعروضات، أو جولتك. تحب تعرف إيه؟',
+    chatSubtitle: 'مرشد المتحف',
+    chatErrorOnce: 'حصل خطأ. حاول مرة أخرى من فضلك.',
+    chatErrorRepeat: 'عذراً، أواجه مشكلة الآن. يمكنك المحاولة مرة أخرى أو اختيار أحد الخيارات بالأسفل.',
     typeMessage: 'اكتب رسالة...',
     ankhuTyping: 'حورس-بوت يكتب...',
+    ticketCheckoutNote: 'ستصلك تذكرتك فوراً بعد إتمام الدفع.',
+    successTitle: '🎉 كل شيء جاهز!',
+    successSubtitle: 'تذاكرك جاهزة.',
+    noTicketsTitle: 'لا توجد تذاكر بعد',
+    noTicketsBody: 'لا توجد لديك أي تذاكر بعد. احجز زيارتك لتبدأ.',
+    bookAVisit: 'احجز زيارة',
+    statusActive: 'فعّالة',
+    viewTicket: 'عرض التذكرة',
+    addToWallet: 'إضافة إلى المحفظة',
+    walletSoon: 'بطاقة المحفظة قريباً',
+    egyptianMuseum: 'المتحف المصري',
     
     // Quiz
     quizTitle: 'اختبار المعلومات',
