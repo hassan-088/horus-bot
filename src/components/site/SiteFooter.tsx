@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Instagram, Twitter, Facebook } from 'lucide-react';
+import { Mail, Clock, MapPin, Instagram, Twitter, Facebook } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 export function SiteFooter() {
@@ -18,8 +18,8 @@ export function SiteFooter() {
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isRTL
-                ? 'نظام إرشاد متاحف يجمع روبوتاً ذاتي القيادة وتطبيقاً للزائر ومنصة لإدارة الجولات.'
-                : 'A museum guidance system combining an autonomous robot, a visitor app, and a tour management backend.'}
+                ? 'مصمَّم لمساعدة المتاحف على إرشاد الزوار عبر مساحاتها الكبيرة والمعقّدة بتجربة أكثر اتصالاً وقابليةً للوصول وتفاعلاً.'
+                : 'Designed to help museums guide visitors through large and complex spaces with a more connected, accessible, and engaging experience.'}
             </p>
           </div>
 
@@ -37,7 +37,7 @@ export function SiteFooter() {
             <h4 className="section-label mb-4">{isRTL ? 'تواصل' : 'Contact'}</h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground">
               <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> hello@horus-bot.com</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary" /> +20 100 000 0000</li>
+              <li className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {isRTL ? 'الأحد – الخميس، 9 ص – 6 م' : 'Sun–Thu, 9am–6pm'}</li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Cairo, Egypt</li>
             </ul>
           </div>

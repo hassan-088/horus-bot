@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Send, Briefcase } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Mail, MapPin, Send, Briefcase, Clock, Ticket } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,16 +12,19 @@ import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+const SUBJECTS = ['support', 'booking', 'technical', 'partnership', 'press'] as const;
+type Subject = (typeof SUBJECTS)[number];
+
 const schema = z.object({
   name: z.string().trim().min(2, 'Too short').max(100),
   email: z.string().trim().email('Invalid email').max(255),
-  subject: z.enum(['support', 'partnership', 'press']),
+  subject: z.enum(SUBJECTS),
   message: z.string().trim().min(10, 'Too short').max(1000),
 });
 
 export default function ContactPage() {
   const { isRTL } = useApp();
-  const [form, setForm] = useState<{ name: string; email: string; subject: 'support' | 'partnership' | 'press'; message: string }>({
+  const [form, setForm] = useState<{ name: string; email: string; subject: Subject; message: string }>({
     name: '',
     email: '',
     subject: 'support',
@@ -48,27 +52,34 @@ export default function ContactPage() {
       <SectionHero
         label={isRTL ? 'تواصل' : 'Contact'}
         title={isRTL ? 'تواصل مع الفريق المناسب' : 'Reach the right team'}
-        subtitle={isRTL ? 'دعم للزوار، شراكات للمتاحف، واستفسارات الصحافة.' : 'Visitor support, museum partnerships, and press inquiries.'}
+        subtitle={isRTL ? 'فريقنا هنا للمساعدة — قبل زيارتك وأثناءها وبعدها.' : 'Our team is here to help — before, during, and after your visit.'}
       />
 
-      <section className="mx-auto max-w-6xl px-4 md:px-8 pb-24">
+      <div className="mx-auto max-w-4xl px-4 md:px-8 -mt-6 mb-10 text-center">
+        <p className="text-sm text-muted-foreground">
+          {isRTL ? 'مصمَّم للمتاحف والزوار والفضاءات الثقافية في مصر.' : 'Built for museums, visitors, and cultural spaces in Egypt.'}
+        </p>
+      </div>
+
+      <section className="mx-auto max-w-6xl px-4 md:px-8 pb-20">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-4 lg:col-span-1">
             <Card className="p-6">
               <Mail className="h-5 w-5 text-primary mb-3" />
               <h3 className="font-serif text-base mb-1">{isRTL ? 'دعم الزوار' : 'Visitor support'}</h3>
               <p className="text-sm text-muted-foreground">support@horus-bot.com</p>
+              <p className="text-xs text-primary/80 mt-2">{isRTL ? 'الردود عادةً خلال ساعات قليلة' : 'Typically replies within a few hours'}</p>
             </Card>
             <Card className="p-6">
               <Briefcase className="h-5 w-5 text-primary mb-3" />
               <h3 className="font-serif text-base mb-1">{isRTL ? 'شراكات المتاحف' : 'Museum partnerships'}</h3>
               <p className="text-sm text-muted-foreground">museums@horus-bot.com</p>
+              <p className="text-xs text-muted-foreground mt-2">{isRTL ? 'لطلبات التعاون والشراكة مع المتاحف' : 'For museum collaborations and partnership requests'}</p>
             </Card>
             <Card className="p-6">
-              <Phone className="h-5 w-5 text-primary mb-3" />
-              <h3 className="font-serif text-base mb-1">{isRTL ? 'الهاتف' : 'Phone'}</h3>
-              <p className="text-sm text-muted-foreground">+20 100 000 0000</p>
-              <p className="text-xs text-muted-foreground mt-1">{isRTL ? 'أحد - خميس، 9 ص - 6 م' : 'Sun–Thu, 9am–6pm'}</p>
+              <Clock className="h-5 w-5 text-primary mb-3" />
+              <h3 className="font-serif text-base mb-1">{isRTL ? 'ساعات الدعم' : 'Support hours'}</h3>
+              <p className="text-sm text-muted-foreground">{isRTL ? 'الأحد – الخميس، 9 ص – 6 م' : 'Available Sun–Thu, 9am–6pm'}</p>
             </Card>
             <Card className="p-6">
               <MapPin className="h-5 w-5 text-primary mb-3" />
@@ -91,24 +102,47 @@ export default function ContactPage() {
               </div>
               <div>
                 <Label htmlFor="subject">{isRTL ? 'الموضوع' : 'Subject'}</Label>
-                <Select value={form.subject} onValueChange={(v) => setForm({ ...form, subject: v as typeof form.subject })}>
+                <Select value={form.subject} onValueChange={(v) => setForm({ ...form, subject: v as Subject })}>
                   <SelectTrigger id="subject" className="mt-1.5"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="support">{isRTL ? 'دعم زائر' : 'Visitor support'}</SelectItem>
-                    <SelectItem value="partnership">{isRTL ? 'شراكة متحف' : 'Museum partnership'}</SelectItem>
+                    <SelectItem value="booking">{isRTL ? 'مشكلة في الحجز' : 'Booking issue'}</SelectItem>
+                    <SelectItem value="technical">{isRTL ? 'مشكلة تقنية' : 'Technical issue'}</SelectItem>
+                    <SelectItem value="partnership">{isRTL ? 'طلب شراكة' : 'Partnership request'}</SelectItem>
                     <SelectItem value="press">{isRTL ? 'استفسار صحفي' : 'Press inquiry'}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label htmlFor="message">{isRTL ? 'الرسالة' : 'Message'}</Label>
-                <Textarea id="message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="mt-1.5 min-h-32" placeholder={isRTL ? 'كيف يمكننا مساعدتك؟' : 'How can we help?'} required />
+                <Textarea
+                  id="message"
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  className="mt-1.5 min-h-32"
+                  placeholder={isRTL ? 'أخبرنا بما تحتاجه — حجز، دعم، أو شراكة…' : 'Tell us what you need — booking, support, or partnerships…'}
+                  required
+                />
               </div>
               <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
                 <Send className="h-4 w-4" /> {submitting ? (isRTL ? 'يتم الإرسال...' : 'Sending...') : (isRTL ? 'إرسال الرسالة' : 'Send message')}
               </Button>
             </form>
           </Card>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-3xl px-4 md:px-8 pb-24">
+        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-8 text-center">
+          <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-3">
+            {isRTL ? 'تفضّل خطوة أسرع؟' : 'Prefer a faster next step?'}
+          </h2>
+          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+            {isRTL ? 'احجز زيارتك الآن وابدأ تجربتك مباشرةً.' : 'Book your visit now and start your experience right away.'}
+          </p>
+          <Button asChild size="lg">
+            <Link to="/tickets-info"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك الآن' : 'Book your visit now'}</Link>
+          </Button>
         </div>
       </section>
     </>

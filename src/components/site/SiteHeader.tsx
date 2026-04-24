@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, X, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,14 @@ export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const original = document.body.style.overflow;
+    if (open) document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-sidebar/80 backdrop-blur-xl">
@@ -78,7 +86,7 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div className="lg:hidden border-t border-border/40 bg-sidebar/95 backdrop-blur-xl">
+        <div className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-50 overflow-y-auto border-t border-border/40 bg-sidebar shadow-2xl">
           <nav className="flex flex-col p-4 gap-1">
             {navItems.map((item) => (
               <NavLink
