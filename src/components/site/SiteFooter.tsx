@@ -6,7 +6,7 @@ export function SiteFooter() {
   const { isRTL } = useApp();
 
   return (
-    <footer className="border-t border-border/40 bg-sidebar/60">
+    <footer className="border-t border-border/30 bg-sidebar/30 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 md:px-8 py-16">
         <div className="grid gap-12 md:grid-cols-4">
           <div className="md:col-span-1">
