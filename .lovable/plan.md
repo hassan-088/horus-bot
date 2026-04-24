@@ -1,87 +1,95 @@
 
-This is a comprehensive copy + UX polish pass across all 7 marketing pages plus 2 shared components. No redesign — only content rewrites, a few new sections on Home, and one mobile menu UX fix on Contact. I'll proceed page by page following the user's spec exactly.
+# Final Horus-Bot Website + App Demo Polish
 
-## Plan: Final Product-Level Copy & UX Polish
+Focused fix pass — no redesign, no new architecture. Apply the user's exact copy, fix the listed bugs, and smooth the visual transitions.
 
-### Approach
-Rewrite all marketing copy to remove technical jargon (no backend, LiDAR, ROS, beacons, etc.) and replace with confident, user-facing product language. Add 2 new Home sections, fix Group pricing, fill App screenshots, add FAQ closing CTA, fix Contact mobile menu. Every English string keeps its Arabic counterpart via the existing `isRTL` ternary.
+## Part A — Website Bug Fixes
 
-### Files to edit
+### A1. Scroll-to-top on route change
+- Create `src/components/site/ScrollToTop.tsx` — listens to `useLocation().pathname` and runs `window.scrollTo({ top: 0, left: 0, behavior: 'instant' })`.
+- Mount it once inside `<BrowserRouter>` in `src/App.tsx`, just above `<AppRoutes />`.
+- Applies to every route (public + app), so About/Experience/Tickets/App/FAQ/Contact and footer links all open from the top.
 
-**`src/pages/site/HomePage.tsx`** — Largest changes
-- Hero: new headline "Smart museum tours powered by an autonomous robot" + revised subtext + small museum-facing line + replace "robot waiting at gate" risk
-- Product Overview: collapse to 2-part explanation (robot + app), drop any "layers/backend" language
-- Overview cards: keep robot + app, replace 3rd "backend" card with **Guided Tour Experience** (or Museum Support)
-- Features section: rename to **Core Capabilities**, rewrite cards to benefit-led wording
-- How It Works: rewrite step 3 ("greets you, app loads route") and step 4 (robot guides + app supports)
-- App preview: add "Works before, during, and after your visit"
-- **NEW Section: "For Museums & Cultural Institutions"** — title, subtext, 5 benefit bullets
-- **NEW Section: "System Status"** — 4 product readiness bullets
-- Footer CTA: "Start your guided museum tour with Horus-Bot" + new subtext
+### A2. Mobile hamburger menu reliability (`SiteHeader.tsx`)
+Desktop nav stays exactly as-is. Only the mobile overlay branch changes:
+- Make the overlay a true full-viewport `fixed inset-0 z-[100]` panel (not anchored under header) with its own internal header row (logo + close X).
+- Add an opaque/blurred backdrop layer; clicking the backdrop closes the menu.
+- Keep `body` scroll lock effect (already present) and confirm it cleans up.
+- Ensure hamburger button has `type="button"` and `aria-expanded`.
+- Close on: X click, backdrop click, any nav link click, route change (effect on `location.pathname`).
 
-**`src/pages/site/AboutPage.tsx`**
-- Hero: confident rewrite ("Built to operate in real museum environments…")
-- Problem section: add museum-side problem (peak-hour guide availability)
-- Solution section: strip technical mechanics, convert to impact statements
-- Mission & Vision: tighten to spec wording
-- Team: add multidisciplinary intro line above cards; 4 team cards (Product/Robotics/AI&Content/Mobile)
-- Technology section: reframe as 4 capability categories (Autonomous Guidance / Intelligent Exhibit Narration / Companion Visitor App / Accessible Interaction) — no frameworks/sensors
-- Remove any duplication of Home's "what is the product"
+### A3. Smooth premium background (`src/index.css`)
+- Add a `body::before` fixed full-viewport gradient layer (z-index -1, `pointer-events:none`):
+  - `radial-gradient` ivory→cream→subtle gold glow→ivory, very low opacity.
+- Make `bg-sidebar/40` section dividers more transparent so the page reads as one continuous surface (replace usages on HomePage/AppPage with `bg-transparent` + a soft top/bottom fade divider, or reduce to `bg-sidebar/15` with `border-0`).
+- Keep card colors, typography, gold accents identical.
 
-**`src/pages/site/ExperiencePage.tsx`**
-- Hero subtext tightened
-- Before Visit: "you" language, remove instructional tone
-- At the Museum: rewrite headphones as supporting note; replace "pair with nearest robot" with "Connect with your assigned robot"
-- During the Tour: add emotional intro line; rewrite cards in experience-first wording (no "synchronization/pairing")
-- Engagement: outcome-led rewrites (quizzes/badges/photo points)
-- Accessibility: add intro line "Designed to be usable by every visitor…"
+## Part B — Copy Rewrites (use the user's exact EN+AR text)
 
-**`src/pages/site/TicketsInfoPage.tsx`**
-- Hero: "Book your visit" + new subtext + **urgency line** + **reassurance line**
-- Adult/Student/Group cards: rewrite bullets per spec
-- **Fix Group pricing**: change to "$80 / group (up to 5 people)" — critical fix
-- Trust block: humanize the 3 trust items (cancellation/QR/secure payment)
+For every page below: replace English copy with the spec text and provide a natural Modern Standard / Egyptian Arabic equivalent via `isRTL` ternaries. No structural changes unless noted.
 
-**`src/pages/site/AppPage.tsx`**
-- Hero: "Your entire museum experience, in one place" + new subtext + robot-connection line near top
-- Store buttons: add "Download before your visit for the best experience" line
-- Core functions: rewrite all 4 cards as user outcomes
-- **Screenshots**: replace empty placeholders with 4–5 mockup phone frames showing labeled fake screens (Live navigation / Exhibit details / Ask the guide / Interactive quiz / Visit progress) — built with existing UI primitives since real app screens aren't exportable here
-- Final CTA: "Install the app before you arrive" + new subtext
+- **HomePage.tsx** — Hero, sub-line, Product Overview (3 cards), Core Capabilities (6 cards including new Multilingual wording: "Arabic, Egyptian Arabic, English, and other supported languages"), How It Works (4 steps), For Museums (5 bullets), System Status (4 bullets), Footer CTA.
+- **AboutPage.tsx** — Why Horus-Bot Exists; Problem (5 cards); Solution (4 cards); Mission/Vision; Team intro + 4 team cards; Capabilities (4 cards).
+- **ExperiencePage.tsx** — Hero + 5 stages: Before Visit (4), At the Museum (3), During the Tour (intro + 4), Engagement (3), Accessibility (intro + 3).
+- **AppPage.tsx** — New hero copy + robot connection line + app store line; Core Capabilities (4 cards); 5 screen preview cards (Live navigation, Exhibit details, Ask the guide, Interactive quiz, Visit progress) — keep current placeholder phone frames but make them feel intentional (label + icon + soft gradient, no broken empty boxes); final CTA.
+- **TicketsInfoPage.tsx** — New hero + two info notices; Adult $25, Student $15, Group $80 with the listed bullets; Trusted Booking section (3 cards: free cancellation, instant QR, secure payment).
+- **FaqPage.tsx** — Replace with the 8 listed Q&A. Set only the first 2 (`Do I have to use the app?`, `What if all robots are busy?`) open by default via `defaultValue={["q1","q2"]}` on the Accordion. Final CTA block ("Still Have Questions?" + Book your visit button).
+- **ContactPage.tsx** — New hero/subtitle. Contact cards: Visitor Support (`support@horus-bot.com`) and Museum Partnerships (`museums@horus-bot.com`). **Remove the phone card entirely.** Keep Office: Cairo, Egypt. Subject options: Visitor support / Booking issue / Technical issue / Partnership request / Press inquiry. New message placeholder. Bottom CTA.
+- **SiteFooter.tsx** — Update brand blurb to spec ("A new way to experience museums — guided, personalized, and effortless from start to finish.") Remove any phone numbers.
 
-**`src/pages/site/FaqPage.tsx`**
-- Reassuring tone rewrites for all existing answers
-- **Add 2 questions**: "How long does the full experience take?" + "What happens if I get disconnected?"
-- Set 1–2 questions open by default (`defaultValue` on Accordion — switch to `type="multiple"` if needed for 2 open)
-- **Add closing CTA block**: "Still have questions?" + Book your visit button
+Tone guardrails applied everywhere: no "backend", "edge function", "LiDAR", "ROS", "AI-powered" (except small subtle use in chat), "revolutionary", "magical". Use product language: robot guide, companion app, guided museum experience, assigned robot, live tour support.
 
-**`src/pages/site/ContactPage.tsx`**
-- Hero: add human subtext "Our team is here to help — before, during, and after your visit"
-- Contact cards: add response expectations under each (replies within hours / partnerships scope / hours Sun–Thu); **remove placeholder phone** if it's clearly fake (+20 100 000 0000 in footer is placeholder — replace with email-only or generic "Available Sun–Thu, 9am–6pm" without fake number)
-- Subject options: expand to 5 (Visitor support / Booking issue / Technical issue / Partnership / Press) — update Zod enum
-- Message placeholder: "Tell us what you need — booking, support, or partnerships…"
-- Add light trust line: "Built for museums, visitors, and cultural spaces in Egypt"
-- **Add fallback CTA at bottom**: "Prefer a faster next step?" + Book your visit button
-- **Mobile menu UX fix**: lock body scroll when mobile menu open (this lives in `SiteHeader.tsx`)
+## Part C — App Demo Fixes
 
-**`src/components/site/SiteHeader.tsx`**
-- Mobile menu: add `useEffect` to toggle `document.body.style.overflow = 'hidden'` when open
-- Ensure overlay has solid bg (not translucent) so form/page content doesn't bleed through
-- No CTA label changes needed (already "Book Your Visit")
+### C1. Checkout & purchase flow (`TicketsScreen.tsx`)
+- Above the checkout button, add helper line: "You'll receive your ticket instantly after checkout." (EN/AR).
+- Replace the destructive toast on 0 tickets with a soft inline message above the totals card ("Please select at least one ticket.") — no big red overlay.
+- Success dialog title → "🎉 You're all set!" with subtitle "Your tickets are ready." Button stays "Go to My Tickets".
+- On checkout, also persist a richer ticket object including `museum: "Egyptian Museum"`, formatted `date`, `status: 'active'` so My Tickets can render full cards. (Existing `addTickets` already saves to localStorage via AppContext — extend the Ticket shape in `src/lib/data.ts` with optional `museum` and `status` fields.)
 
-**`src/components/site/SiteFooter.tsx`**
-- Replace brand blurb with: "Designed to help museums guide visitors through large and complex spaces with a more connected, accessible, and engaging experience." (+ AR)
-- Remove any "robot, app, and backend" wording (currently says "tour management backend" — must remove)
-- Fake phone number: remove or replace with "Available Sun–Thu, 9am–6pm"
+### C2. My Tickets page (`MyTicketsScreen.tsx`)
+- Empty state: title "No tickets yet", text "You do not have any tickets yet. Book your visit to get started.", primary button "Book a visit" → navigates to `/tickets`.
+- Filled state: card per ticket showing museum name, formatted date, type + count, total price, a placeholder QR square (CSS pattern, no library), `Status: Active` badge, and two buttons: "View Ticket" (opens a simple dialog with ticket details + QR) and "Add to Wallet" (toast: "Wallet pass coming soon").
+- Full EN/AR.
 
-### Out of scope
-- Visual redesign (theme stays cinematic gold/dark)
-- Real app screenshots (will use styled mockup frames built with existing UI primitives, labeled as preview)
-- Backend wiring for Contact form (form still validates + toasts only)
-- New pages
+### C3. Chat error UX (`ChatModal.tsx`)
+- Track a `failureCount` ref/state.
+- On any error, do NOT surface raw error message. Replace fallback text:
+  - 1st failure: "Something went wrong. Please try again." (AR equivalent).
+  - 2+ failures: "Sorry, I'm having trouble right now. You can try again, or tap one of the options below." Keep `QuickReplies` visible (already always rendered).
+- Remove the destructive toast that exposes `error.message`. Just log to console.
+- Update initial greeting in `src/lib/i18n.ts` (`chatGreeting`) to: "Hi, I'm Horus-Bot 👋 I can help you with tickets, directions, exhibits, or your tour. What would you like to know?" + AR equivalent.
+- Soften the "AI-Powered" subtitle — keep it small, change to "Museum guide" (EN) / "مرشد المتحف" (AR) since the user wants AI-powered de-emphasized.
 
-### Tone guardrails I'll apply everywhere
-- Banned: backend, layer, LiDAR, ROS, SLAM, beacons, sensor fusion, MQTT, Firebase, AI models, NLP, sync, pairing-as-jargon
-- Banned: revolutionary, magical, cutting-edge, immersive (unsupported), greets you by name, robot waiting at the gate
-- Required: confident, calm, premium, short sentences, "you" language, benefit-first, museum-real
-- Arabic stays Modern Standard, natural — not literal translation
+### C4. Chat language behavior
+- Update `SYSTEM_PROMPT` in `supabase/functions/horus-chat/index.ts`:
+  - "You can communicate in Arabic, Egyptian Arabic (عامية مصرية), English, and other languages. Always reply in the same language and dialect the visitor used. If they wrote in Egyptian Arabic, reply in friendly Egyptian Arabic. Keep replies short, warm, and museum-focused."
+- No code change needed in client — model handles dialect matching.
+
+## Files to create
+- `src/components/site/ScrollToTop.tsx`
+
+## Files to edit
+- `src/App.tsx` — mount `ScrollToTop`
+- `src/index.css` — global gradient background layer, soften section dividers
+- `src/components/site/SiteHeader.tsx` — full-viewport mobile overlay + backdrop
+- `src/components/site/SiteFooter.tsx` — copy
+- `src/pages/site/HomePage.tsx`
+- `src/pages/site/AboutPage.tsx`
+- `src/pages/site/ExperiencePage.tsx`
+- `src/pages/site/AppPage.tsx`
+- `src/pages/site/TicketsInfoPage.tsx`
+- `src/pages/site/FaqPage.tsx`
+- `src/pages/site/ContactPage.tsx`
+- `src/pages/TicketsScreen.tsx` — helper line, soft 0-ticket message, new success modal, persist richer ticket
+- `src/pages/MyTicketsScreen.tsx` — full empty + filled states with QR placeholder, View Ticket dialog
+- `src/lib/data.ts` — extend `Ticket` type with optional `museum`, `status`
+- `src/lib/i18n.ts` — chat greeting + new strings (My Tickets empty/filled, ticket statuses, view/wallet buttons, soft errors)
+- `src/components/chat/ChatModal.tsx` — friendly fallback by failure count, remove technical toast, softer subtitle
+- `supabase/functions/horus-chat/index.ts` — system prompt language behavior
+
+## Out of scope
+- Redesign, new pages, new visual identity
+- Real screenshots (placeholders stay, just look intentional)
+- Wiring contact form to a real inbox
+- Real wallet pass generation
