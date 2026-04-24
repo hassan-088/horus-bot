@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Mail, Clock, MapPin, Instagram, Twitter, Facebook } from 'lucide-react';
+import { Mail, Briefcase, MapPin, Instagram, Twitter, Facebook } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 export function SiteFooter() {
   const { isRTL } = useApp();
 
   return (
-    <footer className="border-t border-border/40 bg-sidebar/60">
+    <footer className="border-t border-border/30 bg-sidebar/30 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 md:px-8 py-16">
         <div className="grid gap-12 md:grid-cols-4">
           <div className="md:col-span-1">
@@ -18,8 +18,8 @@ export function SiteFooter() {
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isRTL
-                ? 'مصمَّم لمساعدة المتاحف على إرشاد الزوار عبر مساحاتها الكبيرة والمعقّدة بتجربة أكثر اتصالاً وقابليةً للوصول وتفاعلاً.'
-                : 'Designed to help museums guide visitors through large and complex spaces with a more connected, accessible, and engaging experience.'}
+                ? 'طريقة جديدة لاستكشاف المتاحف — موجَّهة، شخصية، وسلِسة من البداية إلى النهاية.'
+                : 'A new way to experience museums — guided, personalized, and effortless from start to finish.'}
             </p>
           </div>
 
@@ -28,6 +28,7 @@ export function SiteFooter() {
             <ul className="space-y-2.5 text-sm">
               <li><Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'من نحن' : 'About'}</Link></li>
               <li><Link to="/experience" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'التجربة' : 'Experience'}</Link></li>
+              <li><Link to="/tickets-info" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'التذاكر' : 'Tickets'}</Link></li>
               <li><Link to="/app" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'التطبيق' : 'App'}</Link></li>
               <li><Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'الأسئلة' : 'FAQ'}</Link></li>
             </ul>
@@ -36,8 +37,8 @@ export function SiteFooter() {
           <div>
             <h4 className="section-label mb-4">{isRTL ? 'تواصل' : 'Contact'}</h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> hello@horus-bot.com</li>
-              <li className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {isRTL ? 'الأحد – الخميس، 9 ص – 6 م' : 'Sun–Thu, 9am–6pm'}</li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> support@horus-bot.com</li>
+              <li className="flex items-center gap-2"><Briefcase className="h-4 w-4 text-primary" /> museums@horus-bot.com</li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Cairo, Egypt</li>
             </ul>
           </div>

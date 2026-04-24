@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, Send, Briefcase, Clock, Ticket } from 'lucide-react';
+import { Mail, MapPin, Send, Briefcase, Ticket } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,35 +51,24 @@ export default function ContactPage() {
     <>
       <SectionHero
         label={isRTL ? 'تواصل' : 'Contact'}
-        title={isRTL ? 'تواصل مع الفريق المناسب' : 'Reach the right team'}
-        subtitle={isRTL ? 'فريقنا هنا للمساعدة — قبل زيارتك وأثناءها وبعدها.' : 'Our team is here to help — before, during, and after your visit.'}
+        title={isRTL ? 'تواصل مع الفريق المناسب' : 'Reach the Right Team'}
+        subtitle={isRTL ? 'فريقنا هنا لمساعدتك قبل زيارتك وأثناءها وبعدها.' : 'Our team is here to help before, during, and after your visit.'}
       />
 
-      <div className="mx-auto max-w-4xl px-4 md:px-8 -mt-6 mb-10 text-center">
-        <p className="text-sm text-muted-foreground">
-          {isRTL ? 'مصمَّم للمتاحف والزوار والفضاءات الثقافية في مصر.' : 'Built for museums, visitors, and cultural spaces in Egypt.'}
-        </p>
-      </div>
-
-      <section className="mx-auto max-w-6xl px-4 md:px-8 pb-20">
+      <section className="mx-auto max-w-6xl px-4 md:px-8 pt-4 pb-20">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-4 lg:col-span-1">
             <Card className="p-6">
               <Mail className="h-5 w-5 text-primary mb-3" />
-              <h3 className="font-serif text-base mb-1">{isRTL ? 'دعم الزوار' : 'Visitor support'}</h3>
+              <h3 className="font-serif text-base mb-1">{isRTL ? 'دعم الزوار' : 'Visitor Support'}</h3>
               <p className="text-sm text-muted-foreground">support@horus-bot.com</p>
-              <p className="text-xs text-primary/80 mt-2">{isRTL ? 'الردود عادةً خلال ساعات قليلة' : 'Typically replies within a few hours'}</p>
+              <p className="text-xs text-primary/80 mt-2">{isRTL ? 'الردود عادةً خلال ساعات قليلة.' : 'Typically replies within a few hours.'}</p>
             </Card>
             <Card className="p-6">
               <Briefcase className="h-5 w-5 text-primary mb-3" />
-              <h3 className="font-serif text-base mb-1">{isRTL ? 'شراكات المتاحف' : 'Museum partnerships'}</h3>
+              <h3 className="font-serif text-base mb-1">{isRTL ? 'شراكات المتاحف' : 'Museum Partnerships'}</h3>
               <p className="text-sm text-muted-foreground">museums@horus-bot.com</p>
-              <p className="text-xs text-muted-foreground mt-2">{isRTL ? 'لطلبات التعاون والشراكة مع المتاحف' : 'For museum collaborations and partnership requests'}</p>
-            </Card>
-            <Card className="p-6">
-              <Clock className="h-5 w-5 text-primary mb-3" />
-              <h3 className="font-serif text-base mb-1">{isRTL ? 'ساعات الدعم' : 'Support hours'}</h3>
-              <p className="text-sm text-muted-foreground">{isRTL ? 'الأحد – الخميس، 9 ص – 6 م' : 'Available Sun–Thu, 9am–6pm'}</p>
+              <p className="text-xs text-muted-foreground mt-2">{isRTL ? 'للمتاحف الراغبة في إدخال حورس-بوت إلى تجربة الزائر.' : 'For museums interested in bringing Horus-Bot into their visitor experience.'}</p>
             </Card>
             <Card className="p-6">
               <MapPin className="h-5 w-5 text-primary mb-3" />
@@ -120,7 +109,7 @@ export default function ContactPage() {
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   className="mt-1.5 min-h-32"
-                  placeholder={isRTL ? 'أخبرنا بما تحتاجه — حجز، دعم، أو شراكة…' : 'Tell us what you need — booking, support, or partnerships…'}
+                  placeholder={isRTL ? 'أخبرنا بما تحتاجه — دعم في الحجز، مساعدة في الزيارة، أو تفاصيل شراكة.' : 'Tell us what you need — booking support, visit help, or partnership details.'}
                   required
                 />
               </div>
@@ -135,13 +124,13 @@ export default function ContactPage() {
       <section className="mx-auto max-w-3xl px-4 md:px-8 pb-24">
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-8 text-center">
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-3">
-            {isRTL ? 'تفضّل خطوة أسرع؟' : 'Prefer a faster next step?'}
+            {isRTL ? 'تفضّل بداية أسرع؟' : 'Prefer a Faster Start?'}
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            {isRTL ? 'احجز زيارتك الآن وابدأ تجربتك مباشرةً.' : 'Book your visit now and start your experience right away.'}
+            {isRTL ? 'احجز زيارتك واختبر حورس-بوت بنفسك.' : 'Book your visit and experience Horus-Bot firsthand.'}
           </p>
           <Button asChild size="lg">
-            <Link to="/tickets-info"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك الآن' : 'Book your visit now'}</Link>
+            <Link to="/tickets-info"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book your visit'}</Link>
           </Button>
         </div>
       </section>

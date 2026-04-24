@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { ScrollToTop } from "@/components/site/ScrollToTop";
 
 import SplashScreen from "./pages/SplashScreen";
 import HomePage from "./pages/site/HomePage";
@@ -91,6 +92,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <AppRoutes />
           </BrowserRouter>
         </TooltipProvider>

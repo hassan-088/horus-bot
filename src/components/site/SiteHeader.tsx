@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
@@ -18,8 +18,10 @@ const navItems = [
 export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();
   const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
 
+  // Lock body scroll while mobile menu is open
   useEffect(() => {
     const original = document.body.style.overflow;
     if (open) document.body.style.overflow = 'hidden';
@@ -28,8 +30,13 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-sidebar/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-sidebar/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
@@ -77,53 +84,82 @@ export function SiteHeader() {
         </div>
 
         <button
+          type="button"
           className="lg:hidden p-2 text-foreground"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
+      {/* MOBILE MENU OVERLAY — full viewport, above everything */}
       {open && (
-        <div className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-50 overflow-y-auto border-t border-border/40 bg-sidebar shadow-2xl">
-          <nav className="flex flex-col p-4 gap-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
+        <div className="lg:hidden fixed inset-0 z-[100]">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-foreground/40 backdrop-blur-sm animate-fade-in"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+          {/* Panel */}
+          <div className="absolute inset-x-0 top-0 max-h-screen overflow-y-auto bg-sidebar border-b border-border/40 shadow-2xl animate-slide-in-right">
+            <div className="flex h-16 items-center justify-between px-4 border-b border-border/40">
+              <Link to="/" onClick={() => setOpen(false)} className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
+                  <span className="font-serif text-lg font-bold text-primary">H</span>
+                </div>
+                <span className="font-serif text-lg tracking-wide text-foreground">Horus-Bot</span>
+              </Link>
+              <button
+                type="button"
+                className="p-2 text-foreground"
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    'rounded-lg px-3 py-2.5 text-sm font-medium',
-                    isActive
-                      ? 'bg-primary/15 text-primary'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  )
-                }
+                aria-label="Close menu"
               >
-                {isRTL ? item.labelAr : item.labelEn}
-              </NavLink>
-            ))}
-            <div className="mt-3 flex flex-col gap-2 border-t border-border/40 pt-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
-                className="justify-start gap-1.5"
-              >
-                <Globe className="h-4 w-4" />
-                {language === 'en' ? 'العربية' : 'English'}
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => { setOpen(false); navigate('/home'); }}>
-                {isRTL ? 'افتح التطبيق' : 'Open App'}
-              </Button>
-              <Button size="sm" onClick={() => { setOpen(false); navigate('/tickets-info'); }}>
-                {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
-              </Button>
+                <X className="h-5 w-5" />
+              </button>
             </div>
-          </nav>
+
+            <nav className="flex flex-col p-4 gap-1">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    cn(
+                      'rounded-lg px-3 py-3 text-base font-medium',
+                      isActive
+                        ? 'bg-primary/15 text-primary'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    )
+                  }
+                >
+                  {isRTL ? item.labelAr : item.labelEn}
+                </NavLink>
+              ))}
+              <div className="mt-4 flex flex-col gap-2 border-t border-border/40 pt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+                  className="justify-start gap-1.5"
+                >
+                  <Globe className="h-4 w-4" />
+                  {language === 'en' ? 'العربية' : 'English'}
+                </Button>
+                <Button variant="outline" onClick={() => { setOpen(false); navigate('/home'); }}>
+                  {isRTL ? 'افتح التطبيق' : 'Open App'}
+                </Button>
+                <Button onClick={() => { setOpen(false); navigate('/tickets-info'); }}>
+                  {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
+                </Button>
+              </div>
+            </nav>
+          </div>
         </div>
       )}
     </header>

@@ -24,10 +24,9 @@ export function SectionHero({
     <section className={cn('relative overflow-hidden', className)}>
       {/* Cinematic gold radial wash */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-sidebar" />
         <div
-          className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full opacity-30 blur-3xl"
-          style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.4), transparent 60%)' }}
+          className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
+          style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 60%)' }}
         />
       </div>
 
