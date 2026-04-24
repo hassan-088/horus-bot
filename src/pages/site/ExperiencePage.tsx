@@ -38,7 +38,7 @@ export default function ExperiencePage() {
         ]}
       />
 
-      <div className="bg-sidebar/40 border-y border-border/30">
+      <div className="bg-sidebar/15">
         <Stage
           label={isRTL ? 'في المتحف' : 'At the Museum'}
           title={isRTL ? 'الوصول وبدء جولتك' : 'Arrive and begin your tour'}
@@ -64,7 +64,7 @@ export default function ExperiencePage() {
         ]}
       />
 
-      <div className="bg-sidebar/40 border-y border-border/30">
+      <div className="bg-sidebar/15">
         <Stage
           label={isRTL ? 'التفاعل' : 'Engagement'}
           title={isRTL ? 'لحظات صغيرة تبقى معك' : 'Small moments that stay with you'}

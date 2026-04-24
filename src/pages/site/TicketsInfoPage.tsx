@@ -94,7 +94,7 @@ export default function TicketsInfoPage() {
         </div>
       </section>
 
-      <section className="bg-sidebar/40 border-y border-border/30">
+      <section className="bg-sidebar/15">
         <div className="mx-auto max-w-4xl px-4 md:px-8 py-20 text-center">
           <div className="section-label mb-4">{isRTL ? 'حجز موثوق' : 'Trusted booking'}</div>
           <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'تفاصيل تطمئنك قبل الحجز' : 'Details that put you at ease before you book'}</h2>

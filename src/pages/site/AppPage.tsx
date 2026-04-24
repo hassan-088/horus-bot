@@ -66,7 +66,7 @@ export default function AppPage() {
         </div>
       </section>
 
-      <section className="bg-sidebar/40 border-y border-border/30">
+      <section className="bg-sidebar/15">
         <div className="mx-auto max-w-7xl px-4 md:px-8 py-20">
           <div className="section-label mb-4">{isRTL ? 'لقطات' : 'Screens'}</div>
           <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'الواجهات التي ستستخدمها' : 'The screens you will use'}</h2>

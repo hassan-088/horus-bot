@@ -96,7 +96,7 @@ export default function HomePage() {
       </section>
 
       {/* CORE CAPABILITIES */}
-      <section className="bg-sidebar/40 border-y border-border/30">
+      <section className="bg-sidebar/15">
         <div className="mx-auto max-w-7xl px-4 md:px-8 py-20 md:py-28">
           <div className="text-center mb-14">
             <div className="section-label mb-4">{isRTL ? 'القدرات الأساسية' : 'Core Capabilities'}</div>
@@ -172,7 +172,7 @@ export default function HomePage() {
       </section>
 
       {/* APP PREVIEW */}
-      <section className="bg-sidebar/40 border-y border-border/30">
+      <section className="bg-sidebar/15">
         <div className="mx-auto max-w-7xl px-4 md:px-8 py-20 md:py-28">
           <div className="grid gap-12 lg:grid-cols-2 items-center">
             <div>
@@ -237,7 +237,7 @@ export default function HomePage() {
       </section>
 
       {/* SYSTEM STATUS */}
-      <section className="bg-sidebar/40 border-y border-border/30">
+      <section className="bg-sidebar/15">
         <div className="mx-auto max-w-5xl px-4 md:px-8 py-20">
           <div className="text-center mb-12">
             <div className="section-label mb-4 text-primary">{isRTL ? 'حالة النظام' : 'System Status'}</div>

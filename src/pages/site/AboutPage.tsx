@@ -47,7 +47,7 @@ export default function AboutPage() {
       </section>
 
       {/* SOLUTION */}
-      <section className="bg-sidebar/40 border-y border-border/30">
+      <section className="bg-sidebar/15">
         <div className="mx-auto max-w-7xl px-4 md:px-8 py-20">
           <div className="section-label mb-4 text-primary">{isRTL ? 'الحل' : 'The Solution'}</div>
           <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'ما يقدّمه حورس-بوت لكل مشكلة' : 'What Horus-Bot brings to each problem'}</h2>
@@ -82,7 +82,7 @@ export default function AboutPage() {
       </section>
 
       {/* TEAM */}
-      <section className="bg-sidebar/40 border-y border-border/30">
+      <section className="bg-sidebar/15">
         <div className="mx-auto max-w-7xl px-4 md:px-8 py-20">
           <div className="section-label mb-4">{isRTL ? 'الفريق' : 'Team'}</div>
           <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'من يبني حورس-بوت' : 'Who builds Horus-Bot'}</h2>
