@@ -184,6 +184,21 @@
     @apply bg-background text-foreground antialiased;
     line-height: 1.5;
     font-family: 'Inter', system-ui, sans-serif;
+    position: relative;
+  }
+
+  /* Smooth premium ambient background — one continuous warm wash */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, hsl(var(--primary) / 0.07), transparent 70%),
+      radial-gradient(ellipse 70% 50% at 100% 50%, hsl(var(--primary) / 0.05), transparent 65%),
+      radial-gradient(ellipse 70% 50% at 0% 80%, hsl(var(--primary) / 0.04), transparent 65%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--card) / 0.4) 50%, hsl(var(--background)) 100%);
   }
 
   h1, h2, h3, .font-serif {
