@@ -92,6 +92,11 @@ export default function TicketsInfoPage() {
             </Card>
           ))}
         </div>
+        <div className="mt-6 text-center text-sm">
+          <Link to="/tickets-mine" className="text-primary hover:underline">
+            {isRTL ? 'حجزت بالفعل؟ اعرض تذاكرك' : 'Already booked? View your tickets'}
+          </Link>
+        </div>
       </section>
 
       <section className="bg-sidebar/15">

@@ -159,6 +159,16 @@ export function SiteHeader() {
                   <Globe className="h-4 w-4" />
                   {language === 'en' ? 'العربية' : 'English'}
                 </Button>
+                {user && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => { setOpen(false); navigate('/tickets-mine'); }}
+                    className="justify-start gap-1.5"
+                  >
+                    <TicketIcon className="h-4 w-4" />
+                    {isRTL ? 'تذاكري' : 'My tickets'}
+                  </Button>
+                )}
                 <Button variant="outline" onClick={() => { setOpen(false); navigate('/home'); }}>
                   {isRTL ? 'افتح التطبيق' : 'Open App'}
                 </Button>
