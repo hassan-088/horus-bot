@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, Ticket as TicketIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
 
 export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -75,6 +77,12 @@ export function SiteHeader() {
             <Globe className="h-4 w-4" />
             {language === 'en' ? 'EN' : 'ع'}
           </Button>
+          {user && (
+            <Button variant="ghost" size="sm" onClick={() => navigate('/tickets-mine')} className="gap-1.5">
+              <TicketIcon className="h-4 w-4" />
+              {isRTL ? 'تذاكري' : 'My tickets'}
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => navigate('/home')}>
             {isRTL ? 'افتح التطبيق' : 'Open App'}
           </Button>
