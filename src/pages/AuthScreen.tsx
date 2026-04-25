@@ -81,11 +81,11 @@ export default function AuthScreen() {
       if (isSignUp) {
         const { error } = await signUp(email, password, displayName || undefined);
         if (error) {
-          if (error.message.includes('already registered')) {
-            toast.error(isArabic ? 'هذا البريد مسجل بالفعل' : 'This email is already registered');
-          } else {
-            toast.error(error.message);
-          }
+          toast.error(
+            isArabic
+              ? 'تعذّر إنشاء حسابك. تأكّد من بياناتك وحاول مرة أخرى.'
+              : "We couldn't create your account. Please check your details and try again.",
+          );
         } else {
           toast.success(isArabic ? 'تم إنشاء الحساب بنجاح!' : 'Account created successfully!');
           navigate('/home', { replace: true });
@@ -93,11 +93,11 @@ export default function AuthScreen() {
       } else {
         const { error } = await signIn(email, password);
         if (error) {
-          if (error.message.includes('Invalid login credentials')) {
-            toast.error(isArabic ? 'بيانات الدخول غير صحيحة' : 'Invalid email or password');
-          } else {
-            toast.error(error.message);
-          }
+          toast.error(
+            isArabic
+              ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.'
+              : 'Email or password is incorrect. Please try again.',
+          );
         } else {
           toast.success(isArabic ? 'مرحباً بعودتك!' : 'Welcome back!');
           navigate('/home', { replace: true });
@@ -111,10 +111,10 @@ export default function AuthScreen() {
   const texts = {
     title: isSignUp 
       ? (isArabic ? 'إنشاء حساب' : 'Create Account') 
-      : (isArabic ? 'تسجيل الدخول' : 'Sign In'),
+      : (isArabic ? 'مرحباً بعودتك إلى Horus-Bot' : 'Welcome back to Horus-Bot'),
     subtitle: isSignUp
       ? (isArabic ? 'انضم إلى رحلتك في المتحف' : 'Join your museum journey')
-      : (isArabic ? 'مرحباً بعودتك' : 'Welcome back'),
+      : (isArabic ? 'سجّل الدخول للوصول إلى تذاكرك وجولاتك وتقدّم زيارتك.' : 'Log in to access your tickets, tours, and saved visit progress.'),
     email: isArabic ? 'البريد الإلكتروني' : 'Email',
     password: isArabic ? 'كلمة المرور' : 'Password',
     displayName: isArabic ? 'الاسم' : 'Display Name',
