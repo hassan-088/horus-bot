@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      tickets: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          museum_name: string
+          payment_method: string
+          qr_value: string
+          status: string
+          ticket_types: Json
+          total_price: number
+          total_tickets: number
+          user_id: string
+          visit_date: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          museum_name?: string
+          payment_method: string
+          qr_value: string
+          status?: string
+          ticket_types?: Json
+          total_price: number
+          total_tickets: number
+          user_id: string
+          visit_date: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          museum_name?: string
+          payment_method?: string
+          qr_value?: string
+          status?: string
+          ticket_types?: Json
+          total_price?: number
+          total_tickets?: number
+          user_id?: string
+          visit_date?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string
