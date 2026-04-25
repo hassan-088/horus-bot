@@ -16,6 +16,7 @@ import TicketsInfoPage from "./pages/site/TicketsInfoPage";
 import AppPage from "./pages/site/AppPage";
 import FaqPage from "./pages/site/FaqPage";
 import ContactPage from "./pages/site/ContactPage";
+import MyTicketsPage from "./pages/site/MyTicketsPage";
 import OnboardingScreen from "./pages/OnboardingScreen";
 import AuthScreen from "./pages/AuthScreen";
 import HomeScreen from "./pages/HomeScreen";
@@ -55,6 +56,7 @@ function AppRoutes() {
         <Route path="/app" element={<AppPage />} />
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/tickets-mine" element={<MyTicketsPage />} />
         {/* App */}
         <Route path="/launch" element={<SplashScreen />} />
         <Route path="/onboarding" element={<OnboardingScreen />} />

@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { MessageSquare, Bell, Map, BookOpen, Smartphone, Apple, Compass, Award, Sparkles } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SectionHero } from '@/components/site/SectionHero';
 import { FeatureCard } from '@/components/site/FeatureCard';
+import { ComingSoonModal } from '@/components/site/ComingSoonModal';
 import { useApp } from '@/contexts/AppContext';
 
 export default function AppPage() {
   const { isRTL } = useApp();
+  const [showSoon, setShowSoon] = useState(false);
 
   const screens = [
     { icon: Map, label: isRTL ? 'الملاحة الحية' : 'Live navigation' },
@@ -16,18 +19,24 @@ export default function AppPage() {
     { icon: Sparkles, label: isRTL ? 'تقدّم الزيارة' : 'Visit progress' },
   ];
 
+  const StoreButtons = () => (
+    <>
+      <Button size="lg" onClick={() => setShowSoon(true)}>
+        <Apple className="h-4 w-4" /> App Store
+      </Button>
+      <Button size="lg" variant="outline" onClick={() => setShowSoon(true)}>
+        <Smartphone className="h-4 w-4" /> Google Play
+      </Button>
+    </>
+  );
+
   return (
     <>
       <SectionHero
         label={isRTL ? 'التطبيق' : 'The App'}
         title={isRTL ? 'تجربة متحفك كاملةً في مكان واحد' : 'Your Entire Museum Experience, in One Place'}
         subtitle={isRTL ? 'تنقَّل، استكشف، اطرح الأسئلة، وابقَ على المسار — كل ذلك من تطبيق واحد بسيط.' : 'Navigate, explore, ask questions, and stay on track — all through one simple app.'}
-        actions={
-          <>
-            <Button size="lg"><Apple className="h-4 w-4" /> App Store</Button>
-            <Button size="lg" variant="outline"><Smartphone className="h-4 w-4" /> Google Play</Button>
-          </>
-        }
+        actions={<StoreButtons />}
       />
 
       <div className="mx-auto max-w-3xl px-4 md:px-8 -mt-6 mb-4 text-center space-y-2">
@@ -103,10 +112,11 @@ export default function AppPage() {
         <h2 className="font-serif text-3xl md:text-5xl mb-6">{isRTL ? 'حمّل التطبيق قبل أن تصل' : 'Install the App Before You Arrive'}</h2>
         <p className="text-lg text-muted-foreground mb-10">{isRTL ? 'ادخل وأنت جاهز — كل شيء مهيّأ قبل وصولك بالفعل.' : 'Walk in ready — everything is set before you even arrive.'}</p>
         <div className="flex flex-wrap gap-3 justify-center">
-          <Button size="lg"><Apple className="h-4 w-4" /> App Store</Button>
-          <Button size="lg" variant="outline"><Smartphone className="h-4 w-4" /> Google Play</Button>
+          <StoreButtons />
         </div>
       </section>
+
+      <ComingSoonModal open={showSoon} onOpenChange={setShowSoon} />
     </>
   );
 }
