@@ -87,7 +87,7 @@ export default function TicketsInfoPage() {
                 ))}
               </ul>
               <Button asChild className="w-full" variant={t.featured ? 'default' : 'outline'}>
-                <Link to="/tickets"><TicketIcon className="h-4 w-4" /> {isRTL ? 'احجز الآن' : 'Book now'}</Link>
+                <Link to="/book"><TicketIcon className="h-4 w-4" /> {isRTL ? 'احجز الآن' : 'Book now'}</Link>
               </Button>
             </Card>
           ))}
