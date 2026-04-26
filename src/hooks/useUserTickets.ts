@@ -84,13 +84,20 @@ export function useUserTickets() {
         user_id: user.id,
         museum_name: input.museum_name ?? 'The Egyptian Museum',
         visit_date: input.visit_date,
+        visit_time: input.visit_time ?? null,
         ticket_types: input.ticket_types,
         total_tickets: input.total_tickets,
         total_price: input.total_price,
-        currency: input.currency ?? 'USD',
+        currency: input.currency ?? 'EGP',
         payment_method: input.payment_method,
         status: 'active',
         qr_value: makeQrValue(),
+        tour_duration: input.tour_duration ?? null,
+        visitor_type: input.visitor_type ?? null,
+        interests: input.interests ?? null,
+        accessibility: input.accessibility ?? null,
+        preferred_language: input.preferred_language ?? null,
+        notes: input.notes ?? null,
       };
       const { data, error } = await supabase
         .from('tickets')
