@@ -56,7 +56,7 @@ export default function MyTicketsPage() {
               {isRTL ? 'احجز زيارتك لتبدأ.' : 'Book your visit to get started.'}
             </p>
             <Button asChild>
-              <Link to="/tickets-info">{isRTL ? 'احجز زيارة' : 'Book a visit'}</Link>
+              <Link to="/book">{isRTL ? 'احجز زيارة' : 'Book your visit'}</Link>
             </Button>
           </Card>
         )}
