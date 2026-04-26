@@ -30,7 +30,7 @@ export default function HomePage() {
         actions={
           <>
             <Button asChild size="lg">
-              <Link to="/tickets-info">
+              <Link to="/book">
                 <Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
               </Link>
             </Button>
@@ -236,7 +236,7 @@ export default function HomePage() {
             : 'Book your visit, connect instantly, and enjoy a guided museum experience from the moment you arrive.'}
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
-          <Button asChild size="lg"><Link to="/tickets-info"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}</Link></Button>
+          <Button asChild size="lg"><Link to="/book"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}</Link></Button>
           <Button asChild variant="outline" size="lg"><Link to="/app"><Compass className="h-4 w-4" /> {isRTL ? 'اكتشف التطبيق' : 'Explore the App'}</Link></Button>
         </div>
       </section>

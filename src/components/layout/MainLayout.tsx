@@ -14,7 +14,7 @@ interface MainLayoutProps {
 }
 
 // Public marketing site routes — show SiteHeader/SiteFooter, hide app nav/chat
-const publicRoutes = ['/', '/about', '/experience', '/tickets-info', '/app', '/faq', '/contact'];
+const publicRoutes = ['/', '/about', '/experience', '/tickets-info', '/app', '/faq', '/contact', '/tickets-mine', '/book'];
 
 // App-only pages that should NOT show bottom navigation
 const noNavPages = ['/launch', '/onboarding', '/ar_view'];

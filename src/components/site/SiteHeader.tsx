@@ -83,10 +83,7 @@ export function SiteHeader() {
               {isRTL ? 'تذاكري' : 'My tickets'}
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={() => navigate('/home')}>
-            {isRTL ? 'افتح التطبيق' : 'Open App'}
-          </Button>
-          <Button size="sm" onClick={() => navigate('/tickets-info')}>
+          <Button size="sm" onClick={() => navigate('/book')}>
             {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
           </Button>
         </div>
@@ -169,10 +166,7 @@ export function SiteHeader() {
                     {isRTL ? 'تذاكري' : 'My tickets'}
                   </Button>
                 )}
-                <Button variant="outline" onClick={() => { setOpen(false); navigate('/home'); }}>
-                  {isRTL ? 'افتح التطبيق' : 'Open App'}
-                </Button>
-                <Button onClick={() => { setOpen(false); navigate('/tickets-info'); }}>
+                <Button onClick={() => { setOpen(false); navigate('/book'); }}>
                   {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
                 </Button>
               </div>

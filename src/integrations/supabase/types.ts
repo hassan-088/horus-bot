@@ -46,46 +46,67 @@ export type Database = {
       }
       tickets: {
         Row: {
+          accessibility: string[] | null
           created_at: string
           currency: string
           id: string
+          interests: string[] | null
           museum_name: string
+          notes: string | null
           payment_method: string
+          preferred_language: string | null
           qr_value: string
           status: string
           ticket_types: Json
           total_price: number
           total_tickets: number
+          tour_duration: number | null
           user_id: string
           visit_date: string
+          visit_time: string | null
+          visitor_type: string | null
         }
         Insert: {
+          accessibility?: string[] | null
           created_at?: string
           currency?: string
           id?: string
+          interests?: string[] | null
           museum_name?: string
+          notes?: string | null
           payment_method: string
+          preferred_language?: string | null
           qr_value: string
           status?: string
           ticket_types?: Json
           total_price: number
           total_tickets: number
+          tour_duration?: number | null
           user_id: string
           visit_date: string
+          visit_time?: string | null
+          visitor_type?: string | null
         }
         Update: {
+          accessibility?: string[] | null
           created_at?: string
           currency?: string
           id?: string
+          interests?: string[] | null
           museum_name?: string
+          notes?: string | null
           payment_method?: string
+          preferred_language?: string | null
           qr_value?: string
           status?: string
           ticket_types?: Json
           total_price?: number
           total_tickets?: number
+          tour_duration?: number | null
           user_id?: string
           visit_date?: string
+          visit_time?: string | null
+          visitor_type?: string | null
         }
         Relationships: []
       }

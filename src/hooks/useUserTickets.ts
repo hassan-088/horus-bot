@@ -7,6 +7,7 @@ export interface UserTicket {
   user_id: string;
   museum_name: string;
   visit_date: string;
+  visit_time?: string | null;
   ticket_types: Record<string, number>;
   total_tickets: number;
   total_price: number;
@@ -15,16 +16,29 @@ export interface UserTicket {
   status: string;
   qr_value: string;
   created_at: string;
+  tour_duration?: number | null;
+  visitor_type?: string | null;
+  interests?: string[] | null;
+  accessibility?: string[] | null;
+  preferred_language?: string | null;
+  notes?: string | null;
 }
 
 export interface NewTicketInput {
   museum_name?: string;
   visit_date: string;
+  visit_time?: string;
   ticket_types: Record<string, number>;
   total_tickets: number;
   total_price: number;
   currency?: string;
   payment_method: string;
+  tour_duration?: number;
+  visitor_type?: string;
+  interests?: string[];
+  accessibility?: string[];
+  preferred_language?: string;
+  notes?: string;
 }
 
 function makeQrValue() {
@@ -70,13 +84,20 @@ export function useUserTickets() {
         user_id: user.id,
         museum_name: input.museum_name ?? 'The Egyptian Museum',
         visit_date: input.visit_date,
+        visit_time: input.visit_time ?? null,
         ticket_types: input.ticket_types,
         total_tickets: input.total_tickets,
         total_price: input.total_price,
-        currency: input.currency ?? 'USD',
+        currency: input.currency ?? 'EGP',
         payment_method: input.payment_method,
         status: 'active',
         qr_value: makeQrValue(),
+        tour_duration: input.tour_duration ?? null,
+        visitor_type: input.visitor_type ?? null,
+        interests: input.interests ?? null,
+        accessibility: input.accessibility ?? null,
+        preferred_language: input.preferred_language ?? null,
+        notes: input.notes ?? null,
       };
       const { data, error } = await supabase
         .from('tickets')

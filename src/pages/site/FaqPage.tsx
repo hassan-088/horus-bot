@@ -58,7 +58,7 @@ export default function FaqPage() {
             {isRTL ? 'احجز زيارتك واختبرها بنفسك.' : 'Book your visit and experience it for yourself.'}
           </p>
           <Button asChild size="lg">
-            <Link to="/tickets-info"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book your visit'}</Link>
+            <Link to="/book"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book your visit'}</Link>
           </Button>
         </div>
       </section>

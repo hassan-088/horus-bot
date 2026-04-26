@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Ticket, LogIn, Calendar, QrCode, Wallet } from 'lucide-react';
+import { Ticket, LogIn, Calendar, Clock, QrCode, Wallet, Sparkles, Languages } from 'lucide-react';
 import { AppBar } from '@/components/layout/AppBar';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Button } from '@/components/ui/button';
@@ -59,9 +59,11 @@ export default function MyTicketsScreen() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="font-serif text-lg">{tk.museum_name}</h3>
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {tk.visit_date}
+                <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1 flex-wrap">
+                  <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{tk.visit_date}</span>
+                  {tk.visit_time && (
+                    <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{tk.visit_time}</span>
+                  )}
                 </div>
               </div>
               <Badge variant="secondary" className="bg-primary/15 text-primary border-0">
@@ -72,9 +74,31 @@ export default function MyTicketsScreen() {
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
                 {tk.total_tickets} × {isRTL ? 'تذاكر' : 'tickets'}
+                {tk.tour_duration ? ` • ${tk.tour_duration} ${isRTL ? 'دقيقة' : 'min'}` : ''}
               </span>
               <span className="font-semibold">{tk.total_price} {tk.currency}</span>
             </div>
+
+            {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
+              <div className="space-y-1.5">
+                {tk.preferred_language && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Languages className="h-3 w-3" />
+                    <span className="capitalize">{tk.preferred_language.replace('-', ' ')}</span>
+                  </div>
+                )}
+                {tk.interests && tk.interests.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1">
+                    <Sparkles className="h-3 w-3 text-primary" />
+                    {tk.interests.slice(0, 4).map((i) => (
+                      <span key={i} className="rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] capitalize">
+                        {i.replace('-', ' ')}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="rounded-xl border-2 border-dashed border-border p-4 flex items-center gap-3 bg-background/50">
               <QrCode className="h-10 w-10 text-foreground shrink-0" />
