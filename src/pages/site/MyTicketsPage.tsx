@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Ticket, LogIn, Calendar, QrCode, Wallet } from 'lucide-react';
+import { Ticket, LogIn, Calendar, Clock, QrCode, Wallet, Languages, Users, Sparkles } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -68,9 +68,11 @@ export default function MyTicketsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="font-serif text-xl">{tk.museum_name}</h3>
-                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {tk.visit_date}
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1 flex-wrap">
+                      <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{tk.visit_date}</span>
+                      {tk.visit_time && (
+                        <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{tk.visit_time}</span>
+                      )}
                     </div>
                   </div>
                   <Badge variant="secondary" className="bg-primary/15 text-primary border-0">
@@ -78,20 +80,43 @@ export default function MyTicketsPage() {
                   </Badge>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-3">
+                <div className="grid sm:grid-cols-3 gap-3">
                   <div className="rounded-xl bg-muted/50 p-3 text-sm">
-                    <div className="text-xs text-muted-foreground">
-                      {isRTL ? 'عدد التذاكر' : 'Tickets'}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{isRTL ? 'عدد التذاكر' : 'Tickets'}</div>
                     <div className="font-semibold">{tk.total_tickets}</div>
                   </div>
-                  <div className="rounded-xl bg-muted/50 p-3 text-sm">
-                    <div className="text-xs text-muted-foreground">
-                      {isRTL ? 'الإجمالي' : 'Total'}
+                  {tk.tour_duration && (
+                    <div className="rounded-xl bg-muted/50 p-3 text-sm">
+                      <div className="text-xs text-muted-foreground">{isRTL ? 'مدة الجولة' : 'Duration'}</div>
+                      <div className="font-semibold">{tk.tour_duration} {isRTL ? 'دقيقة' : 'min'}</div>
                     </div>
+                  )}
+                  <div className="rounded-xl bg-muted/50 p-3 text-sm">
+                    <div className="text-xs text-muted-foreground">{isRTL ? 'الإجمالي' : 'Total'}</div>
                     <div className="font-semibold">{tk.total_price} {tk.currency}</div>
                   </div>
                 </div>
+
+                {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
+                  <div className="space-y-2">
+                    {tk.preferred_language && (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Languages className="h-3.5 w-3.5" />
+                        <span className="capitalize">{tk.preferred_language.replace('-', ' ')}</span>
+                      </div>
+                    )}
+                    {tk.interests && tk.interests.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        <Sparkles className="h-3.5 w-3.5 text-primary mt-1" />
+                        {tk.interests.map((i) => (
+                          <span key={i} className="rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[11px] capitalize">
+                            {i.replace('-', ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="rounded-xl border-2 border-dashed border-border p-4 flex items-center gap-3">
                   <QrCode className="h-12 w-12 text-foreground shrink-0" />
