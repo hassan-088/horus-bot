@@ -7,6 +7,7 @@ export interface UserTicket {
   user_id: string;
   museum_name: string;
   visit_date: string;
+  visit_time?: string | null;
   ticket_types: Record<string, number>;
   total_tickets: number;
   total_price: number;
@@ -15,16 +16,29 @@ export interface UserTicket {
   status: string;
   qr_value: string;
   created_at: string;
+  tour_duration?: number | null;
+  visitor_type?: string | null;
+  interests?: string[] | null;
+  accessibility?: string[] | null;
+  preferred_language?: string | null;
+  notes?: string | null;
 }
 
 export interface NewTicketInput {
   museum_name?: string;
   visit_date: string;
+  visit_time?: string;
   ticket_types: Record<string, number>;
   total_tickets: number;
   total_price: number;
   currency?: string;
   payment_method: string;
+  tour_duration?: number;
+  visitor_type?: string;
+  interests?: string[];
+  accessibility?: string[];
+  preferred_language?: string;
+  notes?: string;
 }
 
 function makeQrValue() {
