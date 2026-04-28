@@ -13,20 +13,20 @@ interface Props {
 export function ComingSoonModal({ open, onOpenChange }: Props) {
   const { isRTL } = useApp();
   const [email, setEmail] = useState('');
-  const [showNotify, setShowNotify] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const reset = () => {
     setEmail('');
-    setShowNotify(false);
+    setShowForm(false);
   };
 
-  const handleNotify = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     toast.success(
       isRTL
-        ? 'شكراً. سنُعلمك فور إتاحة تطبيق Horus-Bot.'
-        : "Thank you. We'll notify you when the Horus-Bot app is available.",
+        ? 'تم تسجيلك في الوصول المبكر. سنُعلمك فور الإتاحة.'
+        : "You're on the early-access list. We'll notify you as soon as it's available.",
     );
     reset();
     onOpenChange(false);
@@ -43,19 +43,19 @@ export function ComingSoonModal({ open, onOpenChange }: Props) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl">
-            {isRTL ? 'معاينة التطبيق متاحة' : 'App Preview Available'}
+            {isRTL ? 'الوصول المبكر إلى تطبيق Horus-Bot' : 'Early Access to the Horus-Bot App'}
           </DialogTitle>
           <DialogDescription>
             {isRTL
-              ? 'لم يُنشر تطبيق Horus-Bot على المتاجر بعد. يمكنك الانضمام لقائمة الوصول المبكر لتجربته خلال جولتك.'
-              : 'The Horus-Bot app is not published on stores yet. For now, you can join the early access list and use the app during the demo experience.'}
+              ? 'تطبيق Horus-Bot متاح حالياً ضمن الوصول المبكر. انضم لتجربته أثناء العرض التوضيحي.'
+              : 'The Horus-Bot app is currently available in early access. Join to experience it during the demo.'}
           </DialogDescription>
         </DialogHeader>
 
-        {!showNotify ? (
+        {!showForm ? (
           <div className="flex flex-col gap-2 sm:flex-row">
-            <Button className="flex-1" onClick={() => setShowNotify(true)}>
-              {isRTL ? 'انضم للوصول المبكر' : 'Join early access'}
+            <Button className="flex-1" onClick={() => setShowForm(true)}>
+              {isRTL ? 'طلب الوصول' : 'Request Access'}
             </Button>
             <Button
               variant="outline"
@@ -69,11 +69,11 @@ export function ComingSoonModal({ open, onOpenChange }: Props) {
             </Button>
           </div>
         ) : (
-          <form onSubmit={handleNotify} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <p className="text-sm text-muted-foreground">
               {isRTL
-                ? 'أدخل بريدك الإلكتروني ليصلك تنبيه فور إتاحة التطبيق.'
-                : 'Enter your email to be notified when the app is available.'}
+                ? 'أدخل بريدك الإلكتروني لإرسال دعوة الوصول المبكر إليك.'
+                : "Enter your email and we'll send your early-access invitation."}
             </p>
             <Input
               type="email"
@@ -83,11 +83,11 @@ export function ComingSoonModal({ open, onOpenChange }: Props) {
               required
             />
             <div className="flex gap-2">
-              <Button type="button" variant="outline" className="flex-1" onClick={() => setShowNotify(false)}>
+              <Button type="button" variant="outline" className="flex-1" onClick={() => setShowForm(false)}>
                 {isRTL ? 'رجوع' : 'Back'}
               </Button>
               <Button type="submit" className="flex-1">
-                {isRTL ? 'أبلغني' : 'Notify me'}
+                {isRTL ? 'إرسال الطلب' : 'Submit request'}
               </Button>
             </div>
           </form>

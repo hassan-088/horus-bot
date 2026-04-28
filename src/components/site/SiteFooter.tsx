@@ -46,24 +46,27 @@ export function SiteFooter() {
           <div>
             <h4 className="section-label mb-4">{isRTL ? 'تابعنا' : 'Follow'}</h4>
             <div className="flex gap-3">
-              <a href="#" aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+              <span aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground">
                 <Instagram className="h-4 w-4" />
-              </a>
-              <a href="#" aria-label="Twitter" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+              </span>
+              <span aria-label="Twitter" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground">
                 <Twitter className="h-4 w-4" />
-              </a>
-              <a href="#" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+              </span>
+              <span aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground">
                 <Facebook className="h-4 w-4" />
-              </a>
+              </span>
             </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {isRTL ? 'قنواتنا الرسمية قريباً.' : 'Official channels coming soon.'}
+            </p>
           </div>
         </div>
 
         <div className="mt-12 pt-6 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} Horus-Bot. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-primary transition-colors">{isRTL ? 'الخصوصية' : 'Privacy'}</a>
-            <a href="#" className="hover:text-primary transition-colors">{isRTL ? 'الشروط' : 'Terms'}</a>
+            <Link to="/contact" className="hover:text-primary transition-colors">{isRTL ? 'الخصوصية' : 'Privacy'}</Link>
+            <Link to="/contact" className="hover:text-primary transition-colors">{isRTL ? 'الشروط' : 'Terms'}</Link>
           </div>
         </div>
       </div>

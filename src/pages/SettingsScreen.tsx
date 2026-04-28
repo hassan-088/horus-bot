@@ -8,13 +8,13 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { t } from '@/lib/i18n';
-import { Eye, Type, Palette, Globe, Volume2, Hand, User, LogOut, LogIn } from 'lucide-react';
+import { Eye, Type, Globe, Volume2, Hand, User, LogOut, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export default function SettingsScreen() {
   const navigate = useNavigate();
-  const { language, setLanguage, themeMode, setThemeMode, highContrast, setHighContrast, fontScale, setFontScale, isRTL } = useApp();
+  const { language, setLanguage, fontScale, setFontScale, isRTL } = useApp();
   const { user, profile, signOut } = useAuth();
   
   const fontScaleValues = { sm: 0, md: 1, lg: 2, xl: 3 };
@@ -106,22 +106,7 @@ export default function SettingsScreen() {
           </div>
           
           <div className="space-y-3">
-            {/* High Contrast */}
-            <div className="flex items-center justify-between p-4 bg-card rounded-2xl shadow-soft">
-              <div className={cn('flex items-center gap-3', isRTL && 'flex-row-reverse')}>
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Palette className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <span className="font-medium block">{t('highContrast', language)}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {language === 'ar' ? 'تباين أعلى للرؤية' : 'Higher visibility contrast'}
-                  </span>
-                </div>
-              </div>
-              <Switch checked={highContrast} onCheckedChange={setHighContrast} />
-            </div>
-
+            {/* High-contrast toggle removed — site uses fixed light theme. */}
             {/* Font Size */}
             <div className="p-4 bg-card rounded-2xl shadow-soft space-y-4">
               <div className={cn('flex items-center gap-3', isRTL && 'flex-row-reverse')}>
@@ -196,27 +181,7 @@ export default function SettingsScreen() {
           </div>
         </div>
 
-        {/* Appearance Section */}
-        <div>
-          <div className="flex items-center gap-2 mb-3 px-1">
-            <Palette className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              {language === 'ar' ? 'المظهر' : 'Appearance'}
-            </h2>
-          </div>
-          
-          <div className="p-4 bg-card rounded-2xl shadow-soft space-y-2">
-            <span className="font-medium">{t('themeMode', language)}</span>
-            <Select value={themeMode} onValueChange={(v) => setThemeMode(v as 'system' | 'light' | 'dark')}>
-              <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="system">{t('system', language)}</SelectItem>
-                <SelectItem value="light">{t('light', language)}</SelectItem>
-                <SelectItem value="dark">{t('dark', language)}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        {/* Appearance is locked to the Horus-Bot light theme. */}
 
         {/* Language Section */}
         <div>
