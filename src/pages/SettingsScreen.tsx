@@ -196,27 +196,7 @@ export default function SettingsScreen() {
           </div>
         </div>
 
-        {/* Appearance Section */}
-        <div>
-          <div className="flex items-center gap-2 mb-3 px-1">
-            <Palette className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              {language === 'ar' ? 'المظهر' : 'Appearance'}
-            </h2>
-          </div>
-          
-          <div className="p-4 bg-card rounded-2xl shadow-soft space-y-2">
-            <span className="font-medium">{t('themeMode', language)}</span>
-            <Select value={themeMode} onValueChange={(v) => setThemeMode(v as 'system' | 'light' | 'dark')}>
-              <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="system">{t('system', language)}</SelectItem>
-                <SelectItem value="light">{t('light', language)}</SelectItem>
-                <SelectItem value="dark">{t('dark', language)}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        {/* Appearance is locked to the Horus-Bot light theme. */}
 
         {/* Language Section */}
         <div>
