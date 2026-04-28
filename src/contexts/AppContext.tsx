@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { Language } from '@/lib/i18n';
 import { Ticket } from '@/lib/data';
 
-type ThemeMode = 'system' | 'light' | 'dark';
+type ThemeMode = 'light';
 type FontScale = 'sm' | 'md' | 'lg' | 'xl';
 
 interface AppState {
@@ -37,7 +37,7 @@ interface AppContextType extends AppState {
 
 const defaultState: AppState = {
   language: 'en',
-  themeMode: 'dark',
+  themeMode: 'light',
   highContrast: false,
   fontScale: 'md',
   onboardingCompleted: false,
@@ -57,7 +57,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem('ankhu-app-state');
     if (saved) {
       try {
-        return { ...defaultState, ...JSON.parse(saved) };
+        // Normalize legacy stored values: force light mode, no high contrast.
+        return { ...defaultState, ...JSON.parse(saved), themeMode: 'light', highContrast: false };
       } catch {
         return defaultState;
       }
@@ -70,23 +71,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('ankhu-app-state', JSON.stringify(state));
   }, [state]);
 
-  // Apply theme
+  // Force light mode site-wide. No system-preference detection. No dark class.
   useEffect(() => {
     const root = document.documentElement;
-    
-    // Remove all theme classes
     root.classList.remove('dark', 'high-contrast');
-    
-    if (state.highContrast) {
-      root.classList.add('high-contrast');
-    } else if (state.themeMode === 'dark') {
-      root.classList.add('dark');
-    } else if (state.themeMode === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDark) {
-        root.classList.add('dark');
-      }
-    }
   }, [state.themeMode, state.highContrast]);
 
   // Apply RTL
@@ -103,8 +91,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [state.fontScale]);
 
   const setLanguage = (language: Language) => setState(s => ({ ...s, language }));
-  const setThemeMode = (themeMode: ThemeMode) => setState(s => ({ ...s, themeMode }));
-  const setHighContrast = (highContrast: boolean) => setState(s => ({ ...s, highContrast }));
+  // Theme is locked to light. Setters are kept as no-ops for API stability.
+  const setThemeMode = (_themeMode: ThemeMode) => setState(s => ({ ...s, themeMode: 'light' }));
+  const setHighContrast = (_highContrast: boolean) => setState(s => ({ ...s, highContrast: false }));
   const setFontScale = (fontScale: FontScale) => setState(s => ({ ...s, fontScale }));
   const completeOnboarding = () => setState(s => ({ ...s, onboardingCompleted: true }));
   const acceptPrivacy = () => setState(s => ({ ...s, privacyAccepted: true }));
