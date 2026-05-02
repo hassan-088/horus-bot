@@ -1,88 +1,89 @@
+## Tasks 3 & 4 — Excitement Copy + Real Visuals
 
-## Goal
+### Important note about assets
 
-Two production-cleanup tasks on the marketing site, no redesign:
+The brief references `/assets/images/`, `/assets/artifacts/`, and `/assets/prototype/`. **None of those folders exist** in this project. The only real visual assets available are:
 
-1. Force the entire website (and app shell) to permanent light mode.
-2. Confirm/clean any fake-app or Lovable-preview exposure, polish the early-access modal, and run a full clickability audit.
+- `src/assets/gem.jpg` — Grand Egyptian Museum exterior/hall photo (premium, atmospheric)
+- `src/assets/onboarding.jpg` — museum/visitor scene
+- `src/assets/exhibit-golden-mask.jpg` — Tutankhamun mask
+- `src/assets/exhibit-rosetta.jpg` — Rosetta Stone
+- `src/assets/exhibit-vase.jpg` — Egyptian artifact
+- `src/assets/gem-complex-map.png` — GEM map
+- `src/assets/ankh.png` — ankh symbol
+- `public/banner.png` — large banner image
 
----
-
-## Task 1 — Force light mode everywhere
-
-Root cause: `src/contexts/AppContext.tsx` defaults `themeMode: 'dark'` and persists it to localStorage under `ankhu-app-state`. Returning desktop visitors keep the stored `dark`. Mobile (fresh storage) ends up light only by accident.
-
-### Changes
-
-**`src/contexts/AppContext.tsx`**
-- Change `ThemeMode` type to `'light'` only (or keep type but force value).
-- Set `defaultState.themeMode = 'light'` and `highContrast: false`.
-- In the theme `useEffect`, always remove `dark` and `high-contrast` from `<html>` and never add them back. Remove the `prefers-color-scheme` matchMedia branch entirely.
-- In the persisted-state hydration, ignore any saved `themeMode` / `highContrast` (force them back to `'light'` / `false` after parsing) so existing visitors with `dark` in localStorage are normalized on next load.
-- Keep `setThemeMode` / `setHighContrast` as no-ops (or remove from context) so any leftover settings UI cannot re-enable dark.
-
-**`src/index.css`**
-- Leave `.dark { ... }` and `.high-contrast { ... }` blocks in place (they’re harmless once the class is never applied), OR delete them for cleanliness. Recommend: leave them — no risk, smaller diff.
-- No other CSS changes; the warm cream/gold light palette in `:root` is already correct.
-
-**`src/pages/SettingsScreen.tsx`** (app shell, not site, but uses same context)
-- If it exposes a Theme / High-contrast toggle, hide those rows so users can’t re-flip dark mode. Keep language and font-scale controls. (Will verify and patch in build mode.)
-
-Result: every route, on every viewport and language, renders the light Horus-Bot palette. No system-preference detection. No persisted dark state.
+There is **no robot prototype photo**, **no app mockup screenshot**, and **no QR/ticket photo** in the repo. Plan therefore uses only the real assets above. If you have a robot prototype photo or app mockup, please upload it and I'll wire it into the System Status / App page.
 
 ---
 
-## Task 2 — Fake-app exposure, app-store modal, clickability audit
+### Part A — Copy rewrites (experience-driven voice)
 
-### Findings from the project scan
+**`HomePage.tsx`**
+- Hero subtitle → "Horus-Bot leads your museum tour in real time, guiding you between exhibits while the companion app keeps everything you need in your hand — tickets, maps, content, and interaction." (+ Arabic).
+- Final CTA heading → "Experience the Future of Museum Tours."
+- Final CTA subtitle → "Book your visit and enjoy a guided tour led by an autonomous robot, supported by a smart companion app from the moment you arrive." (+ Arabic).
 
-- Project-wide search for `lovable.app`, `iframe`, `webview`, `gptengineer`, `cdn.gpteng`, `Edit with Lovable`, `preview-badge` returned **no matches**. There is no embedded simulator, iframe, or Lovable badge in source. The `index.html` contains only meta tags and the app entry.
-- The “Edit with Lovable” badge is injected by Lovable’s published hosting, not by source code. To remove it from the published site we’ll call the publish-settings tool to set `hide_badge = true` (in build mode).
-- `SiteHeader.tsx` mobile + desktop nav has no “Open App” buttons. All Book CTAs route to `/book`. The `App` nav item points to `/app` (the marketing page about the companion app), not to the in-browser app shell. Good.
-- `AppPage.tsx` “App Store” and “Google Play” buttons already only open `<ComingSoonModal>`. Same modal is reused for early-access on store buttons.
-- `BookPage.tsx` 5-step booking flow is in place (Account → Tickets → Date/Time → Personalize → Payment) with success modal and `View My Tickets` route to `/tickets-mine`.
-- `ContactPage.tsx` form uses zod validation and toast feedback. Footer social/Privacy/Terms links are placeholder `href="#"` (will be made non-clickable buttons or removed).
+**`TicketsInfoPage.tsx`**
+- Hero title → "Plan Your Visit in Minutes" / "خطّط لزيارتك في دقائق".
+- Hero subtitle → "Choose your ticket, schedule your visit, personalize your tour, and get ready for a guided experience with Horus-Bot." (+ Arabic).
 
-### Changes
+**`AppPage.tsx`**
+- Hero subtitle → "Plan your visit, connect with your robot, and follow your tour — all in one app." (+ Arabic).
+- Reframe section heading "Core Capabilities / What You Actually Get" to softer marketing voice (e.g., "Designed Around Your Visit / Everything You Need, Right in Your Hand").
 
-**`src/components/site/ComingSoonModal.tsx`** — rewrite copy to match the spec exactly:
-- Title: `Early Access to the Horus-Bot App` / `الوصول المبكر إلى تطبيق Horus-Bot`
-- Body: `The Horus-Bot app is currently available in early access. Join to experience it during the demo.` (+ AR equivalent)
-- Buttons: `Request Access` (primary, opens email capture) and `Close`.
-- Email capture sub-step keeps the existing toast confirmation.
-- Remove any “Join early access”/“Open App Demo” phrasing not in spec.
+**`FaqPage.tsx`**
+- Prepend new first FAQ:
+  - Q: "What is Horus-Bot?"
+  - A: "Horus-Bot is an autonomous robot guide that leads your museum tour in real time, while the mobile app supports you with navigation, exhibit content, tickets, and interaction." (+ Arabic).
+- Update default-open accordion items to include the new first item.
 
-**`src/components/site/SiteFooter.tsx`** — remove dead clickability:
-- Convert social icons (`href="#"`) into non-link `<button>`s that do nothing or remove the anchor wrapper, since they go nowhere. Preferred: keep icons but as plain non-interactive elements (no hover affordance), or wire them to `mailto:` for now. Will replace `href="#"` with a clean placeholder that does not look broken (cursor-default, no underline, aria-disabled).
-- Same treatment for Privacy / Terms anchors: either remove or route to `/contact` until real pages exist. Recommend routing both to `/contact` so they’re never dead.
-
-**`src/pages/site/AppPage.tsx`** — no behavioral change; verify both `StoreButtons` instances open only the modal (they do).
-
-**Publish settings (build-mode tool call)**
-- `publish_settings--set_badge_visibility { hide_badge: true }` to remove the “Edit with Lovable” badge from the published site (requires Pro plan; if it errors, we’ll surface a note).
-
-### Clickability audit checklist (verified after edits)
-
-- Header desktop: Home, About, Experience, Tickets, App, FAQ, Contact, Language toggle, My Tickets (auth), Book Your Visit → all route correctly.
-- Header mobile: hamburger opens overlay, same items, language and Book button work, overlay closes on route change.
-- Footer: Explore links route correctly; social/legal links no longer behave as broken `#` anchors.
-- Home page CTAs: Book → `/book`, Explore the App → `/app`.
-- Tickets-info CTAs: Book → `/book`.
-- App page: App Store / Google Play → early-access modal only. No app-shell route.
-- FAQ: accordion expand/collapse works (shadcn Accordion, type=`multiple`).
-- Contact form: zod-validated, success toast.
-- Booking flow: 5 steps, Back/Continue gating, payment success modal, “View My Tickets” → `/tickets-mine`.
-- Language toggle: EN ↔ AR, RTL applied via `<html dir>` from `AppContext`.
-- No iframe, webview, or Lovable preview anywhere in source.
+**Positioning sweep** — light edits on Home/Experience/App so Robot is consistently framed as the star and the App as companion (no structural changes).
 
 ---
 
-## Out of scope
+### Part B — Real visuals (assets-only)
 
-- No layout, copy (other than the modal text), color, or section changes.
-- No new pages or features.
-- App shell (`/home`, `/map`, etc.) is unchanged except the forced-light theme effect.
+**`SectionHero.tsx`** — add optional `backgroundImage` prop. When set, render the image as an absolutely-positioned `<img>` behind content with a warm cream gradient overlay (`from-background via-background/85 to-background/60`) so the existing serif headline stays fully readable. Keeps current hero usage on pages that don't pass an image untouched.
 
-## Validation deliverable
+**`HomePage.tsx`**
+1. Hero → pass `backgroundImage={gem}` (`src/assets/gem.jpg`) so the landing hero feels like entering the Grand Egyptian Museum.
+2. Product Overview → insert one full-width visual band between the heading and the 3 cards: `onboarding.jpg` inside a rounded ring-bordered frame with a soft gold gradient overlay and a small caption ("A guided journey through Egypt's greatest collections").
+3. Robot / App / Experience cards (the 3 overview cards) — add a small 16:9 image header on top of each card:
+   - Robot Guide → `gem.jpg` (museum hall conveying the robot's environment).
+   - Companion App → `gem-complex-map.png` (map asset, fits "navigation in your hand").
+   - Guided Experience → `onboarding.jpg`.
+4. System Status section → add a note card stating "Functional prototype tested in real museum conditions. Prototype photo coming soon." (no fake image inserted). When a real prototype image is uploaded later, drop it here with the caption "Early prototype used for navigation and system testing."
 
-After implementation I will reply with the explicit checklist (Header / Mobile menu / Footer / Booking / App modal / FAQ / Contact / Language / Fake-app / Broken buttons) marked checked.
+**`ExperiencePage.tsx`** — add one slim 21:9 image strip above each `Stage`:
+- Before Visit → `onboarding.jpg` (planning mood).
+- At the Museum → `gem.jpg` (entrance/hall).
+- During the Tour → `exhibit-rosetta.jpg`.
+- Engagement → `exhibit-golden-mask.jpg`.
+Each strip uses `object-cover`, rounded-2xl, warm gradient overlay, no text on top.
+
+**`TicketsInfoPage.tsx`** — add a single decorative `exhibit-vase.jpg` thumbnail strip (rounded, low-opacity) below the hero before the price tiers, to break the card-heavy feel.
+
+**`AppPage.tsx`** — replace the abstract "Screens You Will Use" mock cards with a softer presentation: keep the 5 phone-frame cards (already static, non-interactive), but add `gem-complex-map.png` as a faint background pattern behind the screens grid section (low opacity, decorative only). No fake clickable app surfaces.
+
+All `<img>` tags get descriptive `alt` text and `loading="lazy"`. All imports come from `@/assets/...` (Vite-bundled), so no external URLs.
+
+---
+
+### Files touched
+
+- edit `src/components/site/SectionHero.tsx` (add optional `backgroundImage` prop)
+- edit `src/pages/site/HomePage.tsx` (copy + visuals)
+- edit `src/pages/site/ExperiencePage.tsx` (stage image strips)
+- edit `src/pages/site/TicketsInfoPage.tsx` (copy + decorative image)
+- edit `src/pages/site/AppPage.tsx` (copy + decorative bg)
+- edit `src/pages/site/FaqPage.tsx` (prepend "What is Horus-Bot?")
+
+### Validation checklist (will be reported after implementation)
+
+- All new images load from `src/assets/` (Vite-bundled, no external URLs).
+- Hero text remains readable over the museum background (gradient overlay verified at the user's 1287px viewport and on mobile).
+- No fake/clickable app surfaces introduced.
+- New FAQ item appears first in EN and AR.
+- All updated copy lines match the brief exactly in EN; Arabic translations provided.
+- No layout/section removals.

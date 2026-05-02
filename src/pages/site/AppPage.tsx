@@ -6,6 +6,7 @@ import { SectionHero } from '@/components/site/SectionHero';
 import { FeatureCard } from '@/components/site/FeatureCard';
 import { ComingSoonModal } from '@/components/site/ComingSoonModal';
 import { useApp } from '@/contexts/AppContext';
+import gemMapImage from '@/assets/gem-complex-map.png';
 
 export default function AppPage() {
   const { isRTL } = useApp();
@@ -33,9 +34,9 @@ export default function AppPage() {
   return (
     <>
       <SectionHero
-        label={isRTL ? 'التطبيق' : 'The App'}
+        label={isRTL ? 'التطبيق المرافق' : 'The Companion App'}
         title={isRTL ? 'تجربة متحفك كاملةً في مكان واحد' : 'Your Entire Museum Experience, in One Place'}
-        subtitle={isRTL ? 'تنقَّل، استكشف، اطرح الأسئلة، وابقَ على المسار — كل ذلك من تطبيق واحد بسيط.' : 'Navigate, explore, ask questions, and stay on track — all through one simple app.'}
+        subtitle={isRTL ? 'خطّط لزيارتك، اتصل بروبوتك، وتابع جولتك — كل ذلك في تطبيق واحد.' : 'Plan your visit, connect with your robot, and follow your tour — all in one app.'}
         actions={<StoreButtons />}
       />
 
@@ -52,8 +53,8 @@ export default function AppPage() {
       </div>
 
       <section className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-        <div className="section-label mb-4">{isRTL ? 'القدرات الأساسية' : 'Core Capabilities'}</div>
-        <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'ما الذي تحصل عليه فعلياً' : 'What You Actually Get'}</h2>
+        <div className="section-label mb-4">{isRTL ? 'مصمَّم حول زيارتك' : 'Designed Around Your Visit'}</div>
+        <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'كل ما تحتاجه — في يدك' : 'Everything You Need, Right in Your Hand'}</h2>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <FeatureCard
             icon={Compass}
@@ -78,8 +79,15 @@ export default function AppPage() {
         </div>
       </section>
 
-      <section className="bg-sidebar/15">
-        <div className="mx-auto max-w-7xl px-4 md:px-8 py-20">
+      <section className="relative bg-sidebar/15 overflow-hidden">
+        <img
+          src={gemMapImage}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.06]"
+        />
+        <div className="relative mx-auto max-w-7xl px-4 md:px-8 py-20">
           <div className="section-label mb-4">{isRTL ? 'لقطات' : 'Screens'}</div>
           <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'الواجهات التي ستستخدمها' : 'The Screens You Will Use'}</h2>
           <div className="grid gap-5 grid-cols-2 lg:grid-cols-5">

@@ -3,12 +3,23 @@ import { Card } from '@/components/ui/card';
 import { SectionHero } from '@/components/site/SectionHero';
 import { FeatureCard } from '@/components/site/FeatureCard';
 import { useApp } from '@/contexts/AppContext';
+import onboardingImage from '@/assets/onboarding.jpg';
+import gemImage from '@/assets/gem.jpg';
+import rosettaImage from '@/assets/exhibit-rosetta.jpg';
+import maskImage from '@/assets/exhibit-golden-mask.jpg';
 
 export default function ExperiencePage() {
   const { isRTL } = useApp();
 
-  const Stage = ({ label, title, intro, items }: { label: string; title: string; intro?: string; items: { icon: any; title: string; desc: string }[] }) => (
+  const Stage = ({ label, title, intro, items, image, imageAlt }: { label: string; title: string; intro?: string; items: { icon: any; title: string; desc: string }[]; image?: string; imageAlt?: string }) => (
     <section className="mx-auto max-w-7xl px-4 md:px-8 py-16 md:py-20">
+      {image && (
+        <div className="relative mb-10 overflow-hidden rounded-2xl ring-1 ring-primary/15">
+          <img src={image} alt={imageAlt || ''} loading="lazy" className="aspect-[21/9] w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
+        </div>
+      )}
       <div className="section-label mb-4">{label}</div>
       <h2 className="font-serif text-3xl md:text-4xl mb-4">{title}</h2>
       {intro && <p className="text-muted-foreground max-w-3xl mb-10 leading-relaxed">{intro}</p>}
@@ -28,6 +39,8 @@ export default function ExperiencePage() {
       />
 
       <Stage
+        image={onboardingImage}
+        imageAlt={isRTL ? 'تخطيط الزيارة' : 'Planning your visit'}
         label={isRTL ? 'قبل الزيارة' : 'Before Visit'}
         title={isRTL ? 'تجهيز هادئ من المنزل' : 'Prepare Calmly from Home'}
         items={[
@@ -40,6 +53,8 @@ export default function ExperiencePage() {
 
       <div className="bg-sidebar/15">
         <Stage
+          image={gemImage}
+          imageAlt={isRTL ? 'مدخل المتحف المصري الكبير' : 'Grand Egyptian Museum entrance'}
           label={isRTL ? 'في المتحف' : 'At the Museum'}
           title={isRTL ? 'الوصول وبدء جولتك' : 'Arrive and Begin Your Tour'}
           items={[
@@ -51,6 +66,8 @@ export default function ExperiencePage() {
       </div>
 
       <Stage
+        image={rosettaImage}
+        imageAlt={isRTL ? 'حجر رشيد' : 'Rosetta Stone'}
         label={isRTL ? 'أثناء الجولة' : 'During the Tour'}
         title={isRTL ? 'جولة طبيعية تتكيّف معك' : 'A Natural Tour That Adapts to You'}
         intro={isRTL
@@ -66,6 +83,8 @@ export default function ExperiencePage() {
 
       <div className="bg-sidebar/15">
         <Stage
+          image={maskImage}
+          imageAlt={isRTL ? 'قناع توت عنخ آمون' : 'Mask of Tutankhamun'}
           label={isRTL ? 'التفاعل' : 'Engagement'}
           title={isRTL ? 'لحظات صغيرة تبقى معك' : 'Small Moments That Stay With You'}
           items={[
