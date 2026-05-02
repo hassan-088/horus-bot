@@ -6,6 +6,9 @@ import { SectionHero } from '@/components/site/SectionHero';
 import { FeatureCard } from '@/components/site/FeatureCard';
 import { StepCard } from '@/components/site/StepCard';
 import { useApp } from '@/contexts/AppContext';
+import gemImage from '@/assets/gem.jpg';
+import onboardingImage from '@/assets/onboarding.jpg';
+import gemMapImage from '@/assets/gem-complex-map.png';
 
 export default function HomePage() {
   const { isRTL } = useApp();
@@ -14,6 +17,8 @@ export default function HomePage() {
     <>
       {/* HERO */}
       <SectionHero
+        backgroundImage={gemImage}
+        backgroundAlt={isRTL ? 'قاعة المتحف المصري الكبير' : 'Grand Egyptian Museum hall'}
         label={isRTL ? 'حورس-بوت • تجربة إرشاد المتاحف' : 'Horus-Bot • Museum Guidance Experience'}
         title={
           isRTL ? (
@@ -24,8 +29,8 @@ export default function HomePage() {
         }
         subtitle={
           isRTL
-            ? 'يعمل الروبوت المرشد والتطبيق المرافق معاً لمساعدة الزوار على التنقل داخل المتحف، فهم المعروضات، والاستمتاع بجولة موجَّهة في الوقت الفعلي.'
-            : 'A robot guide and companion app work together to help visitors move through the museum, understand exhibits, and enjoy a guided tour in real time.'
+            ? 'يقود حورس-بوت جولتك في المتحف في الوقت الفعلي، يرشدك بين المعروضات بينما يحتفظ التطبيق المرافق بكل ما تحتاجه في يدك — التذاكر، الخرائط، المحتوى، والتفاعل.'
+            : 'Horus-Bot leads your museum tour in real time, guiding you between exhibits while the companion app keeps everything you need in your hand — tickets, maps, content, and interaction.'
         }
         actions={
           <>
