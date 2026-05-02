@@ -262,17 +262,22 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+        <p className="mt-6 text-center text-xs text-muted-foreground italic">
+          {isRTL
+            ? 'صورة النموذج الأوّلي قريباً — يُستخدم للتنقّل واختبار النظام في بيئات المتحف الحقيقية.'
+            : 'Prototype photo coming soon — used for navigation and system testing in real museum conditions.'}
+        </p>
       </section>
 
       {/* FINAL CTA */}
       <section className="mx-auto max-w-4xl px-4 md:px-8 py-20 md:py-28 text-center">
         <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-6">
-          {isRTL ? 'ابدأ جولتك الموجَّهة في المتحف مع حورس-بوت' : 'Start Your Guided Museum Tour with Horus-Bot'}
+          {isRTL ? 'استمتع بمستقبل جولات المتاحف' : 'Experience the Future of Museum Tours'}
         </h2>
         <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
           {isRTL
-            ? 'احجز زيارتك، اتصل بالتجربة فوراً، واستمتع بجولة متحف موجَّهة من اللحظة التي تصل فيها.'
-            : 'Book your visit, connect instantly, and enjoy a guided museum experience from the moment you arrive.'}
+            ? 'احجز زيارتك واستمتع بجولة موجَّهة يقودها روبوت ذاتي القيادة، يدعمها تطبيق مرافق ذكي من اللحظة التي تصل فيها.'
+            : 'Book your visit and enjoy a guided tour led by an autonomous robot, supported by a smart companion app from the moment you arrive.'}
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
           <Button asChild size="lg"><Link to="/book"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}</Link></Button>
