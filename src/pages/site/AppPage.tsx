@@ -33,9 +33,9 @@ export default function AppPage() {
   return (
     <>
       <SectionHero
-        label={isRTL ? 'التطبيق' : 'The App'}
+        label={isRTL ? 'التطبيق المرافق' : 'The Companion App'}
         title={isRTL ? 'تجربة متحفك كاملةً في مكان واحد' : 'Your Entire Museum Experience, in One Place'}
-        subtitle={isRTL ? 'تنقَّل، استكشف، اطرح الأسئلة، وابقَ على المسار — كل ذلك من تطبيق واحد بسيط.' : 'Navigate, explore, ask questions, and stay on track — all through one simple app.'}
+        subtitle={isRTL ? 'خطّط لزيارتك، اتصل بروبوتك، وتابع جولتك — كل ذلك في تطبيق واحد.' : 'Plan your visit, connect with your robot, and follow your tour — all in one app.'}
         actions={<StoreButtons />}
       />
 

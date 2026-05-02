@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SectionHero } from '@/components/site/SectionHero';
 import { useApp } from '@/contexts/AppContext';
+import vaseImage from '@/assets/exhibit-vase.jpg';
 
 export default function TicketsInfoPage() {
   const { isRTL } = useApp();
@@ -46,11 +47,23 @@ export default function TicketsInfoPage() {
     <>
       <SectionHero
         label={isRTL ? 'التذاكر' : 'Tickets'}
-        title={isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
-        subtitle={isRTL ? 'تفتح لك تذكرتك تجربة متحف موجَّهة بالكامل بقيادة الروبوت — مع كل ما تحتاجه من البداية للنهاية.' : 'Your ticket unlocks a complete robot-guided museum experience — with everything you need from start to finish.'}
+        title={isRTL ? 'خطّط لزيارتك في دقائق' : 'Plan Your Visit in Minutes'}
+        subtitle={isRTL ? 'اختر تذكرتك، حدّد موعد زيارتك، خصّص جولتك، واستعدّ لتجربة موجَّهة مع حورس-بوت.' : 'Choose your ticket, schedule your visit, personalize your tour, and get ready for a guided experience with Horus-Bot.'}
       />
 
-      <div className="mx-auto max-w-4xl px-4 md:px-8 -mt-6 mb-10 grid gap-3 sm:grid-cols-2">
+      <div className="mx-auto max-w-5xl px-4 md:px-8 -mt-6 mb-8">
+        <div className="relative overflow-hidden rounded-2xl ring-1 ring-primary/15">
+          <img
+            src={vaseImage}
+            alt={isRTL ? 'قطعة أثرية مصرية' : 'Egyptian artifact'}
+            loading="lazy"
+            className="h-32 md:h-40 w-full object-cover opacity-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-background/80" />
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-4xl px-4 md:px-8 mb-10 grid gap-3 sm:grid-cols-2">
         <div className="flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
           <Clock className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <p className="text-sm text-foreground/90">
