@@ -9,6 +9,8 @@ interface SectionHeroProps {
   align?: 'center' | 'start';
   className?: string;
   children?: ReactNode;
+  backgroundImage?: string;
+  backgroundAlt?: string;
 }
 
 export function SectionHero({
@@ -19,9 +21,26 @@ export function SectionHero({
   align = 'center',
   className,
   children,
+  backgroundImage,
+  backgroundAlt = '',
 }: SectionHeroProps) {
   return (
     <section className={cn('relative overflow-hidden', className)}>
+      {/* Optional museum background image */}
+      {backgroundImage && (
+        <div className="pointer-events-none absolute inset-0 -z-20">
+          <img
+            src={backgroundImage}
+            alt={backgroundAlt}
+            loading="eager"
+            className="h-full w-full object-cover"
+          />
+          {/* Warm cream gradient overlay so headline stays readable */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background/95" />
+          <div className="absolute inset-0 bg-background/40" />
+        </div>
+      )}
+
       {/* Cinematic gold radial wash */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div

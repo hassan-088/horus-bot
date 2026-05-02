@@ -10,6 +10,7 @@ export default function FaqPage() {
 
   const faqs = isRTL
     ? [
+        { q: 'ما هو حورس-بوت؟', a: 'حورس-بوت هو روبوت إرشاد ذاتي القيادة يقود جولتك في المتحف في الوقت الفعلي، بينما يدعمك التطبيق المحمول بالتنقّل، محتوى المعروضات، التذاكر، والتفاعل.' },
         { q: 'هل عليّ استخدام التطبيق؟', a: 'يُنصح به بشدّة، لأن التطبيق يوفّر للزوار الخرائط، محتوى المعروضات، التذاكر، تقدّم الجولة، والتجربة المتصلة كاملة.' },
         { q: 'ماذا لو كانت كل الروبوتات مشغولة؟', a: 'إذا كانت كل الروبوتات قيد الاستخدام، يُخصَّص الروبوت التالي المتاح في أقرب وقت ممكن. الحجز المبكر يساعد على ضمان فترتك المفضّلة.' },
         { q: 'ما اللغات المدعومة؟', a: 'تدعم التجربة العربية، العامية المصرية، الإنجليزية، ولغات إضافية وفقاً لإعداد المتحف.' },
@@ -20,6 +21,7 @@ export default function FaqPage() {
         { q: 'هل يمكنني الإلغاء أو تغيير الموعد؟', a: 'نعم — يمكن للزوار الإلغاء حتى 24 ساعة قبل الزيارة لاسترداد كامل، أو تغيير الموعد عبر الرابط الموجود في بريد التذكرة.' },
       ]
     : [
+        { q: 'What is Horus-Bot?', a: 'Horus-Bot is an autonomous robot guide that leads your museum tour in real time, while the mobile app supports you with navigation, exhibit content, tickets, and interaction.' },
         { q: 'Do I have to use the app?', a: 'The app is strongly recommended because it gives visitors maps, exhibit content, tickets, tour progress, and the full connected experience.' },
         { q: 'What if all robots are busy?', a: 'If all robots are in use, the next available robot is assigned as soon as possible. Booking early helps secure your preferred time slot.' },
         { q: 'Which languages are supported?', a: 'The experience supports Arabic, Egyptian Arabic, English, and additional languages depending on the museum setup.' },
