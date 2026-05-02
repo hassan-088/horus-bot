@@ -39,6 +39,8 @@ export default function ExperiencePage() {
       />
 
       <Stage
+        image={onboardingImage}
+        imageAlt={isRTL ? 'تخطيط الزيارة' : 'Planning your visit'}
         label={isRTL ? 'قبل الزيارة' : 'Before Visit'}
         title={isRTL ? 'تجهيز هادئ من المنزل' : 'Prepare Calmly from Home'}
         items={[
@@ -51,6 +53,8 @@ export default function ExperiencePage() {
 
       <div className="bg-sidebar/15">
         <Stage
+          image={gemImage}
+          imageAlt={isRTL ? 'مدخل المتحف المصري الكبير' : 'Grand Egyptian Museum entrance'}
           label={isRTL ? 'في المتحف' : 'At the Museum'}
           title={isRTL ? 'الوصول وبدء جولتك' : 'Arrive and Begin Your Tour'}
           items={[
@@ -62,6 +66,8 @@ export default function ExperiencePage() {
       </div>
 
       <Stage
+        image={rosettaImage}
+        imageAlt={isRTL ? 'حجر رشيد' : 'Rosetta Stone'}
         label={isRTL ? 'أثناء الجولة' : 'During the Tour'}
         title={isRTL ? 'جولة طبيعية تتكيّف معك' : 'A Natural Tour That Adapts to You'}
         intro={isRTL
@@ -77,6 +83,8 @@ export default function ExperiencePage() {
 
       <div className="bg-sidebar/15">
         <Stage
+          image={maskImage}
+          imageAlt={isRTL ? 'قناع توت عنخ آمون' : 'Mask of Tutankhamun'}
           label={isRTL ? 'التفاعل' : 'Engagement'}
           title={isRTL ? 'لحظات صغيرة تبقى معك' : 'Small Moments That Stay With You'}
           items={[
