@@ -1,5 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  addDoc,
+  serverTimestamp,
+  Timestamp,
+} from 'firebase/firestore';
+import { db } from '@/integrations/firebase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface UserTicket {
@@ -22,6 +32,7 @@ export interface UserTicket {
   accessibility?: string[] | null;
   preferred_language?: string | null;
   notes?: string | null;
+  robot_tour_ticket_id?: string | null;
 }
 
 export interface NewTicketInput {
@@ -47,6 +58,13 @@ function makeQrValue() {
   return `HRSB-${time}-${rand}`;
 }
 
+function tsToIso(v: unknown): string {
+  if (!v) return new Date().toISOString();
+  if (v instanceof Timestamp) return v.toDate().toISOString();
+  if (typeof v === 'object' && v && 'toDate' in v) return (v as Timestamp).toDate().toISOString();
+  return String(v);
+}
+
 export function useUserTickets() {
   const { user } = useAuth();
   const [tickets, setTickets] = useState<UserTicket[]>([]);
@@ -60,17 +78,44 @@ export function useUserTickets() {
     }
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase
-      .from('tickets')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('visit_date', { ascending: true });
-    if (error) {
-      setError(error.message);
-    } else {
-      setTickets((data ?? []) as unknown as UserTicket[]);
+    try {
+      const q = query(
+        collection(db, 'museumTickets'),
+        where('userId', '==', user.id),
+        orderBy('visit_date', 'asc'),
+      );
+      const snap = await getDocs(q);
+      const rows: UserTicket[] = snap.docs.map((d) => {
+        const x = d.data() as Record<string, unknown>;
+        return {
+          id: d.id,
+          user_id: (x.userId as string) ?? user.id,
+          museum_name: (x.museum_name as string) ?? 'The Egyptian Museum',
+          visit_date: (x.visit_date as string) ?? '',
+          visit_time: (x.visit_time as string) ?? null,
+          ticket_types: (x.ticket_types as Record<string, number>) ?? {},
+          total_tickets: (x.total_tickets as number) ?? 0,
+          total_price: (x.total_price as number) ?? 0,
+          currency: (x.currency as string) ?? 'EGP',
+          payment_method: (x.payment_method as string) ?? '',
+          status: (x.status as string) ?? 'active',
+          qr_value: (x.qr_value as string) ?? '',
+          created_at: tsToIso(x.created_at),
+          tour_duration: (x.tour_duration as number) ?? null,
+          visitor_type: (x.visitor_type as string) ?? null,
+          interests: (x.interests as string[]) ?? null,
+          accessibility: (x.accessibility as string[]) ?? null,
+          preferred_language: (x.preferred_language as string) ?? null,
+          notes: (x.notes as string) ?? null,
+          robot_tour_ticket_id: (x.robot_tour_ticket_id as string) ?? null,
+        };
+      });
+      setTickets(rows);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [user]);
 
   useEffect(() => {
@@ -80,34 +125,74 @@ export function useUserTickets() {
   const createTicket = useCallback(
     async (input: NewTicketInput): Promise<{ ticket: UserTicket | null; error: string | null }> => {
       if (!user) return { ticket: null, error: 'not-authenticated' };
-      const row = {
-        user_id: user.id,
-        museum_name: input.museum_name ?? 'The Egyptian Museum',
-        visit_date: input.visit_date,
-        visit_time: input.visit_time ?? null,
-        ticket_types: input.ticket_types,
-        total_tickets: input.total_tickets,
-        total_price: input.total_price,
-        currency: input.currency ?? 'EGP',
-        payment_method: input.payment_method,
-        status: 'active',
-        qr_value: makeQrValue(),
-        tour_duration: input.tour_duration ?? null,
-        visitor_type: input.visitor_type ?? null,
-        interests: input.interests ?? null,
-        accessibility: input.accessibility ?? null,
-        preferred_language: input.preferred_language ?? null,
-        notes: input.notes ?? null,
-      };
-      const { data, error } = await supabase
-        .from('tickets')
-        .insert(row)
-        .select()
-        .single();
-      if (error) return { ticket: null, error: error.message };
-      const created = data as unknown as UserTicket;
-      setTickets((prev) => [...prev, created]);
-      return { ticket: created, error: null };
+      const qr = makeQrValue();
+      try {
+        // 1) Robot tour ticket (created first so we can reference it).
+        const robotDoc = await addDoc(collection(db, 'robotTourTickets'), {
+          userId: user.id,
+          tour_duration: input.tour_duration ?? null,
+          visitor_type: input.visitor_type ?? null,
+          interests: input.interests ?? [],
+          accessibility: input.accessibility ?? [],
+          preferred_language: input.preferred_language ?? null,
+          notes: input.notes ?? null,
+          status: 'pending', // becomes "active" once robot QR is paired in-museum
+          visit_date: input.visit_date,
+          visit_time: input.visit_time ?? null,
+          created_at: serverTimestamp(),
+        });
+
+        // 2) Museum entry ticket (the one shown in "My Tickets" lists).
+        const museumDoc = await addDoc(collection(db, 'museumTickets'), {
+          userId: user.id,
+          museum_name: input.museum_name ?? 'The Egyptian Museum',
+          visit_date: input.visit_date,
+          visit_time: input.visit_time ?? null,
+          ticket_types: input.ticket_types,
+          total_tickets: input.total_tickets,
+          total_price: input.total_price,
+          currency: input.currency ?? 'EGP',
+          payment_method: input.payment_method,
+          status: 'active',
+          qr_value: qr,
+          // Denormalised tour fields so a single doc can render the full card.
+          tour_duration: input.tour_duration ?? null,
+          visitor_type: input.visitor_type ?? null,
+          interests: input.interests ?? null,
+          accessibility: input.accessibility ?? null,
+          preferred_language: input.preferred_language ?? null,
+          notes: input.notes ?? null,
+          robot_tour_ticket_id: robotDoc.id,
+          created_at: serverTimestamp(),
+        });
+
+        const created: UserTicket = {
+          id: museumDoc.id,
+          user_id: user.id,
+          museum_name: input.museum_name ?? 'The Egyptian Museum',
+          visit_date: input.visit_date,
+          visit_time: input.visit_time ?? null,
+          ticket_types: input.ticket_types,
+          total_tickets: input.total_tickets,
+          total_price: input.total_price,
+          currency: input.currency ?? 'EGP',
+          payment_method: input.payment_method,
+          status: 'active',
+          qr_value: qr,
+          created_at: new Date().toISOString(),
+          tour_duration: input.tour_duration ?? null,
+          visitor_type: input.visitor_type ?? null,
+          interests: input.interests ?? null,
+          accessibility: input.accessibility ?? null,
+          preferred_language: input.preferred_language ?? null,
+          notes: input.notes ?? null,
+          robot_tour_ticket_id: robotDoc.id,
+        };
+        setTickets((prev) => [...prev, created]);
+        return { ticket: created, error: null };
+      } catch (e) {
+        return { ticket: null, error: (e as Error).message };
+      }
     },
     [user],
   );

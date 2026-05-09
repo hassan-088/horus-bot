@@ -1,6 +1,26 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut as fbSignOut,
+  updateProfile as fbUpdateProfile,
+  type User as FirebaseUser,
+} from 'firebase/auth';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { auth, db } from '@/integrations/firebase/client';
+
+// Public app-level user shape. We keep `id` as the field name (mapped from
+// Firebase `uid`) so the rest of the codebase doesn't need to change.
+interface AppUser {
+  id: string;
+  email: string | null;
+}
 
 interface Profile {
   id: string;
@@ -13,8 +33,8 @@ interface Profile {
 }
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AppUser | null;
+  session: { user: AppUser } | null; // back-compat shim, not really used
   profile: Profile | null;
   isLoading: boolean;
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error: Error | null }>;
@@ -25,111 +45,129 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function toAppUser(fu: FirebaseUser | null): AppUser | null {
+  if (!fu) return null;
+  return { id: fu.uid, email: fu.email };
+}
+
+async function ensureProfileDoc(fu: FirebaseUser, displayName?: string): Promise<Profile> {
+  const ref = doc(db, 'users', fu.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    const nowIso = new Date().toISOString();
+    const initial = {
+      user_id: fu.uid,
+      email: fu.email,
+      display_name: displayName ?? fu.displayName ?? (fu.email ? fu.email.split('@')[0] : null),
+      avatar_url: fu.photoURL ?? null,
+      visit_count: 0,
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp(),
+    };
+    await setDoc(ref, initial);
+    return {
+      id: fu.uid,
+      user_id: fu.uid,
+      display_name: initial.display_name,
+      avatar_url: initial.avatar_url,
+      visit_count: 0,
+      created_at: nowIso,
+      updated_at: nowIso,
+    };
+  }
+  const d = snap.data() as Record<string, unknown>;
+  const tsToIso = (v: unknown): string => {
+    if (!v) return new Date().toISOString();
+    if (typeof v === 'object' && v !== null && 'toDate' in v) {
+      return (v as { toDate: () => Date }).toDate().toISOString();
+    }
+    return String(v);
+  };
+  return {
+    id: fu.uid,
+    user_id: fu.uid,
+    display_name: (d.display_name as string | null) ?? null,
+    avatar_url: (d.avatar_url as string | null) ?? null,
+    visit_count: (d.visit_count as number) ?? 0,
+    created_at: tsToIso(d.created_at),
+    updated_at: tsToIso(d.updated_at),
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Defer profile fetch with setTimeout to avoid deadlock
-        if (session?.user) {
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-          }, 0);
-        } else {
+    const unsub = onAuthStateChanged(auth, async (fu) => {
+      setUser(toAppUser(fu));
+      if (fu) {
+        try {
+          const p = await ensureProfileDoc(fu);
+          setProfile(p);
+        } catch (e) {
+          console.error('Failed to load profile', e);
           setProfile(null);
         }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
       }
       setIsLoading(false);
     });
-
-    return () => subscription.unsubscribe();
+    return () => unsub();
   }, []);
 
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (!error && data) {
-      setProfile(data);
+  const signUp: AuthContextType['signUp'] = async (email, password, displayName) => {
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      if (displayName) {
+        try { await fbUpdateProfile(cred.user, { displayName }); } catch { /* non-fatal */ }
+      }
+      const p = await ensureProfileDoc(cred.user, displayName);
+      setProfile(p);
+      return { error: null };
+    } catch (e) {
+      return { error: e as Error };
     }
   };
 
-  const signUp = async (email: string, password: string, displayName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          display_name: displayName || email.split('@')[0],
-        },
-      },
-    });
-    
-    return { error: error as Error | null };
-  };
-
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    return { error: error as Error | null };
+  const signIn: AuthContextType['signIn'] = async (email, password) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      return { error: null };
+    } catch (e) {
+      return { error: e as Error };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await fbSignOut(auth);
     setUser(null);
-    setSession(null);
     setProfile(null);
   };
 
-  const updateProfile = async (updates: Partial<Profile>) => {
-    if (!user) {
-      return { error: new Error('No user logged in') };
+  const updateProfile: AuthContextType['updateProfile'] = async (updates) => {
+    if (!user) return { error: new Error('No user logged in') };
+    try {
+      const ref = doc(db, 'users', user.id);
+      await setDoc(
+        ref,
+        { ...updates, updated_at: serverTimestamp() },
+        { merge: true },
+      );
+      setProfile((prev) => (prev ? { ...prev, ...updates, updated_at: new Date().toISOString() } : prev));
+      return { error: null };
+    } catch (e) {
+      return { error: e as Error };
     }
-
-    const { error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('user_id', user.id);
-
-    if (!error) {
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
-    }
-
-    return { error: error as Error | null };
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        session,
+        session: user ? { user } : null,
         profile,
         isLoading,
         signUp,
@@ -144,9 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  return ctx;
 }
