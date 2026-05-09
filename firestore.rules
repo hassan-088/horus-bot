@@ -1,0 +1,63 @@
+// Firestore Security Rules — paste these into Firebase Console
+// (Firestore Database → Rules → Publish).
+//
+// Project: horus-bot-app
+// Shared by: marketing+booking website, mobile companion app, robot fleet.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ---------------- USERS ----------------
+    // users/{uid} = profile doc. Self read/write only.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      // Per-user subcollections (favorites, progress, visitHistory).
+      match /{sub}/{docId} {
+        allow read, write: if isOwner(uid);
+      }
+      match /{sub}/{docId}/{rest=**} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ---------------- MUSEUM TICKETS ----------------
+    match /museumTickets/{ticketId} {
+      allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete:
+                    if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // ---------------- ROBOT TOUR TICKETS ----------------
+    match /robotTourTickets/{ticketId} {
+      allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete:
+                    if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // ---------------- TOUR SESSIONS ----------------
+    // Created at the museum when a user pairs with a robot via QR.
+    match /tourSessions/{sessionId} {
+      allow read, write:
+                    if isSignedIn() && (
+                      request.resource.data.userId == request.auth.uid ||
+                      resource.data.userId == request.auth.uid
+                    );
+    }
+
+    // ---------------- PUBLIC CONTENT ----------------
+    // Read-only catalog data (exhibits, robots metadata).
+    match /exhibits/{id}      { allow read: if true; allow write: if false; }
+    match /robots/{id}        { allow read: if true; allow write: if false; }
+  }
+}

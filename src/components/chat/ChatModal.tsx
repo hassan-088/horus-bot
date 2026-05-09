@@ -5,8 +5,13 @@ import { Input } from '@/components/ui/input';
 import { useApp } from '@/contexts/AppContext';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+
+// Chat is served by an existing edge function on Lovable Cloud. The website's
+// data plane (auth, tickets, profiles) lives on Firebase; this AI proxy
+// remains here until it is ported to a Firebase Cloud Function.
+const CHAT_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/horus-chat`;
+const CHAT_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 import { QuickReplies } from './QuickReplies';
 import { ExhibitCard } from './ExhibitCard';
 
@@ -114,14 +119,19 @@ export function ChatModal({ isOpen, onClose }: ChatModalProps) {
     setConversationHistory(newHistory);
 
     try {
-      const { data, error } = await supabase.functions.invoke('horus-chat', {
-        body: { messages: newHistory },
+      const res = await fetch(CHAT_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: CHAT_ANON_KEY,
+          Authorization: `Bearer ${CHAT_ANON_KEY}`,
+        },
+        body: JSON.stringify({ messages: newHistory }),
       });
-
-      if (error) {
-        throw error;
+      if (!res.ok) {
+        throw new Error(`Chat request failed: ${res.status}`);
       }
-
+      const data = await res.json();
       if (data.error) {
         throw new Error(data.error);
       }

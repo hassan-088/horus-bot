@@ -1,89 +1,77 @@
-## Tasks 3 & 4 — Excitement Copy + Real Visuals
+## Goal
+Replace the current Lovable Cloud (Supabase) backend with the existing Firebase project `horus-bot-app` so the website shares Auth users, profiles, and tickets with the future mobile app.
 
-### Important note about assets
+## What stays
+- All UI, routes, design system, copy, i18n, MainLayout, chat UI.
+- All marketing pages (`/`, `/about`, `/experience`, `/tickets-info`, `/app`, `/faq`, `/contact`).
+- All in-repo "app" screens (`/home`, `/map`, `/exhibits`, …) — they keep working, just reading from Firebase instead of Supabase.
 
-The brief references `/assets/images/`, `/assets/artifacts/`, and `/assets/prototype/`. **None of those folders exist** in this project. The only real visual assets available are:
+## What changes (code)
 
-- `src/assets/gem.jpg` — Grand Egyptian Museum exterior/hall photo (premium, atmospheric)
-- `src/assets/onboarding.jpg` — museum/visitor scene
-- `src/assets/exhibit-golden-mask.jpg` — Tutankhamun mask
-- `src/assets/exhibit-rosetta.jpg` — Rosetta Stone
-- `src/assets/exhibit-vase.jpg` — Egyptian artifact
-- `src/assets/gem-complex-map.png` — GEM map
-- `src/assets/ankh.png` — ankh symbol
-- `public/banner.png` — large banner image
+### 1. Install Firebase
+- `bun add firebase`
+- New file `src/integrations/firebase/client.ts` exporting `app`, `auth`, `db` (Firestore), `analytics` using the provided config. Hardcoded — these are public web config values.
 
-There is **no robot prototype photo**, **no app mockup screenshot**, and **no QR/ticket photo** in the repo. Plan therefore uses only the real assets above. If you have a robot prototype photo or app mockup, please upload it and I'll wire it into the System Status / App page.
+### 2. Auth migration
+- Rewrite `src/contexts/AuthContext.tsx`:
+  - `onAuthStateChanged` instead of Supabase listener.
+  - `signUp` → `createUserWithEmailAndPassword` + write `users/{uid}` profile doc.
+  - `signIn` → `signInWithEmailAndPassword`.
+  - `signOut` → Firebase `signOut`.
+  - `updateProfile` → `setDoc(users/{uid}, ..., {merge:true})`.
+  - Profile shape: `{ uid, email, displayName, avatarUrl, visitCount, createdAt, updatedAt }`.
+- `src/pages/AuthScreen.tsx` keeps the same form; just calls the new context.
+- `src/components/auth/ProtectedRoute.tsx` unchanged (it only reads `useAuth()`).
 
----
+### 3. Tickets migration (the critical one for booking)
+- Rewrite `src/hooks/useUserTickets.ts` to query Firestore:
+  - `museumTickets` where `userId == uid`
+  - `robotTourTickets` where `userId == uid`
+  - Returned shape kept compatible with current consumers (`MyTicketsScreen`, `MyTicketsPage`).
+- Rewrite the booking submit step in `src/pages/site/BookPage.tsx`:
+  - On final confirm, write **two** docs:
+    - `museumTickets/{auto}` with visitor categories, date, total, qr, status.
+    - `robotTourTickets/{auto}` with tour duration, language, interests, accessibility, linked `museumTicketId`.
+  - Both include `userId = auth.currentUser.uid` and server timestamps.
+- Robot QR pairing is explicitly **out of scope** for this pass (you described it as a third step that happens at the museum via the app).
 
-### Part A — Copy rewrites (experience-driven voice)
+### 4. Other Supabase reads
+Replace with Firestore equivalents (collections under `users/{uid}/...` for per-user data):
+- `useCloudSync.ts`, `FavoritesScreen`, `VisitHistoryScreen`, `ProgressScreen`, `AchievementsScreen` — switch to subcollections `users/{uid}/favorites`, `users/{uid}/visitHistory`, `users/{uid}/progress`.
+- These keep their current UI; only the data layer changes.
 
-**`HomePage.tsx`**
-- Hero subtitle → "Horus-Bot leads your museum tour in real time, guiding you between exhibits while the companion app keeps everything you need in your hand — tickets, maps, content, and interaction." (+ Arabic).
-- Final CTA heading → "Experience the Future of Museum Tours."
-- Final CTA subtitle → "Book your visit and enjoy a guided tour led by an autonomous robot, supported by a smart companion app from the moment you arrive." (+ Arabic).
+### 5. Edge function (`horus-chat`)
+- The Supabase edge function uses `LOVABLE_API_KEY` for Gemini. Two options:
+  - **(chosen)** Keep the edge function as-is for now — it's stateless AI calls and doesn't need Firebase. The chat UI already calls it via `supabase.functions.invoke`. We'll switch this call to a plain `fetch` to the function URL so we can later remove the Supabase client entirely. Functionally identical.
 
-**`TicketsInfoPage.tsx`**
-- Hero title → "Plan Your Visit in Minutes" / "خطّط لزيارتك في دقائق".
-- Hero subtitle → "Choose your ticket, schedule your visit, personalize your tour, and get ready for a guided experience with Horus-Bot." (+ Arabic).
+### 6. Remove Supabase
+- Delete `src/integrations/supabase/` imports from all touched files.
+- Leave `src/integrations/supabase/client.ts` and `types.ts` in place (auto-generated, harmless) but stop importing them. We can fully delete after verifying nothing breaks.
+- `.env` Supabase vars stay (managed file) — unused.
 
-**`AppPage.tsx`**
-- Hero subtitle → "Plan your visit, connect with your robot, and follow your tour — all in one app." (+ Arabic).
-- Reframe section heading "Core Capabilities / What You Actually Get" to softer marketing voice (e.g., "Designed Around Your Visit / Everything You Need, Right in Your Hand").
+### 7. Memory + plan
+- Update `mem://index.md` Core: backend is now Firebase (`horus-bot-app`), shared with mobile app and robot.
+- Add `mem://architecture/firebase-backend.md` documenting collections (`users`, `museumTickets`, `robotTourTickets`, `tourSessions`, etc.) and the auth-uid linkage rule.
 
-**`FaqPage.tsx`**
-- Prepend new first FAQ:
-  - Q: "What is Horus-Bot?"
-  - A: "Horus-Bot is an autonomous robot guide that leads your museum tour in real time, while the mobile app supports you with navigation, exhibit content, tickets, and interaction." (+ Arabic).
-- Update default-open accordion items to include the new first item.
+## What you (the user) must do in Firebase Console
+I'll deliver these as a checklist + a `firestore.rules` file:
+1. **Authentication → Sign-in method**: enable **Email/Password**. (Optional: Google.)
+2. **Authentication → Settings → Authorized domains**: add
+   - `id-preview--368a436a-bb42-4087-9005-93c36ffc0095.lovable.app`
+   - `horus-bot.lovable.app`
+   - any custom domain you publish to.
+3. **Firestore Database**: create database in production mode.
+4. Paste the security rules I'll provide (`users/{uid}` self-only; `museumTickets`/`robotTourTickets` readable+writable only when `request.auth.uid == resource.data.userId`).
 
-**Positioning sweep** — light edits on Home/Experience/App so Robot is consistently framed as the star and the App as companion (no structural changes).
+## Out of scope (explicitly)
+- Robot QR pairing & `tourSessions` (in-museum flow).
+- Migrating existing Supabase data — Supabase has only your test accounts; you confirmed app isn't launched.
+- Native mobile app code.
+- Storage bucket setup (no uploads in current site).
 
----
+## Risk / heads-up
+- Firebase Auth password resets, email verification, and OAuth providers are configured in Firebase Console — not in code.
+- Until you enable Email/Password in the console, sign-up will throw `auth/operation-not-allowed`. Expected.
+- The chat edge function still lives on Lovable Cloud. If you ever delete the Supabase project, we'll need to move the Gemini proxy to a Firebase Cloud Function or call the Lovable AI Gateway directly from a small Vercel-style endpoint.
 
-### Part B — Real visuals (assets-only)
-
-**`SectionHero.tsx`** — add optional `backgroundImage` prop. When set, render the image as an absolutely-positioned `<img>` behind content with a warm cream gradient overlay (`from-background via-background/85 to-background/60`) so the existing serif headline stays fully readable. Keeps current hero usage on pages that don't pass an image untouched.
-
-**`HomePage.tsx`**
-1. Hero → pass `backgroundImage={gem}` (`src/assets/gem.jpg`) so the landing hero feels like entering the Grand Egyptian Museum.
-2. Product Overview → insert one full-width visual band between the heading and the 3 cards: `onboarding.jpg` inside a rounded ring-bordered frame with a soft gold gradient overlay and a small caption ("A guided journey through Egypt's greatest collections").
-3. Robot / App / Experience cards (the 3 overview cards) — add a small 16:9 image header on top of each card:
-   - Robot Guide → `gem.jpg` (museum hall conveying the robot's environment).
-   - Companion App → `gem-complex-map.png` (map asset, fits "navigation in your hand").
-   - Guided Experience → `onboarding.jpg`.
-4. System Status section → add a note card stating "Functional prototype tested in real museum conditions. Prototype photo coming soon." (no fake image inserted). When a real prototype image is uploaded later, drop it here with the caption "Early prototype used for navigation and system testing."
-
-**`ExperiencePage.tsx`** — add one slim 21:9 image strip above each `Stage`:
-- Before Visit → `onboarding.jpg` (planning mood).
-- At the Museum → `gem.jpg` (entrance/hall).
-- During the Tour → `exhibit-rosetta.jpg`.
-- Engagement → `exhibit-golden-mask.jpg`.
-Each strip uses `object-cover`, rounded-2xl, warm gradient overlay, no text on top.
-
-**`TicketsInfoPage.tsx`** — add a single decorative `exhibit-vase.jpg` thumbnail strip (rounded, low-opacity) below the hero before the price tiers, to break the card-heavy feel.
-
-**`AppPage.tsx`** — replace the abstract "Screens You Will Use" mock cards with a softer presentation: keep the 5 phone-frame cards (already static, non-interactive), but add `gem-complex-map.png` as a faint background pattern behind the screens grid section (low opacity, decorative only). No fake clickable app surfaces.
-
-All `<img>` tags get descriptive `alt` text and `loading="lazy"`. All imports come from `@/assets/...` (Vite-bundled), so no external URLs.
-
----
-
-### Files touched
-
-- edit `src/components/site/SectionHero.tsx` (add optional `backgroundImage` prop)
-- edit `src/pages/site/HomePage.tsx` (copy + visuals)
-- edit `src/pages/site/ExperiencePage.tsx` (stage image strips)
-- edit `src/pages/site/TicketsInfoPage.tsx` (copy + decorative image)
-- edit `src/pages/site/AppPage.tsx` (copy + decorative bg)
-- edit `src/pages/site/FaqPage.tsx` (prepend "What is Horus-Bot?")
-
-### Validation checklist (will be reported after implementation)
-
-- All new images load from `src/assets/` (Vite-bundled, no external URLs).
-- Hero text remains readable over the museum background (gradient overlay verified at the user's 1287px viewport and on mobile).
-- No fake/clickable app surfaces introduced.
-- New FAQ item appears first in EN and AR.
-- All updated copy lines match the brief exactly in EN; Arabic translations provided.
-- No layout/section removals.
+Approve and I'll execute the migration in one pass.
