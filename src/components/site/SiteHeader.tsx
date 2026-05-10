@@ -175,14 +175,25 @@ export function SiteHeader() {
                   <Globe className="h-4 w-4" />
                   {language === 'en' ? 'العربية' : 'English'}
                 </Button>
-                {user && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => { setOpen(false); navigate('/tickets-mine'); }}
-                    className="justify-start gap-1.5"
-                  >
-                    <TicketIcon className="h-4 w-4" />
-                    {isRTL ? 'تذاكري' : 'My tickets'}
+                {user ? (
+                  <>
+                    <Button variant="ghost" onClick={() => { setOpen(false); navigate('/tickets-mine'); }} className="justify-start gap-1.5">
+                      <TicketIcon className="h-4 w-4" />
+                      {isRTL ? 'تذاكري' : 'My tickets'}
+                    </Button>
+                    <Button variant="ghost" onClick={() => { setOpen(false); navigate('/account'); }} className="justify-start gap-1.5">
+                      <UserIcon className="h-4 w-4" />
+                      {isRTL ? 'حسابي' : 'My Account'}
+                    </Button>
+                    <Button variant="ghost" onClick={handleLogout} className="justify-start gap-1.5">
+                      <LogOut className="h-4 w-4" />
+                      {isRTL ? 'تسجيل الخروج' : 'Log out'}
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="ghost" onClick={() => { setOpen(false); navigate('/auth'); }} className="justify-start gap-1.5">
+                    <LogIn className="h-4 w-4" />
+                    {isRTL ? 'تسجيل الدخول' : 'Log in'}
                   </Button>
                 )}
                 <Button onClick={() => { setOpen(false); navigate('/book'); }}>
