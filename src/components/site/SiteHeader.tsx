@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Globe, Ticket as TicketIcon } from 'lucide-react';
+import { Menu, X, Globe, Ticket as TicketIcon, User as UserIcon, LogOut, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const navItems = [
   { to: '/', labelEn: 'Home', labelAr: 'الرئيسية' },
@@ -18,8 +19,15 @@ const navItems = [
 
 export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    setOpen(false);
+    await signOut();
+    toast.success(isRTL ? 'تم تسجيل الخروج.' : 'You have been logged out.');
+    navigate('/');
+  };
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -77,10 +85,21 @@ export function SiteHeader() {
             <Globe className="h-4 w-4" />
             {language === 'en' ? 'EN' : 'ع'}
           </Button>
-          {user && (
-            <Button variant="ghost" size="sm" onClick={() => navigate('/tickets-mine')} className="gap-1.5">
-              <TicketIcon className="h-4 w-4" />
-              {isRTL ? 'تذاكري' : 'My tickets'}
+          {user ? (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/tickets-mine')} className="gap-1.5">
+                <TicketIcon className="h-4 w-4" />
+                {isRTL ? 'تذاكري' : 'My tickets'}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/account')} className="gap-1.5">
+                <UserIcon className="h-4 w-4" />
+                {isRTL ? 'حسابي' : 'My Account'}
+              </Button>
+            </>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="gap-1.5">
+              <LogIn className="h-4 w-4" />
+              {isRTL ? 'تسجيل الدخول' : 'Log in'}
             </Button>
           )}
           <Button size="sm" onClick={() => navigate('/book')}>
@@ -156,14 +175,25 @@ export function SiteHeader() {
                   <Globe className="h-4 w-4" />
                   {language === 'en' ? 'العربية' : 'English'}
                 </Button>
-                {user && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => { setOpen(false); navigate('/tickets-mine'); }}
-                    className="justify-start gap-1.5"
-                  >
-                    <TicketIcon className="h-4 w-4" />
-                    {isRTL ? 'تذاكري' : 'My tickets'}
+                {user ? (
+                  <>
+                    <Button variant="ghost" onClick={() => { setOpen(false); navigate('/tickets-mine'); }} className="justify-start gap-1.5">
+                      <TicketIcon className="h-4 w-4" />
+                      {isRTL ? 'تذاكري' : 'My tickets'}
+                    </Button>
+                    <Button variant="ghost" onClick={() => { setOpen(false); navigate('/account'); }} className="justify-start gap-1.5">
+                      <UserIcon className="h-4 w-4" />
+                      {isRTL ? 'حسابي' : 'My Account'}
+                    </Button>
+                    <Button variant="ghost" onClick={handleLogout} className="justify-start gap-1.5">
+                      <LogOut className="h-4 w-4" />
+                      {isRTL ? 'تسجيل الخروج' : 'Log out'}
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="ghost" onClick={() => { setOpen(false); navigate('/auth'); }} className="justify-start gap-1.5">
+                    <LogIn className="h-4 w-4" />
+                    {isRTL ? 'تسجيل الدخول' : 'Log in'}
                   </Button>
                 )}
                 <Button onClick={() => { setOpen(false); navigate('/book'); }}>

@@ -6,11 +6,16 @@ import {
   orderBy,
   getDocs,
   addDoc,
+  updateDoc,
+  doc,
   serverTimestamp,
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
 import { useAuth } from '@/contexts/AuthContext';
+
+export type TicketStatus = 'active' | 'cancelled';
+export type TourType = 'standard' | 'personalized';
 
 export interface UserTicket {
   id: string;
@@ -23,9 +28,11 @@ export interface UserTicket {
   total_price: number;
   currency: string;
   payment_method: string;
-  status: string;
+  status: TicketStatus;
   qr_value: string;
   created_at: string;
+  // Tour fields (denormalized from robotTourTickets for easy listing).
+  tour_type?: TourType | null;
   tour_duration?: number | null;
   visitor_type?: string | null;
   interests?: string[] | null;
@@ -44,6 +51,7 @@ export interface NewTicketInput {
   total_price: number;
   currency?: string;
   payment_method: string;
+  tour_type?: TourType;
   tour_duration?: number;
   visitor_type?: string;
   interests?: string[];
@@ -79,10 +87,10 @@ export function useUserTickets() {
     setLoading(true);
     setError(null);
     try {
+      // Avoid composite-index requirement: filter only by userId, sort client-side.
       const q = query(
         collection(db, 'museumTickets'),
         where('userId', '==', user.id),
-        orderBy('visit_date', 'asc'),
       );
       const snap = await getDocs(q);
       const rows: UserTicket[] = snap.docs.map((d) => {
@@ -98,9 +106,10 @@ export function useUserTickets() {
           total_price: (x.total_price as number) ?? 0,
           currency: (x.currency as string) ?? 'EGP',
           payment_method: (x.payment_method as string) ?? '',
-          status: (x.status as string) ?? 'active',
+          status: ((x.status as TicketStatus) ?? 'active'),
           qr_value: (x.qr_value as string) ?? '',
           created_at: tsToIso(x.created_at),
+          tour_type: (x.tour_type as TourType) ?? null,
           tour_duration: (x.tour_duration as number) ?? null,
           visitor_type: (x.visitor_type as string) ?? null,
           interests: (x.interests as string[]) ?? null,
@@ -110,6 +119,7 @@ export function useUserTickets() {
           robot_tour_ticket_id: (x.robot_tour_ticket_id as string) ?? null,
         };
       });
+      rows.sort((a, b) => (a.visit_date || '').localeCompare(b.visit_date || ''));
       setTickets(rows);
     } catch (e) {
       setError((e as Error).message);
@@ -127,19 +137,21 @@ export function useUserTickets() {
       if (!user) return { ticket: null, error: 'not-authenticated' };
       const qr = makeQrValue();
       try {
-        // 1) Robot tour ticket (created first so we can reference it).
+        // 1) Robot tour ticket — created first so we can reference it.
         const robotDoc = await addDoc(collection(db, 'robotTourTickets'), {
           userId: user.id,
+          tour_type: input.tour_type ?? 'standard',
           tour_duration: input.tour_duration ?? null,
           visitor_type: input.visitor_type ?? null,
           interests: input.interests ?? [],
           accessibility: input.accessibility ?? [],
           preferred_language: input.preferred_language ?? null,
           notes: input.notes ?? null,
-          status: 'pending', // becomes "active" once robot QR is paired in-museum
+          status: 'active', // becomes "in_progress" once robot QR is paired in-museum
           visit_date: input.visit_date,
           visit_time: input.visit_time ?? null,
           created_at: serverTimestamp(),
+          updated_at: serverTimestamp(),
         });
 
         // 2) Museum entry ticket (the one shown in "My Tickets" lists).
@@ -156,6 +168,7 @@ export function useUserTickets() {
           status: 'active',
           qr_value: qr,
           // Denormalised tour fields so a single doc can render the full card.
+          tour_type: input.tour_type ?? 'standard',
           tour_duration: input.tour_duration ?? null,
           visitor_type: input.visitor_type ?? null,
           interests: input.interests ?? null,
@@ -164,6 +177,7 @@ export function useUserTickets() {
           notes: input.notes ?? null,
           robot_tour_ticket_id: robotDoc.id,
           created_at: serverTimestamp(),
+          updated_at: serverTimestamp(),
         });
 
         const created: UserTicket = {
@@ -180,6 +194,7 @@ export function useUserTickets() {
           status: 'active',
           qr_value: qr,
           created_at: new Date().toISOString(),
+          tour_type: input.tour_type ?? 'standard',
           tour_duration: input.tour_duration ?? null,
           visitor_type: input.visitor_type ?? null,
           interests: input.interests ?? null,
@@ -197,5 +212,31 @@ export function useUserTickets() {
     [user],
   );
 
-  return { tickets, loading, error, refresh, createTicket };
+  const cancelTicket = useCallback(
+    async (museumTicketId: string): Promise<{ error: string | null }> => {
+      if (!user) return { error: 'not-authenticated' };
+      try {
+        const tk = tickets.find((t) => t.id === museumTicketId);
+        await updateDoc(doc(db, 'museumTickets', museumTicketId), {
+          status: 'cancelled',
+          updated_at: serverTimestamp(),
+        });
+        if (tk?.robot_tour_ticket_id) {
+          await updateDoc(doc(db, 'robotTourTickets', tk.robot_tour_ticket_id), {
+            status: 'cancelled',
+            updated_at: serverTimestamp(),
+          });
+        }
+        setTickets((prev) =>
+          prev.map((t) => (t.id === museumTicketId ? { ...t, status: 'cancelled' } : t)),
+        );
+        return { error: null };
+      } catch (e) {
+        return { error: (e as Error).message };
+      }
+    },
+    [user, tickets],
+  );
+
+  return { tickets, loading, error, refresh, createTicket, cancelTicket };
 }

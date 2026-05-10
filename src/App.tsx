@@ -18,6 +18,9 @@ import FaqPage from "./pages/site/FaqPage";
 import ContactPage from "./pages/site/ContactPage";
 import MyTicketsPage from "./pages/site/MyTicketsPage";
 import BookPage from "./pages/site/BookPage";
+import PrivacyPage from "./pages/site/PrivacyPage";
+import TermsPage from "./pages/site/TermsPage";
+import AccountPage from "./pages/site/AccountPage";
 import OnboardingScreen from "./pages/OnboardingScreen";
 import AuthScreen from "./pages/AuthScreen";
 import HomeScreen from "./pages/HomeScreen";
@@ -59,6 +62,9 @@ function AppRoutes() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/tickets-mine" element={<MyTicketsPage />} />
         <Route path="/book" element={<BookPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/account" element={<AccountPage />} />
         {/* App */}
         <Route path="/launch" element={<SplashScreen />} />
         <Route path="/onboarding" element={<OnboardingScreen />} />

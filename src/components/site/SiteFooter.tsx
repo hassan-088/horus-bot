@@ -65,8 +65,8 @@ export function SiteFooter() {
         <div className="mt-12 pt-6 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} Horus-Bot. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
           <div className="flex gap-4">
-            <Link to="/contact" className="hover:text-primary transition-colors">{isRTL ? 'الخصوصية' : 'Privacy'}</Link>
-            <Link to="/contact" className="hover:text-primary transition-colors">{isRTL ? 'الشروط' : 'Terms'}</Link>
+            <Link to="/privacy" className="hover:text-primary transition-colors">{isRTL ? 'الخصوصية' : 'Privacy'}</Link>
+            <Link to="/terms" className="hover:text-primary transition-colors">{isRTL ? 'الشروط' : 'Terms'}</Link>
           </div>
         </div>
       </div>
