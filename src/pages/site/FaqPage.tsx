@@ -41,7 +41,7 @@ export default function FaqPage() {
       />
 
       <section className="mx-auto max-w-3xl px-4 md:px-8 pb-16">
-        <Accordion type="multiple" defaultValue={['item-0', 'item-1']} className="space-y-3">
+        <Accordion type="single" collapsible className="space-y-3">
           {faqs.map((f, i) => (
             <AccordionItem key={i} value={`item-${i}`} className="rounded-2xl border border-border/60 bg-card px-5">
               <AccordionTrigger className="font-serif text-base text-foreground hover:text-primary hover:no-underline text-start">{f.q}</AccordionTrigger>
