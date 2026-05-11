@@ -1,150 +1,80 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Language } from '@/lib/i18n';
-import { Ticket } from '@/lib/data';
 
-type ThemeMode = 'light';
 type FontScale = 'sm' | 'md' | 'lg' | 'xl';
 
 interface AppState {
   language: Language;
-  themeMode: ThemeMode;
-  highContrast: boolean;
   fontScale: FontScale;
-  onboardingCompleted: boolean;
-  savedExhibits: string[];
-  visitedExhibits: string[];
-  tickets: Ticket[];
-  privacyAccepted: boolean;
-  tourAlertShown: boolean;
-  quizCompleted: boolean;
-  quizScore: number;
 }
 
 interface AppContextType extends AppState {
   setLanguage: (lang: Language) => void;
-  setThemeMode: (mode: ThemeMode) => void;
-  setHighContrast: (enabled: boolean) => void;
   setFontScale: (scale: FontScale) => void;
-  completeOnboarding: () => void;
-  toggleSavedExhibit: (exhibitId: string) => boolean;
-  markExhibitVisited: (exhibitId: string) => void;
-  addTickets: (tickets: Ticket[]) => void;
-  acceptPrivacy: () => void;
-  showTourAlert: () => void;
-  completeQuiz: (score: number) => void;
   isRTL: boolean;
 }
 
+const STORAGE_KEY = 'horus-bot-prefs';
+const LEGACY_KEY = 'ankhu-app-state';
+
 const defaultState: AppState = {
   language: 'en',
-  themeMode: 'light',
-  highContrast: false,
   fontScale: 'md',
-  onboardingCompleted: false,
-  savedExhibits: [],
-  visitedExhibits: ['golden-mask', 'scarab-amulet'],
-  tickets: [],
-  privacyAccepted: false,
-  tourAlertShown: false,
-  quizCompleted: false,
-  quizScore: 0,
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(() => {
-    const saved = localStorage.getItem('ankhu-app-state');
-    if (saved) {
-      try {
-        // Normalize legacy stored values: force light mode, no high contrast.
-        return { ...defaultState, ...JSON.parse(saved), themeMode: 'light', highContrast: false };
-      } catch {
-        return defaultState;
-      }
-    }
+function loadInitial(): AppState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_KEY);
+    if (!raw) return defaultState;
+    const parsed = JSON.parse(raw) as Partial<AppState>;
+    // Drop the legacy key if present — we have migrated.
+    if (localStorage.getItem(LEGACY_KEY)) localStorage.removeItem(LEGACY_KEY);
+    return {
+      language: (parsed.language as Language) ?? defaultState.language,
+      fontScale: (parsed.fontScale as FontScale) ?? defaultState.fontScale,
+    };
+  } catch {
     return defaultState;
-  });
+  }
+}
 
-  // Persist state
+export function AppProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<AppState>(loadInitial);
+
   useEffect(() => {
-    localStorage.setItem('ankhu-app-state', JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
 
-  // Force light mode site-wide. No system-preference detection. No dark class.
+  // Site is locked to LIGHT mode — no dark / high-contrast classes.
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove('dark', 'high-contrast');
-  }, [state.themeMode, state.highContrast]);
+    document.documentElement.classList.remove('dark', 'high-contrast');
+  }, []);
 
-  // Apply RTL
+  // RTL + lang attributes
   useEffect(() => {
     document.documentElement.dir = state.language === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = state.language;
   }, [state.language]);
 
-  // Apply font scale
+  // Font scale class
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove('font-scale-sm', 'font-scale-md', 'font-scale-lg', 'font-scale-xl');
     root.classList.add(`font-scale-${state.fontScale}`);
   }, [state.fontScale]);
 
-  const setLanguage = (language: Language) => setState(s => ({ ...s, language }));
-  // Theme is locked to light. Setters are kept as no-ops for API stability.
-  const setThemeMode = (_themeMode: ThemeMode) => setState(s => ({ ...s, themeMode: 'light' }));
-  const setHighContrast = (_highContrast: boolean) => setState(s => ({ ...s, highContrast: false }));
-  const setFontScale = (fontScale: FontScale) => setState(s => ({ ...s, fontScale }));
-  const completeOnboarding = () => setState(s => ({ ...s, onboardingCompleted: true }));
-  const acceptPrivacy = () => setState(s => ({ ...s, privacyAccepted: true }));
-  const showTourAlert = () => setState(s => ({ ...s, tourAlertShown: true }));
-  const completeQuiz = (score: number) => setState(s => ({ ...s, quizCompleted: true, quizScore: score }));
-
-  const toggleSavedExhibit = (exhibitId: string): boolean => {
-    const isSaved = state.savedExhibits.includes(exhibitId);
-    setState(s => ({
-      ...s,
-      savedExhibits: isSaved
-        ? s.savedExhibits.filter(id => id !== exhibitId)
-        : [...s.savedExhibits, exhibitId],
-    }));
-    return !isSaved;
-  };
-
-  const markExhibitVisited = (exhibitId: string) => {
-    if (!state.visitedExhibits.includes(exhibitId)) {
-      setState(s => ({
-        ...s,
-        visitedExhibits: [...s.visitedExhibits, exhibitId],
-      }));
-    }
-  };
-
-  const addTickets = (newTickets: Ticket[]) => {
-    setState(s => ({
-      ...s,
-      tickets: [...s.tickets, ...newTickets],
-    }));
-  };
-
-  const isRTL = state.language === 'ar';
+  const setLanguage = (language: Language) => setState((s) => ({ ...s, language }));
+  const setFontScale = (fontScale: FontScale) => setState((s) => ({ ...s, fontScale }));
 
   return (
     <AppContext.Provider
       value={{
         ...state,
         setLanguage,
-        setThemeMode,
-        setHighContrast,
         setFontScale,
-        completeOnboarding,
-        toggleSavedExhibit,
-        markExhibitVisited,
-        addTickets,
-        acceptPrivacy,
-        showTourAlert,
-        completeQuiz,
-        isRTL,
+        isRTL: state.language === 'ar',
       }}
     >
       {children}
@@ -153,9 +83,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 }
 
 export function useApp() {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useApp must be used within an AppProvider');
-  }
-  return context;
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error('useApp must be used within an AppProvider');
+  return ctx;
 }
