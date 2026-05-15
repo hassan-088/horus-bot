@@ -19,6 +19,7 @@ import { useAuth, friendlyAuthError } from '@/contexts/AuthContext';
 import { useExhibits } from '@/hooks/useExhibits';
 import { useUserTickets, type TourType } from '@/hooks/useUserTickets';
 import { museumTicketPrices, robotTourPrices, type MuseumTicketCategory } from '@/lib/data';
+import { sharedStandardRouteIds } from '@/lib/exhibitCatalog';
 import { PASSWORD_RULES, isStrongPassword, isValidPhone } from '@/lib/passwordRules';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -29,14 +30,8 @@ type PayMethod = 'card' | 'cash';
 
 const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00'];
 const STANDARD_TOUR_DURATION_MIN = 45;
-const STANDARD_ROUTE_IDS = [
-  'artifact_001',
-  'artifact_005',
-  'artifact_002',
-  'artifact_006',
-  'artifact_018',
-  'artifact_030',
-];
+const STANDARD_ROUTE_IDS = sharedStandardRouteIds;
+const ARTIFACT_ID_PATTERN = /^artifact_\d{3}$/;
 const DURATIONS = [30, 45, 60, 90];
 
 const emailSchema = z.string().trim().email();
@@ -233,7 +228,9 @@ export default function BookPage() {
       return;
     }
     const selectedExhibitIds =
-      tourType === 'standard' ? standardSelectedExhibitIds : selectedExhibits;
+      tourType === 'standard'
+        ? standardSelectedExhibitIds
+        : selectedExhibits.filter((id) => ARTIFACT_ID_PATTERN.test(id));
     if (tourType === 'personalized' && selectedExhibitIds.length === 0) {
       toast.error(isRTL ? 'اختر قطعة واحدة على الأقل لجولتك.' : 'Please select at least one exhibit for your tour.');
       return;

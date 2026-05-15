@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
-import { exhibits as fallbackExhibits } from '@/lib/data';
+import { sharedExhibitRecords, sharedStandardRouteIds } from '@/lib/exhibitCatalog';
 
 export interface WebsiteExhibit {
   id: string;
@@ -17,14 +17,7 @@ export interface WebsiteExhibit {
   source: 'firestore' | 'fallback';
 }
 
-const STANDARD_ROUTE_IDS = [
-  'artifact_001',
-  'artifact_005',
-  'artifact_002',
-  'artifact_006',
-  'artifact_018',
-  'artifact_030',
-];
+const STANDARD_ROUTE_IDS = sharedStandardRouteIds;
 
 function asStringArray(value: unknown): string[] {
   return Array.isArray(value)
@@ -46,7 +39,7 @@ function fromFirestore(id: string, data: Record<string, unknown>): WebsiteExhibi
   const titleEn = (data.title_en as string | undefined) ?? id;
 
   return {
-    id: (data.id as string | undefined) ?? id,
+    id,
     titleEn,
     titleAr: (data.title_ar as string | null | undefined) ?? null,
     summary: (contentEn.summary as string | undefined)
@@ -63,19 +56,19 @@ function fromFirestore(id: string, data: Record<string, unknown>): WebsiteExhibi
 }
 
 function fallbackRows(): WebsiteExhibit[] {
-  return fallbackExhibits.map((exhibit) => ({
+  return sharedExhibitRecords.map((exhibit) => ({
     id: exhibit.id,
-    titleEn: exhibit.nameEn,
-    titleAr: exhibit.nameAr,
-    summary: exhibit.descriptionEn,
-    routeOrder: null,
-    themes: [],
-    tags: [],
-    imageUrl: null,
-    altEn: exhibit.nameEn,
-    isActive: true,
+    titleEn: exhibit.title_en ?? exhibit.id,
+    titleAr: exhibit.title_ar ?? null,
+    summary: exhibit.content_en?.summary ?? exhibit.content_en?.historical_background ?? '',
+    routeOrder: asRouteOrder(exhibit.route_order),
+    themes: asStringArray(exhibit.themes),
+    tags: asStringArray(exhibit.tags),
+    imageUrl: exhibit.media?.image_url ?? null,
+    altEn: exhibit.media?.alt_en ?? exhibit.title_en ?? exhibit.id,
+    isActive: exhibit.is_active !== false,
     source: 'fallback',
-  }));
+  })).filter((exhibit) => exhibit.isActive);
 }
 
 export function useExhibits() {
@@ -97,7 +90,7 @@ export function useExhibits() {
           .sort((a, b) => a.id.localeCompare(b.id));
 
         if (!mounted) return;
-        setExhibits(rows.length > 0 ? rows : fallbackRows());
+        setExhibits(rows);
       } catch (e) {
         if (!mounted) return;
         setError((e as Error).message);
@@ -127,4 +120,3 @@ export function useExhibits() {
 
   return { exhibits, loading, error, standardRoute };
 }
-

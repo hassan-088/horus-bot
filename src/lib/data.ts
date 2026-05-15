@@ -1,3 +1,5 @@
+import { sharedExhibitRecords } from '@/lib/exhibitCatalog';
+
 export interface Exhibit {
   id: string;
   nameEn: string;
@@ -38,93 +40,24 @@ export interface Ticket {
   status?: 'active' | 'used' | 'expired';
 }
 
-export const exhibits: Exhibit[] = [
-  {
-    id: 'golden-mask',
-    nameEn: 'Golden Mask of Tutankhamun',
-    nameAr: 'قناع توت عنخ آمون الذهبي',
-    descriptionEn: 'The iconic golden death mask of the young pharaoh Tutankhamun, crafted from solid gold and inlaid with semi-precious stones and colored glass. It weighs approximately 11 kg and is one of the most recognized artifacts in the world. The mask was discovered by Howard Carter in 1925 when he opened the innermost coffin in the pharaoh\'s tomb.',
-    descriptionAr: 'القناع الذهبي الشهير للفرعون الصغير توت عنخ آمون، مصنوع من الذهب الخالص ومرصع بالأحجار شبه الكريمة والزجاج الملون. يزن حوالي 11 كجم وهو من أشهر القطع الأثرية في العالم.',
-    x: 250,
-    y: 150,
-    originEn: 'Ancient Egypt',
-    originAr: 'مصر القديمة',
-    periodEn: 'New Kingdom',
-    periodAr: 'المملكة الحديثة',
-    galleryEn: 'Hall A',
-    galleryAr: 'القاعة أ',
-    floor: 'ground',
-    visited: true,
-  },
-  {
-    id: 'rosetta-stone',
-    nameEn: 'Rosetta Stone Replica',
-    nameAr: 'نسخة حجر رشيد',
-    descriptionEn: 'A detailed replica of the famous Rosetta Stone, the key to deciphering Egyptian hieroglyphics. The original stone features the same text in three scripts: hieroglyphic, demotic, and ancient Greek, allowing scholars to finally understand the ancient Egyptian writing system.',
-    descriptionAr: 'نسخة مفصلة من حجر رشيد الشهير، مفتاح فك رموز الهيروغليفية المصرية. يتضمن الحجر الأصلي نفس النص بثلاث لغات: الهيروغليفية والديموطيقية واليونانية القديمة.',
-    x: 400,
-    y: 200,
-    originEn: 'Ancient Egypt',
-    originAr: 'مصر القديمة',
-    periodEn: 'Ptolemaic Period',
-    periodAr: 'العصر البطلمي',
-    galleryEn: 'Hall B',
-    galleryAr: 'القاعة ب',
-    floor: 'ground',
-    visited: false,
-  },
-  {
-    id: 'ancient-vase',
-    nameEn: 'Ceremonial Vase',
-    nameAr: 'الإناء الاحتفالي',
-    descriptionEn: 'An exquisite ceremonial vase used in religious rituals during the New Kingdom period. The intricate carvings depict scenes of offerings to the gods and showcase the remarkable craftsmanship of ancient Egyptian artisans.',
-    descriptionAr: 'إناء احتفالي رائع استخدم في الطقوس الدينية خلال فترة المملكة الحديثة. تصور النقوش المعقدة مشاهد تقديم القرابين للآلهة.',
-    x: 150,
-    y: 300,
-    originEn: 'Ancient Egypt',
-    originAr: 'مصر القديمة',
-    periodEn: 'New Kingdom',
-    periodAr: 'المملكة الحديثة',
-    galleryEn: 'Hall C',
-    galleryAr: 'القاعة ج',
-    floor: 'floor-1',
-    visited: false,
-  },
-  {
-    id: 'scarab-amulet',
-    nameEn: 'Sacred Scarab Amulet',
-    nameAr: 'تميمة الجعران المقدس',
-    descriptionEn: 'A beautifully preserved scarab amulet made of blue faience. Scarabs were powerful symbols of rebirth and regeneration in ancient Egypt, associated with the god Khepri who rolled the sun across the sky.',
-    descriptionAr: 'تميمة جعران محفوظة بشكل جميل مصنوعة من القيشاني الأزرق. كانت الجعارين رموزاً قوية للبعث والتجديد في مصر القديمة.',
-    x: 350,
-    y: 350,
-    originEn: 'Ancient Egypt',
-    originAr: 'مصر القديمة',
-    periodEn: 'Middle Kingdom',
-    periodAr: 'المملكة الوسطى',
-    galleryEn: 'Hall D',
-    galleryAr: 'القاعة د',
-    floor: 'floor-1',
-    visited: true,
-  },
-  {
-    id: 'papyrus-scroll',
-    nameEn: 'Book of the Dead Papyrus',
-    nameAr: 'بردية كتاب الموتى',
-    descriptionEn: 'A rare and well-preserved section of the Book of the Dead, containing spells and instructions to help the deceased navigate the afterlife. The colorful illustrations show the journey through the underworld.',
-    descriptionAr: 'قسم نادر ومحفوظ جيداً من كتاب الموتى، يحتوي على تعاويذ وتعليمات لمساعدة المتوفى في رحلته للآخرة.',
-    x: 280,
-    y: 280,
-    originEn: 'Ancient Egypt',
-    originAr: 'مصر القديمة',
-    periodEn: 'New Kingdom',
-    periodAr: 'المملكة الحديثة',
-    galleryEn: 'Hall B',
-    galleryAr: 'القاعة ب',
-    floor: 'floor-2',
-    visited: false,
-  },
-];
+export const exhibits: Exhibit[] = sharedExhibitRecords.map((exhibit) => ({
+  id: exhibit.id,
+  nameEn: exhibit.title_en ?? exhibit.id,
+  nameAr: exhibit.title_ar ?? exhibit.title_en ?? exhibit.id,
+  descriptionEn: exhibit.content_en?.summary ?? exhibit.content_en?.historical_background ?? '',
+  descriptionAr: exhibit.title_ar ?? exhibit.content_en?.summary ?? exhibit.title_en ?? exhibit.id,
+  x: exhibit.locations?.map?.x ?? 0,
+  y: exhibit.locations?.map?.y ?? 0,
+  originEn: exhibit.locations?.original ?? exhibit.locations?.current ?? '',
+  originAr: exhibit.locations?.original ?? exhibit.locations?.current ?? '',
+  periodEn: exhibit.historical_period ?? '',
+  periodAr: exhibit.historical_period ?? '',
+  galleryEn: exhibit.locations?.gallery ?? '',
+  galleryAr: exhibit.locations?.gallery ?? '',
+  floor: exhibit.locations?.floor === 'floor-1' || exhibit.locations?.floor === 'floor-2'
+    ? exhibit.locations.floor
+    : 'ground',
+}));
 
 export const quizQuestions: QuizQuestion[] = [
   {
