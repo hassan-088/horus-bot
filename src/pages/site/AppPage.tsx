@@ -45,7 +45,7 @@ export default function AppPage() {
           {isRTL ? 'يعمل قبل زيارتك وأثناءها وبعدها.' : 'Works before, during, and after your visit.'}
         </p>
         <p className="text-sm text-primary/90">
-          {isRTL ? 'يعمل بسلاسة مع الروبوت المخصَّص لك ليُرشد رحلة متحفك بالكامل.' : 'Works seamlessly with your assigned robot to guide your full museum journey.'}
+          {isRTL ? 'تظهر تذكرة جولة الروبوت في التطبيق، ثم يتم الاقتران داخل المتحف عبر مسح رمز QR على الروبوت.' : 'Your robot tour ticket appears in the app. Pairing happens at the museum by scanning the physical robot QR.'}
         </p>
         <p className="text-xs text-muted-foreground">
           {isRTL ? 'حمّله قبل زيارتك للحصول على أكثر تجربة سلاسة.' : 'Download before your visit for the smoothest experience.'}

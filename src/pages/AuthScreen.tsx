@@ -320,7 +320,7 @@ export default function AuthScreen() {
                     <SelectContent>
                       <SelectItem value="english">{isArabic ? 'الإنجليزية' : 'English'}</SelectItem>
                       <SelectItem value="arabic">{isArabic ? 'العربية' : 'Arabic'}</SelectItem>
-                      <SelectItem value="egyptian-arabic">{isArabic ? 'العامية المصرية' : 'Egyptian Arabic'}</SelectItem>
+                      <SelectItem value="egyptian_arabic">{isArabic ? 'العامية المصرية' : 'Egyptian Arabic'}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

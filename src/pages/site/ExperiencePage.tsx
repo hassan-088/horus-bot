@@ -59,7 +59,7 @@ export default function ExperiencePage() {
           title={isRTL ? 'الوصول وبدء جولتك' : 'Arrive and Begin Your Tour'}
           items={[
             { icon: QrCode, title: isRTL ? 'امسح عند البوابة' : 'Scan at the Gate', desc: isRTL ? 'امسح رمز QR لتفعيل زيارتك فوراً.' : 'Scan your QR code to activate your visit instantly.' },
-            { icon: Bot, title: isRTL ? 'اتصل بالروبوت المخصَّص لك' : 'Connect with Your Assigned Robot', desc: isRTL ? 'يبدأ مسارك بمجرد الاتصال بالروبوت المخصَّص لك.' : 'Your route begins as you connect to your assigned robot.' },
+            { icon: Bot, title: isRTL ? 'اقترن بروبوت Horus-Bot داخل المتحف' : 'Pair With Horus-Bot at the Museum', desc: isRTL ? 'تكون تذكرة جولة الروبوت جاهزة في التطبيق، ويتم الاقتران عبر مسح رمز QR على الروبوت.' : 'Your robot tour ticket will be ready in the app. Pairing happens at the museum by scanning the physical robot QR.' },
             { icon: Headphones, title: isRTL ? 'تجربة صوتية أكثر خصوصية' : 'A More Personal Audio Experience', desc: isRTL ? 'استخدم السمّاعات للحصول على تجربة استماع أكثر تركيزاً وخصوصية.' : 'Use headphones for a more focused and personal listening experience.' },
           ]}
         />

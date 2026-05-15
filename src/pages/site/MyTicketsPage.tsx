@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Ticket, LogIn, Calendar, Clock, QrCode, Wallet, Languages, Sparkles, Zap, X as XIcon, Loader2,
+  Ticket, LogIn, Calendar, Clock, QrCode, Wallet, Languages, Sparkles, Zap, X as XIcon, Loader2, Bot,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -184,6 +184,11 @@ function TicketCard({ tk, isRTL, onCancel }: { tk: UserTicket; isRTL: boolean; o
         </div>
       </div>
 
+      <div className="rounded-xl bg-muted/50 p-3 text-sm">
+        <div className="text-xs text-muted-foreground">{isRTL ? 'Ø­Ø§Ù„Ø© Ø§Ù„Ø¯ÙØ¹' : 'Payment status'}</div>
+        <div className="font-semibold capitalize">{tk.payment_status.replaceAll('_', ' ')}</div>
+      </div>
+
       {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
         <div className="space-y-2">
           {tk.preferred_language && (
@@ -212,6 +217,62 @@ function TicketCard({ tk, isRTL, onCancel }: { tk: UserTicket; isRTL: boolean; o
             {isRTL ? 'رمز الدخول' : 'Entry QR'}
           </p>
           <p className="font-mono text-sm truncate">{tk.qr_value}</p>
+        </div>
+      </div>
+
+      <div className="grid gap-3">
+        <div className="rounded-xl border border-border/60 p-4 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Ticket className="h-4 w-4 text-primary" />
+              <h4 className="font-semibold">{isRTL ? 'ØªØ°ÙƒØ±Ø© Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…ØªØ­Ù' : 'Museum Entry Ticket'}</h4>
+            </div>
+            <Badge variant="secondary" className="bg-muted text-muted-foreground border-0">{tk.status}</Badge>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-2 text-sm">
+            <div className="rounded-lg bg-muted/50 p-2">
+              <div className="text-[11px] text-muted-foreground">{isRTL ? 'Ø§Ù„ØªØ°Ø§ÙƒØ±' : 'Tickets'}</div>
+              <div className="font-medium">{tk.total_tickets}</div>
+            </div>
+            <div className="rounded-lg bg-muted/50 p-2">
+              <div className="text-[11px] text-muted-foreground">{isRTL ? 'Ø§Ù„Ø³Ø¹Ø±' : 'Price'}</div>
+              <div className="font-medium">{tk.museum_entry_total} {tk.currency}</div>
+            </div>
+            <div className="rounded-lg bg-muted/50 p-2">
+              <div className="text-[11px] text-muted-foreground">{isRTL ? 'Ø­Ø§Ù„Ø© Ø§Ù„ØªØ°ÙƒØ±Ø©' : 'Ticket status'}</div>
+              <div className="font-medium capitalize">{tk.status}</div>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {isRTL ? 'ÙŠÙØ³ØªØ®Ø¯Ù… Ø±Ù…Ø² QR Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…ØªØ­Ù Ø¹Ù†Ø¯ Ø§Ù„Ø¨ÙˆØ§Ø¨Ø©.' : 'Museum Entry QR is used at the museum gate.'}
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-border/60 p-4 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Bot className="h-4 w-4 text-primary" />
+              <h4 className="font-semibold">{isRTL ? 'ØªØ°ÙƒØ±Ø© Ø¬ÙˆÙ„Ø© Horus-Bot' : 'Horus-Bot Robot Tour Ticket'}</h4>
+            </div>
+            <Badge variant="secondary" className="bg-muted text-muted-foreground border-0">{tk.status}</Badge>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-2 text-sm">
+            <div className="rounded-lg bg-muted/50 p-2">
+              <div className="text-[11px] text-muted-foreground">{isRTL ? 'Ø§Ù„Ù†ÙˆØ¹' : 'Tour type'}</div>
+              <div className="font-medium capitalize">{tk.tour_type ?? 'standard'}</div>
+            </div>
+            <div className="rounded-lg bg-muted/50 p-2">
+              <div className="text-[11px] text-muted-foreground">{isRTL ? 'Ø§Ù„Ù…Ø¯Ø©' : 'Duration'}</div>
+              <div className="font-medium">{tk.tour_duration ?? 45} min</div>
+            </div>
+            <div className="rounded-lg bg-muted/50 p-2">
+              <div className="text-[11px] text-muted-foreground">{isRTL ? 'Ø§Ù„Ø³Ø¹Ø±' : 'Price'}</div>
+              <div className="font-medium">{tk.robot_tour_price} {tk.currency}</div>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {isRTL ? 'ÙŠØ­Ø¯Ø« Ø§Ù‚ØªØ±Ø§Ù† Ø§Ù„Ø±ÙˆØ¨ÙˆØª Ù„Ø§Ø­Ù‚Ø§Ù‹ Ø¯Ø§Ø®Ù„ ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù‡Ø§ØªÙ Ø¹Ù† Ø·Ø±ÙŠÙ‚ Ù…Ø³Ø­ Ø±Ù…Ø² QR Ø§Ù„ÙØ¹Ù„ÙŠ Ø¹Ù„Ù‰ Ø§Ù„Ø±ÙˆØ¨ÙˆØª.' : 'Robot pairing happens later inside the mobile app by scanning the physical robot QR.'}
+          </p>
         </div>
       </div>
 

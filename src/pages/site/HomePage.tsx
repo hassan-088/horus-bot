@@ -200,7 +200,7 @@ export default function HomePage() {
           <StepCard
             step={3}
             title={isRTL ? 'قابل روبوتك المرشد' : 'Meet Your Robot Guide'}
-            description={isRTL ? 'يرحّب بك الروبوت المخصَّص لك، ويُحمِّل التطبيق مسارك المختار.' : 'Your assigned robot welcomes you, and the app loads your selected route.'}
+            description={isRTL ? 'تكون تذكرة جولة الروبوت جاهزة في التطبيق، ويتم الاقتران داخل المتحف عبر مسح رمز QR على الروبوت.' : 'Your robot tour ticket will be ready in the app. Pairing happens at the museum by scanning the physical robot QR.'}
           />
           <StepCard
             step={4}

@@ -23,7 +23,7 @@ export default function FaqPage() {
     : [
         { q: 'What is Horus-Bot?', a: 'Horus-Bot is an autonomous robot guide that leads your museum tour in real time, while the mobile app supports you with navigation, exhibit content, tickets, and interaction.' },
         { q: 'Do I have to use the app?', a: 'The app is strongly recommended because it gives visitors maps, exhibit content, tickets, tour progress, and the full connected experience.' },
-        { q: 'What if all robots are busy?', a: 'If all robots are in use, the next available robot is assigned as soon as possible. Booking early helps secure your preferred time slot.' },
+        { q: 'What if all robots are busy?', a: 'Your robot tour ticket will be ready in the app. Pairing happens at the museum by scanning the physical robot QR when a robot is available.' },
         { q: 'Which languages are supported?', a: 'The experience supports Arabic, Egyptian Arabic, English, and additional languages depending on the museum setup.' },
         { q: 'Is it suitable for children?', a: 'Yes — there is a family-friendly option with shorter stops, simpler narration, and fun puzzles after each section.' },
         { q: 'Do I need internet?', a: 'Free Wi-Fi is available at the museum, and mobile data also works so visitors can stay connected throughout the visit.' },

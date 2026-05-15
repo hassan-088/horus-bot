@@ -27,6 +27,7 @@ type StepKey = 'account' | 'tickets' | 'tour' | 'datetime' | 'personalize' | 'pa
 type PayMethod = 'card' | 'cash';
 
 const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00'];
+const STANDARD_TOUR_DURATION_MIN = 45;
 const DURATIONS = [30, 45, 60, 90];
 
 const emailSchema = z.string().trim().email();
@@ -108,13 +109,13 @@ export default function BookPage() {
   const [time, setTime] = useState<string>('11:00');
 
   // Personalize
-  const [duration, setDuration] = useState<number>(60);
+  const [duration, setDuration] = useState<number>(STANDARD_TOUR_DURATION_MIN);
   const [interests, setInterests] = useState<string[]>([]);
   const [accessibility, setAccessibility] = useState<string[]>([]);
   const [tourLanguage, setTourLanguage] = useState<string>('english');
   const [pace, setPace] = useState<string>('normal');
   const [kidsMode, setKidsMode] = useState(false);
-  const [photoSpots, setPhotoSpots] = useState(true);
+  const [photoSpots, setPhotoSpots] = useState(false);
   const [notes, setNotes] = useState('');
 
   // Payment
@@ -226,12 +227,12 @@ export default function BookPage() {
       museum_entry_total: museumPrice,
       robot_tour_price: tourPrice,
       tour_type: tourType,
-      tour_duration_min: tourType === 'personalized' ? duration : undefined,
+      tour_duration_min: tourType === 'personalized' ? duration : STANDARD_TOUR_DURATION_MIN,
       interests: tourType === 'personalized' ? interests : [],
       selected_exhibits: [],
       accessibility: tourType === 'personalized' ? accessibility : [],
       preferred_language: tourLanguage,
-      pace: tourType === 'personalized' ? pace : undefined,
+      pace: tourType === 'personalized' ? pace : 'normal',
       kids_mode: tourType === 'personalized' ? kidsMode : false,
       photo_spots: tourType === 'personalized' ? photoSpots : false,
       notes: notes || undefined,
@@ -267,7 +268,7 @@ export default function BookPage() {
   ];
   const languages = [
     { id: 'arabic', en: 'Arabic', ar: 'العربية' },
-    { id: 'egyptian-arabic', en: 'Egyptian Arabic', ar: 'العامية المصرية' },
+    { id: 'egyptian_arabic', en: 'Egyptian Arabic', ar: 'العامية المصرية' },
     { id: 'english', en: 'English', ar: 'الإنجليزية' },
   ];
   const payOptions: { id: PayMethod; labelEn: string; labelAr: string; icon: typeof CreditCard; disabled?: boolean; note?: { en: string; ar: string } }[] = [
