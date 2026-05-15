@@ -16,6 +16,7 @@ import { SectionHero } from '@/components/site/SectionHero';
 import { BookingStepper } from '@/components/site/BookingStepper';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth, friendlyAuthError } from '@/contexts/AuthContext';
+import { useExhibits } from '@/hooks/useExhibits';
 import { useUserTickets, type TourType } from '@/hooks/useUserTickets';
 import { museumTicketPrices, robotTourPrices, type MuseumTicketCategory } from '@/lib/data';
 import { PASSWORD_RULES, isStrongPassword, isValidPhone } from '@/lib/passwordRules';
@@ -28,6 +29,14 @@ type PayMethod = 'card' | 'cash';
 
 const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00'];
 const STANDARD_TOUR_DURATION_MIN = 45;
+const STANDARD_ROUTE_IDS = [
+  'artifact_001',
+  'artifact_005',
+  'artifact_002',
+  'artifact_006',
+  'artifact_018',
+  'artifact_030',
+];
 const DURATIONS = [30, 45, 60, 90];
 
 const emailSchema = z.string().trim().email();
@@ -52,6 +61,7 @@ export default function BookPage() {
   const { isRTL } = useApp();
   const { user, signIn, signUp } = useAuth();
   const { createBooking } = useUserTickets();
+  const { exhibits, loading: exhibitsLoading, standardRoute } = useExhibits();
   const navigate = useNavigate();
 
   // ---- Step management ----
@@ -110,6 +120,7 @@ export default function BookPage() {
 
   // Personalize
   const [duration, setDuration] = useState<number>(STANDARD_TOUR_DURATION_MIN);
+  const [selectedExhibits, setSelectedExhibits] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [accessibility, setAccessibility] = useState<string[]>([]);
   const [tourLanguage, setTourLanguage] = useState<string>('english');
@@ -128,6 +139,10 @@ export default function BookPage() {
     .reduce((acc, [k, n]) => acc + n * museumTicketPrices[k], 0);
   const tourPrice = robotTourPrices[tourType];
   const totalPrice = museumPrice + tourPrice;
+  const standardSelectedExhibitIds =
+    standardRoute.length === STANDARD_ROUTE_IDS.length
+      ? standardRoute.map((exhibit) => exhibit.id)
+      : STANDARD_ROUTE_IDS;
 
   // ---- Handlers ----
   const updateQuantity = (k: MuseumTicketCategory, d: number) =>
@@ -217,6 +232,12 @@ export default function BookPage() {
       toast.error(isRTL ? 'الحجز متاح نقداً فقط حالياً.' : 'Bookings can only be completed with cash right now.');
       return;
     }
+    const selectedExhibitIds =
+      tourType === 'standard' ? standardSelectedExhibitIds : selectedExhibits;
+    if (tourType === 'personalized' && selectedExhibitIds.length === 0) {
+      toast.error(isRTL ? 'اختر قطعة واحدة على الأقل لجولتك.' : 'Please select at least one exhibit for your tour.');
+      return;
+    }
     setBusy(true);
     const { ticket, error } = await createBooking({
       booking_source: 'website',
@@ -229,7 +250,7 @@ export default function BookPage() {
       tour_type: tourType,
       tour_duration_min: tourType === 'personalized' ? duration : STANDARD_TOUR_DURATION_MIN,
       interests: tourType === 'personalized' ? interests : [],
-      selected_exhibits: [],
+      selected_exhibits: selectedExhibitIds,
       accessibility: tourType === 'personalized' ? accessibility : [],
       preferred_language: tourLanguage,
       pace: tourType === 'personalized' ? pace : 'normal',
@@ -666,6 +687,58 @@ export default function BookPage() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{isRTL ? 'القطع المختارة' : 'Selected exhibits'}</Label>
+                  {exhibitsLoading && exhibits.length === 0 ? (
+                    <div className="flex items-center gap-2 rounded-xl border border-border/60 p-3 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {isRTL ? 'جاري تحميل القطع...' : 'Loading exhibits...'}
+                    </div>
+                  ) : (
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      {exhibits.map((exhibit) => {
+                        const active = selectedExhibits.includes(exhibit.id);
+                        return (
+                          <button
+                            key={exhibit.id}
+                            type="button"
+                            onClick={() => setSelectedExhibits((arr) => toggleInArray(arr, exhibit.id))}
+                            className={cn(
+                              'min-h-16 rounded-xl border p-3 text-left transition-colors',
+                              active ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50',
+                            )}
+                          >
+                            <div className="flex items-start gap-2">
+                              {exhibit.imageUrl ? (
+                                <img
+                                  src={exhibit.imageUrl}
+                                  alt={exhibit.altEn}
+                                  className="h-10 w-10 rounded-lg object-cover border border-border/50 shrink-0"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <span className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                  <Sparkles className="h-4 w-4 text-muted-foreground" />
+                                </span>
+                              )}
+                              <span className={cn(
+                                'mt-0.5 h-4 w-4 rounded-full border flex items-center justify-center shrink-0',
+                                active ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40',
+                              )}>
+                                {active && <Check className="h-3 w-3" />}
+                              </span>
+                              <span>
+                                <span className="block text-sm font-medium">{isRTL && exhibit.titleAr ? exhibit.titleAr : exhibit.titleEn}</span>
+                                <span className="block text-xs text-muted-foreground mt-1">{exhibit.id}</span>
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">

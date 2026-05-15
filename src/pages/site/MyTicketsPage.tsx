@@ -12,6 +12,7 @@ import {
 import { SectionHero } from '@/components/site/SectionHero';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useExhibits, type WebsiteExhibit } from '@/hooks/useExhibits';
 import { useUserTickets, type UserTicket } from '@/hooks/useUserTickets';
 import { toast } from 'sonner';
 
@@ -19,6 +20,7 @@ export default function MyTicketsPage() {
   const { isRTL } = useApp();
   const { user } = useAuth();
   const { tickets, loading, cancelTicket } = useUserTickets();
+  const { exhibits } = useExhibits();
 
   const [confirmTk, setConfirmTk] = useState<UserTicket | null>(null);
   const [busy, setBusy] = useState(false);
@@ -95,7 +97,7 @@ export default function MyTicketsPage() {
             </h3>
             <div className="grid gap-4">
               {active.map((tk) => (
-                <TicketCard key={tk.id} tk={tk} isRTL={isRTL} onCancel={() => setConfirmTk(tk)} />
+                <TicketCard key={tk.id} tk={tk} isRTL={isRTL} exhibits={exhibits} onCancel={() => setConfirmTk(tk)} />
               ))}
             </div>
           </div>
@@ -108,7 +110,7 @@ export default function MyTicketsPage() {
             </h3>
             <div className="grid gap-4">
               {past.map((tk) => (
-                <TicketCard key={tk.id} tk={tk} isRTL={isRTL} />
+                <TicketCard key={tk.id} tk={tk} isRTL={isRTL} exhibits={exhibits} />
               ))}
             </div>
           </div>
@@ -139,8 +141,29 @@ export default function MyTicketsPage() {
   );
 }
 
-function TicketCard({ tk, isRTL, onCancel }: { tk: UserTicket; isRTL: boolean; onCancel?: () => void }) {
+function resolveExhibitNames(ids: string[], exhibits: WebsiteExhibit[], isRTL: boolean): string[] {
+  if (ids.length === 0) return [];
+  const byId = new Map(exhibits.map((exhibit) => [exhibit.id, exhibit]));
+  return ids.map((id) => {
+    const exhibit = byId.get(id);
+    if (!exhibit) return id;
+    return isRTL && exhibit.titleAr ? exhibit.titleAr : exhibit.titleEn;
+  });
+}
+
+function TicketCard({
+  tk,
+  isRTL,
+  exhibits,
+  onCancel,
+}: {
+  tk: UserTicket;
+  isRTL: boolean;
+  exhibits: WebsiteExhibit[];
+  onCancel?: () => void;
+}) {
   const cancelled = tk.status !== 'active';
+  const exhibitNames = resolveExhibitNames(tk.selected_exhibits ?? [], exhibits, isRTL);
   return (
     <Card className={`p-6 space-y-4 ${cancelled ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between gap-3">
@@ -270,6 +293,20 @@ function TicketCard({ tk, isRTL, onCancel }: { tk: UserTicket; isRTL: boolean; o
               <div className="font-medium">{tk.robot_tour_price} {tk.currency}</div>
             </div>
           </div>
+          {exhibitNames.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-[11px] text-muted-foreground">
+                {isRTL ? 'القطع المختارة' : 'Selected exhibits'}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {exhibitNames.map((name) => (
+                  <span key={name} className="rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[11px]">
+                    {name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
           <p className="text-xs text-muted-foreground">
             {isRTL ? 'ÙŠØ­Ø¯Ø« Ø§Ù‚ØªØ±Ø§Ù† Ø§Ù„Ø±ÙˆØ¨ÙˆØª Ù„Ø§Ø­Ù‚Ø§Ù‹ Ø¯Ø§Ø®Ù„ ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù‡Ø§ØªÙ Ø¹Ù† Ø·Ø±ÙŠÙ‚ Ù…Ø³Ø­ Ø±Ù…Ø² QR Ø§Ù„ÙØ¹Ù„ÙŠ Ø¹Ù„Ù‰ Ø§Ù„Ø±ÙˆØ¨ÙˆØª.' : 'Robot pairing happens later inside the mobile app by scanning the physical robot QR.'}
           </p>
