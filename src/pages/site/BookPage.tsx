@@ -50,7 +50,7 @@ const CATEGORY_ROWS: CategoryRow[] = [
 export default function BookPage() {
   const { isRTL } = useApp();
   const { user, signIn, signUp } = useAuth();
-  const { createTicket } = useUserTickets();
+  const { createBooking } = useUserTickets();
   const navigate = useNavigate();
 
   // ---- Step management ----
@@ -125,7 +125,7 @@ export default function BookPage() {
   const totalTickets = Object.values(quantities).reduce((a, b) => a + b, 0);
   const museumPrice = (Object.entries(quantities) as [MuseumTicketCategory, number][])
     .reduce((acc, [k, n]) => acc + n * museumTicketPrices[k], 0);
-  const tourPrice = robotTourPrices[tourType] * Math.max(1, totalTickets);
+  const tourPrice = robotTourPrices[tourType];
   const totalPrice = museumPrice + tourPrice;
 
   // ---- Handlers ----
@@ -212,20 +212,28 @@ export default function BookPage() {
     arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
 
   const confirmAndPay = async () => {
+    if (pay !== 'cash') {
+      toast.error(isRTL ? 'الحجز متاح نقداً فقط حالياً.' : 'Bookings can only be completed with cash right now.');
+      return;
+    }
     setBusy(true);
-    const { ticket, error } = await createTicket({
+    const { ticket, error } = await createBooking({
+      booking_source: 'website',
       visit_date: date,
       visit_time: time,
       ticket_types: quantities,
-      total_tickets: totalTickets,
-      total_price: totalPrice,
-      currency: 'EGP',
-      payment_method: pay,
+      visitor_count: totalTickets,
+      museum_entry_total: museumPrice,
+      robot_tour_price: tourPrice,
       tour_type: tourType,
-      tour_duration: tourType === 'personalized' ? duration : undefined,
+      tour_duration_min: tourType === 'personalized' ? duration : undefined,
       interests: tourType === 'personalized' ? interests : [],
+      selected_exhibits: [],
       accessibility: tourType === 'personalized' ? accessibility : [],
       preferred_language: tourLanguage,
+      pace: tourType === 'personalized' ? pace : undefined,
+      kids_mode: tourType === 'personalized' ? kidsMode : false,
+      photo_spots: tourType === 'personalized' ? photoSpots : false,
       notes: notes || undefined,
     });
     setBusy(false);
@@ -262,11 +270,12 @@ export default function BookPage() {
     { id: 'egyptian-arabic', en: 'Egyptian Arabic', ar: 'العامية المصرية' },
     { id: 'english', en: 'English', ar: 'الإنجليزية' },
   ];
-  const payOptions: { id: PayMethod; labelEn: string; labelAr: string; icon: typeof CreditCard; note?: { en: string; ar: string } }[] = [
+  const payOptions: { id: PayMethod; labelEn: string; labelAr: string; icon: typeof CreditCard; disabled?: boolean; note?: { en: string; ar: string } }[] = [
     { id: 'card', labelEn: 'Card payment', labelAr: 'بطاقة', icon: CreditCard,
+      disabled: true,
       note: {
-        en: 'Online payment is being prepared. You can complete this booking using cash at the museum counter.',
-        ar: 'الدفع عبر الإنترنت قيد الإعداد. يمكنك إتمام الحجز نقداً عند شبّاك المتحف.',
+        en: 'Card checkout is not available yet. Complete this booking using cash at the museum counter.',
+        ar: 'الدفع بالبطاقة غير متاح حالياً. أتمم الحجز نقداً عند شبّاك المتحف.',
       },
     },
     { id: 'cash', labelEn: 'Cash at museum counter', labelAr: 'نقداً عند شبّاك المتحف', icon: Wallet },
@@ -562,7 +571,7 @@ export default function BookPage() {
                     </div>
                     <p className="text-sm text-muted-foreground">{isRTL ? t.descAr : t.descEn}</p>
                     <p className="mt-3 text-sm font-semibold text-primary">
-                      {robotTourPrices[t.id]} EGP / {isRTL ? 'زائر' : 'visitor'}
+                      {robotTourPrices[t.id]} EGP / {isRTL ? 'حجز' : 'booking'}
                     </p>
                   </button>
                 );
@@ -790,10 +799,12 @@ export default function BookPage() {
                   <button
                     key={opt.id}
                     type="button"
-                    onClick={() => setPay(opt.id)}
+                    onClick={() => !opt.disabled && setPay(opt.id)}
+                    disabled={opt.disabled}
                     className={cn(
                       'w-full flex items-start gap-3 p-4 rounded-2xl border text-left transition-colors',
                       active ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/50',
+                      opt.disabled && 'cursor-not-allowed opacity-60 hover:border-border',
                     )}
                   >
                     <div className={cn('h-10 w-10 rounded-lg flex items-center justify-center shrink-0', active ? 'bg-primary/15' : 'bg-muted')}>
@@ -801,7 +812,7 @@ export default function BookPage() {
                     </div>
                     <div className="flex-1">
                       <span className="font-medium">{isRTL ? opt.labelAr : opt.labelEn}</span>
-                      {opt.note && active && (
+                      {opt.note && (active || opt.disabled) && (
                         <p className="text-xs text-muted-foreground mt-1">{isRTL ? opt.note.ar : opt.note.en}</p>
                       )}
                     </div>

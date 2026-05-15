@@ -89,7 +89,7 @@ export default function TicketsInfoPage() {
               )}
               <div className="section-label mb-2">{t.name}</div>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="font-serif text-4xl text-foreground">${t.price}</span>
+                <span className="font-serif text-4xl text-foreground">{t.price} EGP</span>
                 <span className="text-sm text-muted-foreground">/ {t.unit}</span>
               </div>
               <ul className="space-y-3 mb-7">
@@ -129,8 +129,8 @@ export default function TicketsInfoPage() {
             </Card>
             <Card className="p-6">
               <ShieldCheck className="h-5 w-5 text-primary mb-3" />
-              <h3 className="font-serif text-base mb-1">{isRTL ? 'دفع آمن بتشفير موثوق' : 'Secure payment with trusted encryption'}</h3>
-              <p className="text-sm text-muted-foreground">{isRTL ? 'تتم معالجة الدفع عبر مزوّد موثوق ومعتمد.' : 'Processed through a trusted, certified provider.'}</p>
+              <h3 className="font-serif text-base mb-1">{isRTL ? 'الدفع نقداً عند الوصول' : 'Cash payment on arrival'}</h3>
+              <p className="text-sm text-muted-foreground">{isRTL ? 'أكّد حجزك الآن وادفع بالجنيه المصري عند شبّاك المتحف.' : 'Confirm now and pay in EGP at the museum counter.'}</p>
             </Card>
           </div>
         </div>

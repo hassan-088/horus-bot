@@ -29,20 +29,28 @@ service cloud.firestore {
       }
     }
 
+    // ---------------- BOOKINGS ----------------
+    match /bookings/{bookingId} {
+      allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
     // ---------------- MUSEUM TICKETS ----------------
     match /museumTickets/{ticketId} {
       allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete:
-                    if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if false;
     }
 
     // ---------------- ROBOT TOUR TICKETS ----------------
     match /robotTourTickets/{ticketId} {
       allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete:
-                    if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if false;
     }
 
     // ---------------- TOUR SESSIONS ----------------

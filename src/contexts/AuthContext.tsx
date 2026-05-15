@@ -25,16 +25,21 @@ interface AppUser {
 
 interface Profile {
   id: string;
+  uid: string;
   user_id: string;
+  email: string | null;
   display_name: string | null;
   full_name: string | null;
   phone_number: string | null;
   nationality: string | null;
   preferred_language: string | null;
   avatar_url: string | null;
+  accessibility_defaults: Record<string, unknown>;
+  marketing_opt_in: boolean;
   visit_count: number;
   created_at: string;
   updated_at: string;
+  last_seen_at: string;
 }
 
 export interface SignUpExtras {
@@ -120,8 +125,8 @@ const tsToIso = (v: unknown): string => {
 async function ensureProfileDoc(fu: FirebaseUser, extras?: SignUpExtras): Promise<Profile> {
   const ref = doc(db, 'users', fu.uid);
   const snap = await getDoc(ref);
+  const nowIso = new Date().toISOString();
   if (!snap.exists()) {
-    const nowIso = new Date().toISOString();
     const fullName = extras?.fullName ?? fu.displayName ?? null;
     const initial = {
       uid: fu.uid,
@@ -133,38 +138,75 @@ async function ensureProfileDoc(fu: FirebaseUser, extras?: SignUpExtras): Promis
       nationality: extras?.nationality ?? null,
       preferred_language: extras?.preferredLanguage ?? null,
       avatar_url: fu.photoURL ?? null,
+      accessibility_defaults: {},
+      marketing_opt_in: false,
       visit_count: 0,
       created_at: serverTimestamp(),
       updated_at: serverTimestamp(),
+      last_seen_at: serverTimestamp(),
     };
     await setDoc(ref, initial);
     return {
       id: fu.uid,
+      uid: fu.uid,
       user_id: fu.uid,
+      email: fu.email,
       display_name: initial.display_name,
       full_name: initial.full_name,
       phone_number: initial.phone_number,
       nationality: initial.nationality,
       preferred_language: initial.preferred_language,
       avatar_url: initial.avatar_url,
+      accessibility_defaults: initial.accessibility_defaults,
+      marketing_opt_in: initial.marketing_opt_in,
       visit_count: 0,
       created_at: nowIso,
       updated_at: nowIso,
+      last_seen_at: nowIso,
     };
   }
   const d = snap.data() as Record<string, unknown>;
-  return {
-    id: fu.uid,
-    user_id: fu.uid,
-    display_name: (d.display_name as string | null) ?? null,
-    full_name: (d.full_name as string | null) ?? null,
+  const merged = {
+    uid: (d.uid as string) ?? fu.uid,
+    user_id: (d.user_id as string) ?? fu.uid,
+    email: (d.email as string | null) ?? fu.email,
+    full_name: (d.full_name as string | null) ?? fu.displayName ?? null,
+    display_name: (d.display_name as string | null) ?? fu.displayName ?? (fu.email ? fu.email.split('@')[0] : null),
     phone_number: (d.phone_number as string | null) ?? null,
     nationality: (d.nationality as string | null) ?? null,
     preferred_language: (d.preferred_language as string | null) ?? null,
-    avatar_url: (d.avatar_url as string | null) ?? null,
+    avatar_url: (d.avatar_url as string | null) ?? fu.photoURL ?? null,
+    accessibility_defaults: (d.accessibility_defaults as Record<string, unknown>) ?? {},
+    marketing_opt_in: (d.marketing_opt_in as boolean) ?? false,
     visit_count: (d.visit_count as number) ?? 0,
+  };
+  await setDoc(
+    ref,
+    {
+      ...merged,
+      created_at: d.created_at ?? serverTimestamp(),
+      updated_at: serverTimestamp(),
+      last_seen_at: serverTimestamp(),
+    },
+    { merge: true },
+  );
+  return {
+    id: fu.uid,
+    uid: fu.uid,
+    user_id: merged.user_id,
+    email: merged.email,
+    display_name: merged.display_name,
+    full_name: merged.full_name,
+    phone_number: merged.phone_number,
+    nationality: merged.nationality,
+    preferred_language: merged.preferred_language,
+    avatar_url: merged.avatar_url,
+    accessibility_defaults: merged.accessibility_defaults,
+    marketing_opt_in: merged.marketing_opt_in,
+    visit_count: merged.visit_count,
     created_at: tsToIso(d.created_at),
-    updated_at: tsToIso(d.updated_at),
+    updated_at: nowIso,
+    last_seen_at: nowIso,
   };
 }
 
