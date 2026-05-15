@@ -122,6 +122,8 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
     notes: input.notes ?? null,
     total_price: input.robot_tour_price,
     currency: 'EGP',
+    payment_method: 'cash',
+    payment_status: 'pay_at_counter',
     status: 'active',
     paired_robot_id: null,
     session_id: null,
