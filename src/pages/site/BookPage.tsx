@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Minus, Plus, Calendar as CalendarIcon, Clock, User as UserIcon, Mail, Lock, Phone, Flag,
@@ -20,7 +20,11 @@ import { useExhibits } from '@/hooks/useExhibits';
 import { useUserTickets, type TourType } from '@/hooks/useUserTickets';
 import { CURRENCY, museumTicketPrices, robotTourPrices, type MuseumTicketCategory } from '@/lib/pricing';
 import { sharedStandardRouteIds } from '@/lib/exhibitCatalog';
-import { recommendedRoutes, type RecommendedRoute } from '@/lib/recommendedRoutes';
+import {
+  loadRecommendedRoutes,
+  recommendedRoutes,
+  type RecommendedRoute,
+} from '@/lib/recommendedRoutes';
 import { PASSWORD_RULES, isStrongPassword, isValidPhone } from '@/lib/passwordRules';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -149,6 +153,15 @@ export default function BookPage() {
   const activeRecommendedRoutes = recommendedRoutes.filter((route) => route.is_active);
   const selectedRecommendedRoute =
     activeRecommendedRoutes.find((route) => route.id === selectedRouteId) ?? null;
+
+  useEffect(() => {
+    const result = loadRecommendedRoutes();
+    console.info('[Horus-Bot] Recommended routes loaded', {
+      count: result.routes.length,
+      activeCount: result.routes.filter((route) => route.is_active).length,
+      warnings: result.warnings,
+    });
+  }, []);
 
   // ---- Handlers ----
   const updateQuantity = (k: MuseumTicketCategory, d: number) =>
@@ -684,6 +697,13 @@ export default function BookPage() {
                     );
                   })}
                 </div>
+              </div>
+            )}
+            {activeRecommendedRoutes.length === 0 && (
+              <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+                {isRTL
+                  ? 'تعذر تحميل المسارات المقترحة. افتح Console وابحث عن [Horus-Bot] Recommended routes loaded.'
+                  : 'Recommended routes could not be loaded. Open the console and look for [Horus-Bot] Recommended routes loaded.'}
               </div>
             )}
 
