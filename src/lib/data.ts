@@ -150,32 +150,16 @@ export const liveTranscriptLines = {
 // ============================================================================
 // Categories split into Egyptians and Foreigners as required by Egyptian
 // museum policy. Prices are in EGP.
-export const museumTicketPrices = {
-  egyptian_adult: 60,
-  egyptian_student: 30,
-  egyptian_child: 20,
-  foreigner_adult: 500,
-  foreigner_student: 250,
-  foreigner_child: 250,
-} as const;
-
-export type MuseumTicketCategory = keyof typeof museumTicketPrices;
+export {
+  museumTicketPrices,
+  robotTourPrices,
+  ticketPrices,
+  type MuseumTicketCategory,
+} from '@/lib/pricing';
 
 // ----------------------------------------------------------------------------
 // HORUS-BOT ROBOT TOUR PRICING
 // ----------------------------------------------------------------------------
-export const robotTourPrices = {
-  standard: 150,
-  personalized: 300,
-} as const;
-
-// Back-compat alias used by older screens (mobile companion app etc.).
-export const ticketPrices = {
-  adult: museumTicketPrices.egyptian_adult,
-  student: museumTicketPrices.egyptian_student,
-  child: museumTicketPrices.egyptian_child,
-};
-
 // Events data
 export interface MuseumEvent {
   id: string;

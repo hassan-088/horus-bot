@@ -53,6 +53,9 @@ export interface UserTicket {
   kids_mode?: boolean | null;
   photo_spots?: boolean | null;
   notes?: string | null;
+  route_id?: string | null;
+  route_title_en?: string | null;
+  route_title_ar?: string | null;
   paired_robot_id?: string | null;
   session_id?: string | null;
 }
@@ -115,6 +118,9 @@ function toUserTicket(
     kids_mode: (robotTourTicket?.kids_mode as boolean) ?? null,
     photo_spots: (robotTourTicket?.photo_spots as boolean) ?? null,
     notes: (robotTourTicket?.notes as string) ?? null,
+    route_id: (robotTourTicket?.route_id as string) ?? null,
+    route_title_en: (robotTourTicket?.route_title_en as string) ?? null,
+    route_title_ar: (robotTourTicket?.route_title_ar as string) ?? null,
     paired_robot_id: (robotTourTicket?.paired_robot_id as string | null) ?? null,
     session_id: (robotTourTicket?.session_id as string | null) ?? null,
   };
@@ -222,6 +228,9 @@ export function useUserTickets() {
             kids_mode: input.kids_mode ?? false,
             photo_spots: input.photo_spots ?? false,
             notes: input.notes ?? null,
+            route_id: input.route_id ?? null,
+            route_title_en: input.route_title_en ?? null,
+            route_title_ar: input.route_title_ar ?? null,
             paired_robot_id: null,
             session_id: null,
             total_price: robotTourPrice,

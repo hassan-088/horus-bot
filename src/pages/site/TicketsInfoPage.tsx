@@ -5,40 +5,83 @@ import { Button } from '@/components/ui/button';
 import { SectionHero } from '@/components/site/SectionHero';
 import { useApp } from '@/contexts/AppContext';
 import vaseImage from '@/assets/exhibit-vase.jpg';
+import { CURRENCY, museumTicketPrices, robotTourPrices } from '@/lib/pricing';
 
 export default function TicketsInfoPage() {
   const { isRTL } = useApp();
 
   const tiers = [
     {
-      name: isRTL ? 'بالغ' : 'Adult',
-      price: 25,
+      name: isRTL ? 'بالغ مصري' : 'Egyptian Adult',
+      price: museumTicketPrices.egyptian_adult,
       unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
-        isRTL ? 'تجربة متحف موجَّهة كاملة لمدة 60 دقيقة' : 'A full 60-minute guided museum experience',
-        isRTL ? 'وصول كامل للتنقل والخرائط ومحتوى المعروضات' : 'Full access to navigation, maps, and exhibit content',
-        isRTL ? 'مزايا تفاعلية طوال زيارتك' : 'Interactive features throughout your visit',
+        isRTL ? 'دخول المتحف للمواطنين المصريين' : 'Museum entry for Egyptian citizens',
+        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
       ],
     },
     {
-      name: isRTL ? 'طالب' : 'Student',
-      price: 15,
+      name: isRTL ? 'طالب مصري' : 'Egyptian Student',
+      price: museumTicketPrices.egyptian_student,
       unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
-        isRTL ? 'تجربة متحف موجَّهة كاملة لمدة 60 دقيقة' : 'A full 60-minute guided museum experience',
-        isRTL ? 'وصول كامل للتطبيق طوال زيارتك' : 'Full access to the app during your visit',
-        isRTL ? 'يلزم تقديم بطاقة جامعية سارية عند الدخول' : 'Valid student ID required at entry',
+        isRTL ? 'يلزم إبراز بطاقة طالب' : 'Valid student ID required',
+        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
       ],
       featured: true,
     },
     {
-      name: isRTL ? 'مجموعة (حتى 5 أشخاص)' : 'Group (up to 5 people)',
-      price: 80,
-      unit: isRTL ? 'مجموعة' : 'group',
+      name: isRTL ? 'طفل مصري' : 'Egyptian Child',
+      price: museumTicketPrices.egyptian_child,
+      unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
-        isRTL ? 'تجربة موجَّهة مشتركة واحدة لمجموعتك' : 'One shared guided experience for your group',
-        isRTL ? 'مسارات مرنة مصمَّمة للمجموعات' : 'Flexible routes tailored for groups',
-        isRTL ? 'قيمة أفضل مقارنة بالتذاكر الفردية' : 'Better value compared to individual tickets',
+        isRTL ? 'دخول المتحف للأطفال المصريين' : 'Museum entry for Egyptian children',
+        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+      ],
+    },
+    {
+      name: isRTL ? 'بالغ أجنبي' : 'Foreigner Adult',
+      price: museumTicketPrices.foreigner_adult,
+      unit: isRTL ? 'تذكرة' : 'ticket',
+      perks: [
+        isRTL ? 'دخول المتحف للزوار الأجانب' : 'Museum entry for foreign visitors',
+        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+      ],
+    },
+    {
+      name: isRTL ? 'طالب أجنبي' : 'Foreigner Student',
+      price: museumTicketPrices.foreigner_student,
+      unit: isRTL ? 'تذكرة' : 'ticket',
+      perks: [
+        isRTL ? 'يلزم إبراز بطاقة طالب' : 'Valid student ID required',
+        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+      ],
+    },
+    {
+      name: isRTL ? 'طفل أجنبي' : 'Foreigner Child',
+      price: museumTicketPrices.foreigner_child,
+      unit: isRTL ? 'تذكرة' : 'ticket',
+      perks: [
+        isRTL ? 'دخول المتحف للأطفال الأجانب' : 'Museum entry for foreign children',
+        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+      ],
+    },
+    {
+      name: isRTL ? 'جولة Horus-Bot القياسية' : 'Standard Horus-Bot Tour',
+      price: robotTourPrices.standard,
+      unit: isRTL ? 'حجز' : 'booking',
+      perks: [
+        isRTL ? 'إضافة جولة روبوت للحجز' : 'Robot tour add-on per booking',
+        isRTL ? 'ليست لكل زائر' : 'Not charged per visitor',
+      ],
+    },
+    {
+      name: isRTL ? 'جولة Horus-Bot المخصصة' : 'Personalized Horus-Bot Tour',
+      price: robotTourPrices.personalized,
+      unit: isRTL ? 'حجز' : 'booking',
+      perks: [
+        isRTL ? 'إضافة جولة روبوت مخصصة للحجز' : 'Personalized robot tour add-on per booking',
+        isRTL ? 'ليست لكل زائر' : 'Not charged per visitor',
       ],
     },
   ];
@@ -47,8 +90,8 @@ export default function TicketsInfoPage() {
     <>
       <SectionHero
         label={isRTL ? 'التذاكر' : 'Tickets'}
-        title={isRTL ? 'خطّط لزيارتك في دقائق' : 'Plan Your Visit in Minutes'}
-        subtitle={isRTL ? 'اختر تذكرتك، حدّد موعد زيارتك، خصّص جولتك، واستعدّ لتجربة موجَّهة مع حورس-بوت.' : 'Choose your ticket, schedule your visit, personalize your tour, and get ready for a guided experience with Horus-Bot.'}
+        title={isRTL ? 'خطط لزيارتك في دقائق' : 'Plan Your Visit in Minutes'}
+        subtitle={isRTL ? 'اختر تذكرتك، حدد موعد زيارتك، خصص جولتك، واستعد لتجربة موجهة مع Horus-Bot.' : 'Choose your ticket, schedule your visit, personalize your tour, and get ready for a guided experience with Horus-Bot.'}
       />
 
       <div className="mx-auto max-w-5xl px-4 md:px-8 -mt-6 mb-8">
@@ -67,13 +110,13 @@ export default function TicketsInfoPage() {
         <div className="flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
           <Clock className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <p className="text-sm text-foreground/90">
-            {isRTL ? 'الأماكن محدودة لكل فترة — يُنصح بالحجز المبكر.' : 'Spots are limited per time slot — booking early is recommended.'}
+            {isRTL ? 'الأماكن محدودة لكل فترة، وينصح بالحجز المبكر.' : 'Spots are limited per time slot, so booking early is recommended.'}
           </p>
         </div>
         <div className="flex items-start gap-3 rounded-xl border border-border/50 bg-card/60 p-4">
           <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <p className="text-sm text-foreground/90">
-            {isRTL ? 'لا حاجة لأي إعداد — كل شيء جاهز لحظة وصولك.' : 'No setup needed — everything is ready the moment you arrive.'}
+            {isRTL ? 'جولة الروبوت تضاف مرة واحدة لكل حجز، وليست لكل زائر.' : 'Robot tour pricing is added once per booking, not per visitor.'}
           </p>
         </div>
       </div>
@@ -84,12 +127,12 @@ export default function TicketsInfoPage() {
             <Card key={t.name} className={`p-7 relative ${t.featured ? 'border-primary/50 shadow-[0_0_40px_-10px_hsl(var(--primary)/0.4)]' : ''}`}>
               {t.featured && (
                 <div className="absolute -top-3 start-7 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                  {isRTL ? 'الأكثر طلباً' : 'Most popular'}
+                  {isRTL ? 'الأكثر طلبا' : 'Most popular'}
                 </div>
               )}
               <div className="section-label mb-2">{t.name}</div>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="font-serif text-4xl text-foreground">{t.price} EGP</span>
+                <span className="font-serif text-4xl text-foreground">{t.price} {CURRENCY}</span>
                 <span className="text-sm text-muted-foreground">/ {t.unit}</span>
               </div>
               <ul className="space-y-3 mb-7">
@@ -120,17 +163,17 @@ export default function TicketsInfoPage() {
             <Card className="p-6">
               <Calendar className="h-5 w-5 text-primary mb-3" />
               <h3 className="font-serif text-base mb-1">{isRTL ? 'إلغاء مجاني حتى 24 ساعة قبل الزيارة' : 'Free cancellation up to 24 hours before your visit'}</h3>
-              <p className="text-sm text-muted-foreground">{isRTL ? 'استرداد كامل دون أي رسوم.' : 'Full refund, no questions asked.'}</p>
+              <p className="text-sm text-muted-foreground">{isRTL ? 'تحديث حالة الحجز بدون حذف التذاكر.' : 'Cancellation updates your booking status without deleting tickets.'}</p>
             </Card>
             <Card className="p-6">
               <TicketIcon className="h-5 w-5 text-primary mb-3" />
               <h3 className="font-serif text-base mb-1">{isRTL ? 'تذكرة QR فورية على هاتفك' : 'Instant QR ticket sent to your phone'}</h3>
-              <p className="text-sm text-muted-foreground">{isRTL ? 'تصلك خلال دقيقة، جاهزة للمسح عند البوابة.' : 'Arrives within a minute, ready to scan at the gate.'}</p>
+              <p className="text-sm text-muted-foreground">{isRTL ? 'جاهزة للمسح عند البوابة.' : 'Ready to scan at the gate.'}</p>
             </Card>
             <Card className="p-6">
               <ShieldCheck className="h-5 w-5 text-primary mb-3" />
-              <h3 className="font-serif text-base mb-1">{isRTL ? 'الدفع نقداً عند الوصول' : 'Cash payment on arrival'}</h3>
-              <p className="text-sm text-muted-foreground">{isRTL ? 'أكّد حجزك الآن وادفع بالجنيه المصري عند شبّاك المتحف.' : 'Confirm now and pay in EGP at the museum counter.'}</p>
+              <h3 className="font-serif text-base mb-1">{isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival'}</h3>
+              <p className="text-sm text-muted-foreground">{isRTL ? 'أكد حجزك الآن وادفع بالجنيه المصري عند شباك المتحف.' : 'Confirm now and pay in EGP at the museum counter.'}</p>
             </Card>
           </div>
         </div>

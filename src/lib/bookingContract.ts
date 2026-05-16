@@ -29,6 +29,9 @@ export interface CreateBookingInput {
   kids_mode?: boolean;
   photo_spots?: boolean;
   notes?: string;
+  route_id?: string;
+  route_title_en?: string;
+  route_title_ar?: string;
 }
 
 export interface CreatedBookingRefs {
@@ -120,6 +123,9 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
     kids_mode: input.kids_mode ?? false,
     photo_spots: input.photo_spots ?? false,
     notes: input.notes ?? null,
+    route_id: input.route_id ?? null,
+    route_title_en: input.route_title_en ?? null,
+    route_title_ar: input.route_title_ar ?? null,
     total_price: input.robot_tour_price,
     currency: 'EGP',
     payment_method: 'cash',

@@ -1,71 +1,148 @@
-// Firestore Security Rules — paste these into Firebase Console
-// (Firestore Database → Rules → Publish).
-//
-// Project: horus-bot-app
-// Shared by: marketing+booking website, mobile companion app, robot fleet.
-
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function isSignedIn() {
+    function signedIn() {
       return request.auth != null;
     }
-    function isOwner(uid) {
-      return isSignedIn() && request.auth.uid == uid;
+
+    function ownsExisting() {
+      return signedIn() && resource.data.userId == request.auth.uid;
     }
 
-    // ---------------- USERS ----------------
-    // users/{uid} = profile doc. Self read/write only.
-    match /users/{uid} {
-      allow read, write: if isOwner(uid);
-
-      // Per-user subcollections (favorites, progress, visitHistory).
-      match /{sub}/{docId} {
-        allow read, write: if isOwner(uid);
-      }
-      match /{sub}/{docId}/{rest=**} {
-        allow read, write: if isOwner(uid);
-      }
+    function ownsIncoming() {
+      return signedIn() && request.resource.data.userId == request.auth.uid;
     }
 
-    // ---------------- BOOKINGS ----------------
+    function bookingContractCreateValid() {
+      return ownsIncoming()
+        && request.resource.data.booking_id is string
+        && request.resource.data.booking_source in ['website', 'mobile_app']
+        && request.resource.data.payment_method == 'cash'
+        && request.resource.data.payment_status == 'pay_at_counter'
+        && request.resource.data.status == 'active';
+    }
+
+    function ownedCancelUpdate() {
+      return ownsExisting()
+        && ownsIncoming()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'updated_at', 'cancelled_at'])
+        && request.resource.data.status == 'cancelled';
+    }
+
+    function activeOwnedMuseumTicket(ticketId) {
+      return signedIn()
+        && ticketId is string
+        && exists(/databases/$(database)/documents/museumTickets/$(ticketId))
+        && get(/databases/$(database)/documents/museumTickets/$(ticketId)).data.userId == request.auth.uid
+        && get(/databases/$(database)/documents/museumTickets/$(ticketId)).data.status == 'active';
+    }
+
+    function activeOwnedRobotTourTicket(ticketId) {
+      return signedIn()
+        && ticketId is string
+        && exists(/databases/$(database)/documents/robotTourTickets/$(ticketId))
+        && get(/databases/$(database)/documents/robotTourTickets/$(ticketId)).data.userId == request.auth.uid
+        && get(/databases/$(database)/documents/robotTourTickets/$(ticketId)).data.status == 'active';
+    }
+
+    function validTourSessionCreate() {
+      return ownsIncoming()
+        && request.resource.data.sessionId is string
+        && request.resource.data.robotId is string
+        && request.resource.data.museumTicketId is string
+        && request.resource.data.robotTourTicketId is string
+        && activeOwnedMuseumTicket(request.resource.data.museumTicketId)
+        && activeOwnedRobotTourTicket(request.resource.data.robotTourTicketId)
+        && request.resource.data.status in ['ready', 'active', 'paused'];
+    }
+
+    function validRobotPair(robotId) {
+      return signedIn()
+        && resource.data.status == 'available'
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'activeSessionId', 'currentUserId', 'updatedAt'])
+        && request.resource.data.status == 'paired'
+        && request.resource.data.activeSessionId is string
+        && request.resource.data.activeSessionId != ''
+        && request.resource.data.currentUserId == request.auth.uid
+        && existsAfter(/databases/$(database)/documents/tourSessions/$(request.resource.data.activeSessionId))
+        && getAfter(/databases/$(database)/documents/tourSessions/$(request.resource.data.activeSessionId)).data.userId == request.auth.uid
+        && getAfter(/databases/$(database)/documents/tourSessions/$(request.resource.data.activeSessionId)).data.robotId == robotId;
+    }
+
+    function validRobotRelease() {
+      return signedIn()
+        && resource.data.status == 'paired'
+        && resource.data.currentUserId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'activeSessionId', 'currentUserId', 'updatedAt'])
+        && request.resource.data.status == 'available'
+        && request.resource.data.activeSessionId == ''
+        && request.resource.data.currentUserId == '';
+    }
+
+    match /users/{userId} {
+      allow read, update, delete: if signedIn() && userId == request.auth.uid;
+      allow create: if signedIn() && userId == request.auth.uid;
+    }
+
     match /bookings/{bookingId} {
-      allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if ownsExisting();
+      allow create: if bookingContractCreateValid();
+      allow update: if ownedCancelUpdate();
       allow delete: if false;
     }
 
-    // ---------------- MUSEUM TICKETS ----------------
     match /museumTickets/{ticketId} {
-      allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if ownsExisting();
+      allow create: if bookingContractCreateValid();
+      allow update: if ownedCancelUpdate();
       allow delete: if false;
     }
 
-    // ---------------- ROBOT TOUR TICKETS ----------------
     match /robotTourTickets/{ticketId} {
-      allow read:   if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if ownsExisting();
+      allow create: if bookingContractCreateValid();
+      allow update: if ownedCancelUpdate();
       allow delete: if false;
     }
 
-    // ---------------- TOUR SESSIONS ----------------
-    // Created at the museum when a user pairs with a robot via QR.
     match /tourSessions/{sessionId} {
-      allow read, write:
-                    if isSignedIn() && (
-                      request.resource.data.userId == request.auth.uid ||
-                      resource.data.userId == request.auth.uid
-                    );
+      allow read: if ownsExisting();
+      // Prototype client pairing rule. Production should move pairing to a
+      // Cloud Function/server endpoint so robot assignment is authoritative.
+      allow create: if validTourSessionCreate();
+      allow update: if ownsExisting() && ownsIncoming();
+      allow delete: if false;
     }
 
-    // ---------------- PUBLIC CONTENT ----------------
-    // Read-only catalog data (exhibits, robots metadata).
-    match /exhibits/{id}      { allow read: if true; allow write: if false; }
-    match /robots/{id}        { allow read: if true; allow write: if false; }
+    match /questions/{questionId} {
+      allow read: if ownsExisting();
+      allow create: if ownsIncoming()
+        && request.resource.data.source == 'app'
+        && request.resource.data.reason == 'voice_noise_fallback'
+        && request.resource.data.status == 'pending';
+      allow update, delete: if false;
+    }
+
+    match /photos/{photoId} {
+      allow read: if ownsExisting();
+      allow create: if ownsIncoming()
+        && request.resource.data.type == 'robot_capture';
+      allow update, delete: if ownsExisting();
+    }
+
+    match /exhibits/{exhibitId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /robots/{robotId} {
+      allow read: if signedIn();
+      allow update: if validRobotPair(robotId) || validRobotRelease();
+      allow create, delete: if false;
+    }
   }
 }
