@@ -17,6 +17,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { auth, db } from '@/integrations/firebase/client';
 import type { Language } from '@/lib/i18n';
+import { isConnectionError, productMessage } from '@/lib/productMessages';
 
 // Public app-level user shape. We keep `id` as the field name (mapped from
 // Firebase `uid`) so the rest of the codebase doesn't need to change.
@@ -54,12 +55,14 @@ interface AuthContextType {
   session: { user: AppUser } | null; // back-compat shim
   profile: Profile | null;
   isLoading: boolean;
+  profileLoadError: string | null;
   signUp: (email: string, password: string, displayNameOrExtras?: string | SignUpExtras) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   syncPreferredLanguage: (language: Language) => Promise<void>;
+  reloadProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,6 +70,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Map Firebase Auth error codes to friendly messages. Never expose raw codes.
 export function friendlyAuthError(err: unknown, isArabic = false): string {
   const code = (err as { code?: string })?.code ?? '';
+  if (code === 'auth/network-request-failed') return productMessage('network', isArabic);
+  if (code === 'auth/operation-not-allowed') return productMessage('generic', isArabic);
   const map: Record<string, { en: string; ar: string }> = {
     'auth/email-already-in-use': {
       en: 'This email is already registered. Please log in instead.',
@@ -81,11 +86,11 @@ export function friendlyAuthError(err: unknown, isArabic = false): string {
       ar: 'كلمة المرور ضعيفة. استخدم 8 أحرف على الأقل مع حرف كبير وصغير ورقم ورمز.',
     },
     'auth/operation-not-allowed': {
-      en: 'Email/password sign-up is not enabled yet. Please contact support.',
+      en: 'Something went wrong. Please try again.',
       ar: 'إنشاء الحساب بالبريد وكلمة المرور غير مفعل حاليا. يرجى التواصل مع الدعم.',
     },
     'auth/network-request-failed': {
-      en: 'Connection issue. Please check your internet and try again.',
+      en: 'Connection issue. Please check your internet connection and try again.',
       ar: 'تعذر الاتصال. تحقق من الإنترنت ثم حاول مرة أخرى.',
     },
     'auth/user-not-found': {
@@ -226,22 +231,30 @@ export function AuthProvider({
   const [user, setUser] = useState<AppUser | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [profileLoadError, setProfileLoadError] = useState<string | null>(null);
   const queryClient = useQueryClient();
+
+  const loadProfile = async (fu: FirebaseUser) => {
+    setProfileLoadError(null);
+    try {
+      const p = await ensureProfileDoc(fu);
+      setProfile(p);
+      onPreferredLanguageLoaded?.(accountLanguageToUi(p.preferred_language));
+    } catch (e) {
+      console.error('Failed to load profile', e);
+      setProfile(null);
+      setProfileLoadError(isConnectionError(e) ? productMessage('network') : productMessage('profileLoad'));
+    }
+  };
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fu) => {
       setUser(toAppUser(fu));
       if (fu) {
-        try {
-          const p = await ensureProfileDoc(fu);
-          setProfile(p);
-          onPreferredLanguageLoaded?.(accountLanguageToUi(p.preferred_language));
-        } catch (e) {
-          console.error('Failed to load profile', e);
-          setProfile(null);
-        }
+        await loadProfile(fu);
       } else {
         setProfile(null);
+        setProfileLoadError(null);
       }
       setIsLoading(false);
     });
@@ -260,9 +273,13 @@ export function AuthProvider({
       }
       const p = await ensureProfileDoc(cred.user, extras);
       setProfile(p);
+      setProfileLoadError(null);
       return { error: null };
     } catch (e) {
-      return { error: e as Error };
+      console.error('[Horus-Bot] Profile update failed', e);
+      return {
+        error: new Error(isConnectionError(e) ? productMessage('network') : productMessage('profile')),
+      };
     }
   };
 
@@ -271,7 +288,10 @@ export function AuthProvider({
       await signInWithEmailAndPassword(auth, email, password);
       return { error: null };
     } catch (e) {
-      return { error: e as Error };
+      console.error('[Horus-Bot] Password reset failed', e);
+      return {
+        error: new Error(isConnectionError(e) ? productMessage('network') : productMessage('generic')),
+      };
     }
   };
 
@@ -279,11 +299,12 @@ export function AuthProvider({
     await fbSignOut(auth);
     setUser(null);
     setProfile(null);
+    setProfileLoadError(null);
     queryClient.clear();
   };
 
   const updateProfile: AuthContextType['updateProfile'] = async (updates) => {
-    if (!user) return { error: new Error('No user logged in') };
+    if (!user) return { error: new Error(productMessage('generic')) };
     try {
       const ref = doc(db, 'users', user.id);
       const safeUpdates = sanitizeProfileUpdates(updates);
@@ -297,7 +318,10 @@ export function AuthProvider({
       );
       return { error: null };
     } catch (e) {
-      return { error: e as Error };
+      console.error('[Horus-Bot] Profile update failed', e);
+      return {
+        error: new Error(isConnectionError(e) ? productMessage('network') : productMessage('profile')),
+      };
     }
   };
 
@@ -309,6 +333,14 @@ export function AuthProvider({
     setProfile((prev) =>
       prev ? { ...prev, preferred_language, updated_at: new Date().toISOString() } : prev,
     );
+  };
+
+  const reloadProfile = async () => {
+    const fu = auth.currentUser;
+    if (!fu) return;
+    setIsLoading(true);
+    await loadProfile(fu);
+    setIsLoading(false);
   };
 
   const resetPassword: AuthContextType['resetPassword'] = async (email) => {
@@ -327,12 +359,14 @@ export function AuthProvider({
         session: user ? { user } : null,
         profile,
         isLoading,
+        profileLoadError,
         signUp,
         signIn,
         signOut,
         updateProfile,
         resetPassword,
         syncPreferredLanguage,
+        reloadProfile,
       }}
     >
       {children}

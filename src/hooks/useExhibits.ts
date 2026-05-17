@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/integrations/firebase/client';
 import { sharedExhibitRecords, sharedStandardRouteIds } from '@/lib/exhibitCatalog';
+import { isAccessError, isConnectionError, productMessage } from '@/lib/productMessages';
 
 export interface WebsiteExhibit {
   id: string;
@@ -93,7 +94,14 @@ export function useExhibits() {
         setExhibits(rows);
       } catch (e) {
         if (!mounted) return;
-        setError((e as Error).message);
+        console.error('[Horus-Bot] Exhibit load failed', e);
+        setError(
+          isConnectionError(e)
+            ? `${productMessage('exhibits')} ${productMessage('savedContent')}`
+            : isAccessError(e)
+              ? productMessage('permission')
+              : productMessage('exhibits'),
+        );
         setExhibits(fallbackRows());
       } finally {
         if (mounted) setLoading(false);

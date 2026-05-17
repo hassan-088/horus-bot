@@ -20,6 +20,7 @@ import { useExhibits } from '@/hooks/useExhibits';
 import { useUserTickets, type TourType } from '@/hooks/useUserTickets';
 import { CURRENCY, museumTicketPrices, robotTourPrices, type MuseumTicketCategory } from '@/lib/pricing';
 import { sharedStandardRouteIds } from '@/lib/exhibitCatalog';
+import { productMessage } from '@/lib/productMessages';
 import {
   loadRecommendedRoutes,
   recommendedRoutes,
@@ -61,7 +62,7 @@ export default function BookPage() {
   const { isRTL } = useApp();
   const { user, signIn, signUp } = useAuth();
   const { createBooking } = useUserTickets();
-  const { exhibits, loading: exhibitsLoading, standardRoute } = useExhibits();
+  const { exhibits, loading: exhibitsLoading, error: exhibitsError, standardRoute } = useExhibits();
   const navigate = useNavigate();
   const [tourType, setTourType] = useState<TourType>('standard');
 
@@ -236,8 +237,10 @@ export default function BookPage() {
   };
 
   const proceedFromDatetime = () => {
-    if (!date || !time) {
-      toast.error(isRTL ? 'اختر التاريخ والوقت.' : 'Please pick a date and time.');
+    if (!date || !time || date < today) {
+      toast.error(isRTL
+        ? '\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u062a\u0627\u0631\u064a\u062e \u0648\u0648\u0642\u062a \u0635\u0627\u0644\u062d\u064a\u0646.'
+        : 'Please choose a valid date and time.');
       return;
     }
     goNext();
@@ -262,6 +265,10 @@ export default function BookPage() {
   };
 
   const selectRobotTourType = (nextTourType: TourType) => {
+    if (nextTourType === 'personalized' && !exhibitsLoading && exhibits.length === 0) {
+      toast.error(productMessage('exhibits', isRTL));
+      return;
+    }
     setTourType(nextTourType);
     if (nextTourType === 'standard') {
       const highlights = activeRecommendedRoutes.find((route) => route.id === 'horus_highlights');
@@ -274,8 +281,17 @@ export default function BookPage() {
   };
 
   const confirmAndPay = async () => {
+    if (busy) return;
     if (pay !== 'cash') {
-      toast.error(isRTL ? 'يكتمل هذا الحجز نقداً عند شباك المتحف.' : 'This booking is completed with cash at the museum counter.');
+      toast.error(isRTL
+        ? '\u064a\u0643\u062a\u0645\u0644 \u0647\u0630\u0627 \u0627\u0644\u062d\u062c\u0632 \u0646\u0642\u062f\u0627\u064b \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
+        : 'This booking is completed with cash at the museum counter.');
+      return;
+    }
+    if (!date || !time || date < today) {
+      toast.error(isRTL
+        ? '\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u062a\u0627\u0631\u064a\u062e \u0648\u0648\u0642\u062a \u0635\u0627\u0644\u062d\u064a\u0646.'
+        : 'Please choose a valid date and time.');
       return;
     }
     const routeArtifactIds = selectedRecommendedRoute?.artifact_ids.filter((id) => ARTIFACT_ID_PATTERN.test(id));
@@ -289,8 +305,16 @@ export default function BookPage() {
         : effectiveTourType === 'standard'
           ? standardSelectedExhibitIds
           : selectedExhibits.filter((id) => ARTIFACT_ID_PATTERN.test(id));
+    if (effectiveTourType === 'standard' && selectedExhibitIds.length === 0) {
+      toast.error(productMessage('routes', isRTL));
+      return;
+    }
     if (effectiveTourType === 'personalized' && selectedExhibitIds.length === 0) {
-      toast.error(isRTL ? 'اختر قطعة واحدة على الأقل لجولتك.' : 'Please select at least one exhibit for your tour.');
+      toast.error(exhibits.length === 0
+        ? productMessage('exhibits', isRTL)
+        : (isRTL
+          ? '\u0627\u062e\u062a\u0631 \u0642\u0637\u0639\u0629 \u0648\u0627\u062d\u062f\u0629 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644 \u0644\u062c\u0648\u0644\u062a\u0643.'
+          : 'Please select at least one exhibit for your tour.'));
       return;
     }
     setBusy(true);
@@ -318,7 +342,8 @@ export default function BookPage() {
     });
     setBusy(false);
     if (error || !ticket) {
-      toast.error(isRTL ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.');
+      const key = error === productMessage('network') ? 'network' : 'booking';
+      toast.error(productMessage(key, isRTL));
       return;
     }
     setShowSuccess(true);
@@ -702,8 +727,8 @@ export default function BookPage() {
             {activeRecommendedRoutes.length === 0 && (
               <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
                 {isRTL
-                  ? 'تعذر تحميل المسارات المقترحة. افتح Console وابحث عن [Horus-Bot] Recommended routes loaded.'
-                  : 'Recommended routes could not be loaded. Open the console and look for [Horus-Bot] Recommended routes loaded.'}
+                  ? productMessage('routes', true)
+                  : productMessage('routes')}
               </div>
             )}
 
@@ -888,6 +913,12 @@ export default function BookPage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                       {isRTL ? 'جاري تحميل القطع...' : 'Loading exhibits...'}
                     </div>
+                  ) : exhibits.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+                      {exhibitsError
+                        ? productMessage('exhibits', isRTL)
+                        : productMessage('savedContent', isRTL)}
+                    </div>
                   ) : (
                     <div className="grid sm:grid-cols-2 gap-2">
                       {exhibits.map((exhibit) => {
@@ -1039,11 +1070,11 @@ export default function BookPage() {
         {currentStep === 'payment' && (
           <Card className="p-6 md:p-8 space-y-5">
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'الدفع الآمن' : 'Secure Checkout'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? '\u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0627\u0644\u0634\u0628\u0627\u0643' : 'Pay at Counter'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
-                  ? 'اختر طريقة الدفع لإتمام الحجز.'
-                  : 'Choose how you would like to pay to complete your booking.'}
+                  ? '\u0627\u0644\u062f\u0641\u0639 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u062d\u0627\u0644\u064a\u0627\u064b. \u0633\u064a\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u062d\u062c\u0632\u0643 \u0648\u062a\u062f\u0641\u0639 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
+                  : 'Online payment is not available yet. Your booking will be confirmed and paid at the museum counter.'}
               </p>
             </div>
 
@@ -1095,7 +1126,10 @@ export default function BookPage() {
             <div className="flex justify-between gap-2">
               <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
               <Button onClick={confirmAndPay} disabled={busy} className="h-12 px-6">
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : (isRTL ? 'تأكيد الحجز' : 'Confirm booking')}
+                {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+                {busy
+                  ? (isRTL ? '\u062c\u0627\u0631\u064a \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u062c\u0632...' : 'Creating booking...')
+                  : (isRTL ? '\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u062d\u062c\u0632' : 'Confirm booking')}
               </Button>
             </div>
           </Card>
@@ -1106,17 +1140,19 @@ export default function BookPage() {
         <DialogContent className="max-w-sm rounded-2xl text-center">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              🎉 {isRTL ? 'كل شيء جاهز!' : "You're all set!"}
+              {isRTL
+                ? '\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u0627\u0644\u062d\u062c\u0632'
+                : 'Booking confirmed'}
             </DialogTitle>
             <DialogDescription>
               {isRTL
-                ? 'تذكرة المتحف وجولة Horus-Bot محفوظتان في حسابك.'
-                : 'Your museum ticket and Horus-Bot tour are saved to your account.'}
+                ? '\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u0627\u0644\u062d\u062c\u0632. \u064a\u0631\u062c\u0649 \u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641. \u062a\u0630\u0627\u0643\u0631\u0643 \u0645\u062a\u0627\u062d\u0629 \u0627\u0644\u0622\u0646 \u0641\u064a \u062a\u0630\u0627\u0643\u0631\u064a.'
+                : 'Booking confirmed. Please pay at the museum counter. Your tickets are now available in My Tickets.'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center">
             <Button onClick={() => { setShowSuccess(false); navigate('/tickets-mine'); }}>
-              {isRTL ? 'عرض تذاكري' : 'View My Tickets'}
+              {isRTL ? '\u0639\u0631\u0636 \u062a\u0630\u0627\u0643\u0631\u064a' : 'View My Tickets'}
             </Button>
           </DialogFooter>
         </DialogContent>

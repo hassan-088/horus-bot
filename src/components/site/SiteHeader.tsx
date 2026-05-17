@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Globe, Ticket as TicketIcon, User as UserIcon, LogOut, LogIn } from 'lucide-react';
+import { Menu, X, Globe, Ticket as TicketIcon, User as UserIcon, LogOut, LogIn, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { productMessage } from '@/lib/productMessages';
 import { toast } from 'sonner';
 
 const navItems = [
@@ -21,20 +22,42 @@ export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();
   const { user, signOut, syncPreferredLanguage } = useAuth();
   const navigate = useNavigate();
+  const [logoutBusy, setLogoutBusy] = useState(false);
+  const [languageBusy, setLanguageBusy] = useState(false);
 
   const handleLogout = async () => {
+    if (logoutBusy) return;
+    setLogoutBusy(true);
     setOpen(false);
-    await signOut();
-    toast.success(isRTL ? 'تم تسجيل الخروج.' : 'You have been logged out.');
-    navigate('/');
+    try {
+      await signOut();
+      toast.success(isRTL ? '\u062a\u0645 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c.' : 'You have been logged out.');
+      navigate('/');
+    } catch (e) {
+      console.error('[Horus-Bot] Sign out failed', e);
+      toast.error(productMessage('generic', isRTL));
+    } finally {
+      setLogoutBusy(false);
+    }
   };
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
   const handleLanguageToggle = async () => {
+    if (languageBusy) return;
     const next = language === 'en' ? 'ar' : 'en';
     setLanguage(next);
-    await syncPreferredLanguage(next);
+    setLanguageBusy(true);
+    try {
+      await syncPreferredLanguage(next);
+    } catch (e) {
+      console.error('[Horus-Bot] Preferred language sync failed', e);
+      toast.warning(isRTL
+        ? '\u062a\u0645 \u062a\u063a\u064a\u064a\u0631 \u0627\u0644\u0644\u063a\u0629\u060c \u0644\u0643\u0646 \u062a\u0639\u0630\u0631 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a.'
+        : 'Language changed, but we could not update your profile.');
+    } finally {
+      setLanguageBusy(false);
+    }
   };
 
   // Lock body scroll while mobile menu is open
@@ -86,9 +109,10 @@ export function SiteHeader() {
             variant="ghost"
             size="sm"
             onClick={handleLanguageToggle}
+            disabled={languageBusy}
             className="gap-1.5"
           >
-            <Globe className="h-4 w-4" />
+            {languageBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
             {language === 'en' ? 'EN' : 'ع'}
           </Button>
           {user ? (
@@ -176,9 +200,10 @@ export function SiteHeader() {
                   variant="ghost"
                   size="sm"
                   onClick={handleLanguageToggle}
+                  disabled={languageBusy}
                   className="justify-start gap-1.5"
                 >
-                  <Globe className="h-4 w-4" />
+                  {languageBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
                   {language === 'en' ? 'العربية' : 'English'}
                 </Button>
                 {user ? (
@@ -191,9 +216,22 @@ export function SiteHeader() {
                       <UserIcon className="h-4 w-4" />
                       {isRTL ? 'حسابي' : 'My Account'}
                     </Button>
-                    <Button variant="ghost" onClick={handleLogout} className="justify-start gap-1.5">
-                      <LogOut className="h-4 w-4" />
-                      {isRTL ? 'تسجيل الخروج' : 'Log out'}
+                    <Button
+                      variant="ghost"
+                      onClick={handleLogout}
+                      disabled={logoutBusy}
+                      className="justify-start gap-1.5"
+                    >
+                      {logoutBusy ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <LogOut className="h-4 w-4" />
+                      )}
+                      {logoutBusy
+                        ? (isRTL
+                          ? '\u062c\u0627\u0631\u064a \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c...'
+                          : 'Logging out...')
+                        : (isRTL ? '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c' : 'Log out')}
                     </Button>
                   </>
                 ) : (

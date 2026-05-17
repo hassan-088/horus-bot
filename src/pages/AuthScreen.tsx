@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Globe, Flag, ArrowLeft, Loader2, Check, X as XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { PASSWORD_RULES, firstPasswordError, isValidPhone } from '@/lib/passwordRules';
+import { productMessage } from '@/lib/productMessages';
 import { cn } from '@/lib/utils';
 import ankhLogo from '@/assets/ankh.png';
 
@@ -60,28 +61,28 @@ export default function AuthScreen() {
     const e: typeof errors = {};
     if (isSignUp) {
       if (!fullName.trim() || fullName.trim().length < 2) {
-        e.fullName = isArabic ? 'يرجى إدخال اسمك الكامل.' : 'Please enter your full name.';
+        e.fullName = isArabic ? 'ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ø³Ù…Ùƒ Ø§Ù„ÙƒØ§Ù…Ù„.' : 'Please enter your full name.';
       }
     }
     if (!email.trim()) {
-      e.email = isArabic ? 'يرجى إدخال بريدك الإلكتروني.' : 'Please enter your email.';
+      e.email = isArabic ? 'ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ.' : 'Please enter your email.';
     } else if (!emailSchema.safeParse(email).success) {
-      e.email = isArabic ? 'يرجى إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.';
+      e.email = isArabic ? 'ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØµØ­ÙŠØ­.' : 'Please enter a valid email address.';
     }
     if (!password) {
-      e.password = isArabic ? 'يرجى إدخال كلمة المرور.' : 'Please enter your password.';
+      e.password = isArabic ? 'ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±.' : 'Please enter your password.';
     } else if (isSignUp) {
       const pwErr = firstPasswordError(password, isArabic);
       if (pwErr) e.password = pwErr;
     }
     if (isSignUp) {
       if (!confirm) {
-        e.confirm = isArabic ? 'يرجى تأكيد كلمة المرور.' : 'Please confirm your password.';
+        e.confirm = isArabic ? 'ÙŠØ±Ø¬Ù‰ ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±.' : 'Please confirm your password.';
       } else if (confirm !== password) {
-        e.confirm = isArabic ? 'كلمتا المرور غير متطابقتين.' : 'Passwords do not match.';
+        e.confirm = isArabic ? 'ÙƒÙ„Ù…ØªØ§ Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚ØªÙŠÙ†.' : 'Passwords do not match.';
       }
       if (phone.trim() && !isValidPhone(phone)) {
-        e.phone = isArabic ? 'يرجى إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
+        e.phone = isArabic ? 'ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø±Ù‚Ù… Ù‡Ø§ØªÙ ØµØ­ÙŠØ­.' : 'Please enter a valid phone number.';
       }
     }
     setErrors(e);
@@ -103,7 +104,7 @@ export default function AuthScreen() {
         if (error) {
           toast.error(friendlyAuthError(error, isArabic));
         } else {
-          toast.success(isArabic ? 'تم إنشاء الحساب بنجاح!' : 'Account created successfully!');
+          toast.success(isArabic ? 'ØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨ Ø¨Ù†Ø¬Ø§Ø­!' : 'Account created successfully!');
           navigate('/account', { replace: true });
         }
       } else {
@@ -111,7 +112,7 @@ export default function AuthScreen() {
         if (error) {
           toast.error(friendlyAuthError(error, isArabic));
         } else {
-          toast.success(isArabic ? 'مرحبا بعودتك!' : 'Welcome back!');
+          toast.success(isArabic ? 'Ù…Ø±Ø­Ø¨Ø§ Ø¨Ø¹ÙˆØ¯ØªÙƒ!' : 'Welcome back!');
           navigate('/account', { replace: true });
         }
       }
@@ -122,51 +123,52 @@ export default function AuthScreen() {
 
   const handleForgot = async () => {
     if (!forgotEmail.trim()) {
-      toast.error(isArabic ? 'يرجى إدخال بريدك الإلكتروني.' : 'Please enter your email.');
+      toast.error(isArabic ? 'ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ.' : 'Please enter your email.');
       return;
     }
     if (!emailSchema.safeParse(forgotEmail).success) {
-      toast.error(isArabic ? 'يرجى إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.');
+      toast.error(isArabic ? 'ÙŠØ±Ø¬Ù‰ Ø¥Ø¯Ø®Ø§Ù„ Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØµØ­ÙŠØ­.' : 'Please enter a valid email address.');
       return;
     }
     setForgotBusy(true);
     const { error } = await resetPassword(forgotEmail.trim());
     setForgotBusy(false);
     if (error) {
-      toast.error(friendlyAuthError(error, isArabic));
+      const key = error.message === productMessage('network') ? 'network' : 'generic';
+      toast.error(productMessage(key, isArabic));
       return;
     }
-    toast.success(isArabic ? 'تم إرسال رابط إعادة تعيين كلمة المرور. تحقق من بريدك.' : 'Password reset link sent. Please check your email.');
+    toast.success(isArabic ? 'ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±. ØªØ­Ù‚Ù‚ Ù…Ù† Ø¨Ø±ÙŠØ¯Ùƒ.' : 'Password reset link sent. Please check your email.');
     setForgotOpen(false);
     setForgotEmail('');
   };
 
   const t = {
     title: isSignUp
-      ? (isArabic ? 'إنشاء حساب' : 'Create Account')
-      : (isArabic ? 'مرحبا بعودتك إلى Horus-Bot' : 'Welcome back to Horus-Bot'),
+      ? (isArabic ? 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨' : 'Create Account')
+      : (isArabic ? 'Ù…Ø±Ø­Ø¨Ø§ Ø¨Ø¹ÙˆØ¯ØªÙƒ Ø¥Ù„Ù‰ Horus-Bot' : 'Welcome back to Horus-Bot'),
     subtitle: isSignUp
-      ? (isArabic ? 'انضم إلى رحلتك في المتحف.' : 'Join your museum journey.')
-      : (isArabic ? 'سجل الدخول للوصول إلى تذاكرك وجولاتك.' : 'Log in to access your tickets and tours.'),
-    fullName: isArabic ? 'الاسم الكامل' : 'Full name',
-    email: isArabic ? 'البريد الإلكتروني' : 'Email',
-    password: isArabic ? 'كلمة المرور' : 'Password',
-    confirm: isArabic ? 'تأكيد كلمة المرور' : 'Confirm password',
-    phone: isArabic ? 'رقم الهاتف (اختياري)' : 'Phone number (optional)',
-    nationality: isArabic ? 'الجنسية (اختياري)' : 'Nationality (optional)',
-    prefLang: isArabic ? 'لغة الواجهة (اختياري)' : 'UI language (optional)',
+      ? (isArabic ? 'Ø§Ù†Ø¶Ù… Ø¥Ù„Ù‰ Ø±Ø­Ù„ØªÙƒ ÙÙŠ Ø§Ù„Ù…ØªØ­Ù.' : 'Join your museum journey.')
+      : (isArabic ? 'Ø³Ø¬Ù„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù„Ù„ÙˆØµÙˆÙ„ Ø¥Ù„Ù‰ ØªØ°Ø§ÙƒØ±Ùƒ ÙˆØ¬ÙˆÙ„Ø§ØªÙƒ.' : 'Log in to access your tickets and tours.'),
+    fullName: isArabic ? 'Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„' : 'Full name',
+    email: isArabic ? 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ' : 'Email',
+    password: isArabic ? 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±' : 'Password',
+    confirm: isArabic ? 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±' : 'Confirm password',
+    phone: isArabic ? 'Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)' : 'Phone number (optional)',
+    nationality: isArabic ? 'Ø§Ù„Ø¬Ù†Ø³ÙŠØ© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)' : 'Nationality (optional)',
+    prefLang: isArabic ? 'Ù„ØºØ© Ø§Ù„ÙˆØ§Ø¬Ù‡Ø© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)' : 'UI language (optional)',
     submit: isSignUp
-      ? (isArabic ? 'إنشاء حساب' : 'Create Account')
-      : (isArabic ? 'تسجيل الدخول' : 'Sign In'),
+      ? (isArabic ? 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨' : 'Create Account')
+      : (isArabic ? 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„' : 'Sign In'),
     switchText: isSignUp
-      ? (isArabic ? 'لديك حساب بالفعل؟' : 'Already have an account?')
-      : (isArabic ? 'ليس لديك حساب؟' : "Don't have an account?"),
+      ? (isArabic ? 'Ù„Ø¯ÙŠÙƒ Ø­Ø³Ø§Ø¨ Ø¨Ø§Ù„ÙØ¹Ù„ØŸ' : 'Already have an account?')
+      : (isArabic ? 'Ù„ÙŠØ³ Ù„Ø¯ÙŠÙƒ Ø­Ø³Ø§Ø¨ØŸ' : "Don't have an account?"),
     switchAction: isSignUp
-      ? (isArabic ? 'تسجيل الدخول' : 'Sign In')
-      : (isArabic ? 'إنشاء حساب' : 'Sign Up'),
-    back: isArabic ? 'رجوع' : 'Back',
-    forgot: isArabic ? 'نسيت كلمة المرور؟' : 'Forgot password?',
-    pwRulesIntro: isArabic ? 'يجب أن تتضمن كلمة المرور على الأقل:' : 'Password must contain at least:',
+      ? (isArabic ? 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„' : 'Sign In')
+      : (isArabic ? 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨' : 'Sign Up'),
+    back: isArabic ? 'Ø±Ø¬ÙˆØ¹' : 'Back',
+    forgot: isArabic ? 'Ù†Ø³ÙŠØª ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±ØŸ' : 'Forgot password?',
+    pwRulesIntro: isArabic ? 'ÙŠØ¬Ø¨ Ø£Ù† ØªØªØ¶Ù…Ù† ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„:' : 'Password must contain at least:',
   };
 
   return (
@@ -199,7 +201,7 @@ export default function AuthScreen() {
                 <Input
                   id="fullName" value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder={isArabic ? 'اسمك الكامل' : 'Your full name'}
+                  placeholder={isArabic ? 'Ø§Ø³Ù…Ùƒ Ø§Ù„ÙƒØ§Ù…Ù„' : 'Your full name'}
                   className={cn('pl-10 rtl:pl-3 rtl:pr-10', errors.fullName && 'border-destructive focus-visible:ring-destructive')}
                 />
               </div>
@@ -228,7 +230,7 @@ export default function AuthScreen() {
               <Input
                 id="password" type={showPassword ? 'text' : 'password'} value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 className={cn('pl-10 pr-10 rtl:pl-10 rtl:pr-10', errors.password && 'border-destructive focus-visible:ring-destructive')}
               />
               <button
@@ -276,7 +278,7 @@ export default function AuthScreen() {
                   <Input
                     id="confirm" type={showConfirm ? 'text' : 'password'} value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     className={cn('pl-10 pr-10 rtl:pl-10 rtl:pr-10', errors.confirm && 'border-destructive focus-visible:ring-destructive')}
                   />
                   <button
@@ -312,7 +314,7 @@ export default function AuthScreen() {
                     <Input
                       id="nationality" value={nationality}
                       onChange={(e) => setNationality(e.target.value)}
-                      placeholder={isArabic ? 'مثال: مصري' : 'e.g. Egyptian'}
+                      placeholder={isArabic ? 'Ù…Ø«Ø§Ù„: Ù…ØµØ±ÙŠ' : 'e.g. Egyptian'}
                       className="pl-10 rtl:pl-3 rtl:pr-10"
                     />
                   </div>
@@ -327,8 +329,8 @@ export default function AuthScreen() {
                   >
                     <SelectTrigger id="prefLang"><Globe className="h-4 w-4 mr-1" /><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="english">{isArabic ? 'الإنجليزية' : 'English'}</SelectItem>
-                      <SelectItem value="arabic">{isArabic ? 'العربية' : 'Arabic'}</SelectItem>
+                      <SelectItem value="english">{isArabic ? 'Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©' : 'English'}</SelectItem>
+                      <SelectItem value="arabic">{isArabic ? 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©' : 'Arabic'}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -358,10 +360,10 @@ export default function AuthScreen() {
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
         <DialogContent className="sm:max-w-sm rounded-2xl">
           <DialogHeader>
-            <DialogTitle>{isArabic ? 'إعادة تعيين كلمة المرور' : 'Reset your password'}</DialogTitle>
+            <DialogTitle>{isArabic ? 'Ø¥Ø¹Ø§Ø¯Ø© ØªØ¹ÙŠÙŠÙ† ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±' : 'Reset your password'}</DialogTitle>
             <DialogDescription>
               {isArabic
-                ? 'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.'
+                ? 'Ø£Ø¯Ø®Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ÙˆØ³Ù†Ø±Ø³Ù„ Ù„Ùƒ Ø±Ø§Ø¨Ø· Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„ØªØ¹ÙŠÙŠÙ†.'
                 : "Enter your email and we'll send you a reset link."}
             </DialogDescription>
           </DialogHeader>
@@ -375,10 +377,10 @@ export default function AuthScreen() {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setForgotOpen(false)}>
-              {isArabic ? 'إلغاء' : 'Cancel'}
+              {isArabic ? 'Ø¥Ù„ØºØ§Ø¡' : 'Cancel'}
             </Button>
             <Button onClick={handleForgot} disabled={forgotBusy}>
-              {forgotBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : (isArabic ? 'إرسال الرابط' : 'Send reset link')}
+              {forgotBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : (isArabic ? 'Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø§Ø¨Ø·' : 'Send reset link')}
             </Button>
           </DialogFooter>
         </DialogContent>

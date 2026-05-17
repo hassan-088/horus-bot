@@ -18,6 +18,7 @@ import {
   type CreateBookingInput as SharedCreateBookingInput,
   type TourType,
 } from '@/lib/bookingContract';
+import { isAccessError, isConnectionError, productMessage } from '@/lib/productMessages';
 
 export type TicketStatus =
   | 'active'
@@ -163,10 +164,12 @@ export function useUserTickets() {
   const [tickets, setTickets] = useState<UserTicket[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [skippedBookingCount, setSkippedBookingCount] = useState(0);
 
   const refresh = useCallback(async () => {
     if (!user) {
       setTickets([]);
+      setSkippedBookingCount(0);
       return;
     }
     setLoading(true);
@@ -194,10 +197,13 @@ export function useUserTickets() {
         );
       }));
       const completeRows = rows.filter((row): row is UserTicket => row !== null);
+      setSkippedBookingCount(rows.length - completeRows.length);
       completeRows.sort((a, b) => (a.visit_date || '').localeCompare(b.visit_date || ''));
       setTickets(completeRows);
     } catch (e) {
-      setError((e as Error).message);
+      console.error('[Horus-Bot] Ticket load failed', e);
+      setSkippedBookingCount(0);
+      setError(isConnectionError(e) ? productMessage('network') : productMessage('tickets'));
     } finally {
       setLoading(false);
     }
@@ -280,7 +286,11 @@ export function useUserTickets() {
         setTickets((prev) => [...prev, created]);
         return { ticket: created, error: null };
       } catch (e) {
-        return { ticket: null, error: (e as Error).message };
+        console.error('[Horus-Bot] Booking creation failed', e);
+        return {
+          ticket: null,
+          error: isConnectionError(e) ? productMessage('network') : productMessage('booking'),
+        };
       }
     },
     [user],
@@ -316,13 +326,20 @@ export function useUserTickets() {
         );
         return { error: null };
       } catch (e) {
-        return { error: (e as Error).message };
+        console.error('[Horus-Bot] Booking cancellation failed', e);
+        return {
+          error: isConnectionError(e)
+            ? productMessage('network')
+            : isAccessError(e)
+              ? productMessage('permission')
+              : productMessage('generic'),
+        };
       }
     },
     [user, tickets],
   );
 
-  return { tickets, loading, error, refresh, createBooking, cancelTicket };
+  return { tickets, loading, error, skippedBookingCount, refresh, createBooking, cancelTicket };
 }
 
 export function canCancelUserTicket(ticket: UserTicket): boolean {
