@@ -19,7 +19,15 @@ import {
   type TourType,
 } from '@/lib/bookingContract';
 
-export type TicketStatus = 'active' | 'cancelled';
+export type TicketStatus =
+  | 'active'
+  | 'cancelled'
+  | 'completed'
+  | 'expired'
+  | 'paired'
+  | 'in_progress'
+  | 'pending'
+  | 'used';
 
 export interface UserTicket {
   id: string;
@@ -41,6 +49,8 @@ export interface UserTicket {
   payment_method: string;
   payment_status: string;
   status: TicketStatus;
+  museum_status: TicketStatus;
+  robot_status: TicketStatus;
   qr_value: string;
   created_at: string;
   tour_type?: TourType | null;
@@ -75,11 +85,31 @@ function asStringArray(v: unknown): string[] {
   return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
 }
 
+function normalizeStatus(value: unknown): TicketStatus {
+  const raw = String(value ?? '').trim().toLowerCase();
+  switch (raw) {
+    case 'cancelled':
+    case 'completed':
+    case 'expired':
+    case 'paired':
+    case 'in_progress':
+    case 'pending':
+    case 'used':
+      return raw;
+    default:
+      return 'active';
+  }
+}
+
+function isLegacyBookingId(value: unknown): boolean {
+  return String(value ?? '').trim().toUpperCase().startsWith('ORD-');
+}
+
 function toUserTicket(
   bookingId: string,
   booking: Record<string, unknown>,
-  museumTicket?: Record<string, unknown>,
-  robotTourTicket?: Record<string, unknown>,
+  museumTicket: Record<string, unknown>,
+  robotTourTicket: Record<string, unknown>,
 ): UserTicket {
   const museumTicketId = (booking.museum_ticket_id as string) ?? (museumTicket?.ticketId as string) ?? '';
   const robotTourTicketId = (booking.robot_tour_ticket_id as string) ?? (robotTourTicket?.tourTicketId as string) ?? '';
@@ -105,7 +135,9 @@ function toUserTicket(
     currency: (booking.currency as string) ?? 'EGP',
     payment_method: (booking.payment_method as string) ?? 'cash',
     payment_status: (booking.payment_status as string) ?? 'pay_at_counter',
-    status: ((booking.status as TicketStatus) ?? 'active'),
+    status: normalizeStatus(booking.status),
+    museum_status: normalizeStatus(museumTicket.status),
+    robot_status: normalizeStatus(robotTourTicket.status),
     qr_value: (museumTicket?.qr_value as string) ?? '',
     created_at: tsToIso(booking.created_at ?? museumTicket?.created_at),
     tour_type: (robotTourTicket?.tour_type as TourType) ?? null,
@@ -144,21 +176,26 @@ export function useUserTickets() {
       const snap = await getDocs(q);
       const rows = await Promise.all(snap.docs.map(async (bookingDoc) => {
         const booking = bookingDoc.data() as Record<string, unknown>;
+        const bookingId = (booking.booking_id as string | undefined) ?? bookingDoc.id;
+        if (isLegacyBookingId(bookingId)) return null;
         const museumTicketId = booking.museum_ticket_id as string | undefined;
         const robotTourTicketId = booking.robot_tour_ticket_id as string | undefined;
+        if (!museumTicketId || !robotTourTicketId) return null;
         const [museumSnap, robotSnap] = await Promise.all([
-          museumTicketId ? getDoc(doc(db, 'museumTickets', museumTicketId)) : Promise.resolve(null),
-          robotTourTicketId ? getDoc(doc(db, 'robotTourTickets', robotTourTicketId)) : Promise.resolve(null),
+          getDoc(doc(db, 'museumTickets', museumTicketId)),
+          getDoc(doc(db, 'robotTourTickets', robotTourTicketId)),
         ]);
+        if (!museumSnap.exists() || !robotSnap.exists()) return null;
         return toUserTicket(
           bookingDoc.id,
           booking,
-          museumSnap?.exists() ? museumSnap.data() as Record<string, unknown> : undefined,
-          robotSnap?.exists() ? robotSnap.data() as Record<string, unknown> : undefined,
+          museumSnap.data() as Record<string, unknown>,
+          robotSnap.data() as Record<string, unknown>,
         );
       }));
-      rows.sort((a, b) => (a.visit_date || '').localeCompare(b.visit_date || ''));
-      setTickets(rows);
+      const completeRows = rows.filter((row): row is UserTicket => row !== null);
+      completeRows.sort((a, b) => (a.visit_date || '').localeCompare(b.visit_date || ''));
+      setTickets(completeRows);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -208,6 +245,8 @@ export function useUserTickets() {
             payment_method: 'cash',
             payment_status: 'pay_at_counter',
             status: 'active',
+            museum_status: 'active',
+            robot_status: 'active',
             created_at: new Date().toISOString(),
           },
           {
@@ -215,6 +254,7 @@ export function useUserTickets() {
             total_tickets: input.visitor_count,
             total_price: museumEntryTotal,
             qr_value: createdRefs.qrValue,
+            status: 'active',
           },
           {
             tourTicketId: createdRefs.robotTourTicketId,
@@ -234,6 +274,7 @@ export function useUserTickets() {
             paired_robot_id: null,
             session_id: null,
             total_price: robotTourPrice,
+            status: 'active',
           },
         );
         setTickets((prev) => [...prev, created]);
@@ -251,6 +292,13 @@ export function useUserTickets() {
       try {
         const tk = tickets.find((t) => t.booking_id === bookingId || t.id === bookingId);
         if (!tk) return { error: 'booking-not-found' };
+        if (!canCancelUserTicket(tk)) {
+          return {
+            error: isWithinCancellationDeadline(tk)
+              ? 'Cancellation is available up to 24 hours before your visit.'
+              : 'booking-not-cancellable',
+          };
+        }
         const batch = writeBatch(db);
         const update = {
           status: 'cancelled',
@@ -262,7 +310,9 @@ export function useUserTickets() {
         batch.update(doc(db, 'robotTourTickets', tk.robot_tour_ticket_id), update);
         await batch.commit();
         setTickets((prev) =>
-          prev.map((t) => (t.booking_id === tk.booking_id ? { ...t, status: 'cancelled' } : t)),
+          prev.map((t) => (t.booking_id === tk.booking_id
+            ? { ...t, status: 'cancelled', museum_status: 'cancelled', robot_status: 'cancelled' }
+            : t)),
         );
         return { error: null };
       } catch (e) {
@@ -273,4 +323,50 @@ export function useUserTickets() {
   );
 
   return { tickets, loading, error, refresh, createBooking, cancelTicket };
+}
+
+export function canCancelUserTicket(ticket: UserTicket): boolean {
+  if (ticket.status !== 'active') return false;
+  if (['used', 'cancelled', 'expired'].includes(ticket.museum_status)) return false;
+  if (['paired', 'in_progress', 'completed', 'cancelled', 'expired'].includes(ticket.robot_status)) {
+    return false;
+  }
+  return !isWithinCancellationDeadline(ticket);
+}
+
+export function isWithinCancellationDeadline(ticket: UserTicket): boolean {
+  const startsAt = visitStartsAt(ticket.visit_date, ticket.visit_time);
+  if (!startsAt) return true;
+  return startsAt.getTime() - Date.now() <= 24 * 60 * 60 * 1000;
+}
+
+function visitStartsAt(date: string, time?: string | null): Date | null {
+  if (!date) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(date);
+  if (!match) return null;
+  const parsedTime = parseTime(time ?? '');
+  return new Date(
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3]),
+    parsedTime?.hour ?? 0,
+    parsedTime?.minute ?? 0,
+  );
+}
+
+function parseTime(value: string): { hour: number; minute: number } | null {
+  const start = value.trim().split(' - ')[0]?.trim();
+  if (!start) return null;
+  const amPm = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(start);
+  if (amPm) {
+    let hour = Number(amPm[1]);
+    const minute = Number(amPm[2]);
+    const period = amPm[3].toUpperCase();
+    if (period === 'PM' && hour !== 12) hour += 12;
+    if (period === 'AM' && hour === 12) hour = 0;
+    return { hour, minute };
+  }
+  const match = /^(\d{1,2}):(\d{2})/.exec(start);
+  if (!match) return null;
+  return { hour: Number(match[1]), minute: Number(match[2]) };
 }

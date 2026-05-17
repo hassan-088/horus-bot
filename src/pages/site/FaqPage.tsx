@@ -10,34 +10,92 @@ export default function FaqPage() {
 
   const faqs = isRTL
     ? [
-        { q: 'ما هو حورس-بوت؟', a: 'حورس-بوت هو روبوت إرشاد ذاتي القيادة يقود جولتك في المتحف في الوقت الفعلي، بينما يدعمك التطبيق المحمول بالتنقّل، محتوى المعروضات، التذاكر، والتفاعل.' },
-        { q: 'هل عليّ استخدام التطبيق؟', a: 'يُنصح به بشدّة، لأن التطبيق يوفّر للزوار الخرائط، محتوى المعروضات، التذاكر، تقدّم الجولة، والتجربة المتصلة كاملة.' },
-        { q: 'ماذا لو كانت كل الروبوتات مشغولة؟', a: 'إذا كانت كل الروبوتات قيد الاستخدام، يُخصَّص الروبوت التالي المتاح في أقرب وقت ممكن. الحجز المبكر يساعد على ضمان فترتك المفضّلة.' },
-        { q: 'ما اللغات المدعومة؟', a: 'تدعم التجربة العربية، العامية المصرية، الإنجليزية، ولغات إضافية وفقاً لإعداد المتحف.' },
-        { q: 'هل التجربة مناسبة للأطفال؟', a: 'نعم — يتوفر خيار عائلي ودود مع محطات أقصر، شرح أبسط، وألغاز ممتعة بعد كل قسم.' },
-        { q: 'هل أحتاج إنترنت؟', a: 'يتوفّر Wi-Fi مجاني داخل المتحف، كما تعمل بياناتك الخلوية أيضاً، فيظل الزوار متصلين طوال الزيارة.' },
-        { q: 'ماذا يحدث إذا انقطع الاتصال؟', a: 'لا داعي للقلق — تستمر التجربة، ويعيد التطبيق الاتصال تلقائياً بمجرد عودة الشبكة.' },
-        { q: 'هل المتحف مهيَّأ لذوي الاحتياجات الخاصة؟', a: 'نعم — مسارات الروبوت مصمَّمة لتكون بدون درج ومناسبة للكراسي المتحركة، مع وصف صوتي موسَّع متاح للزوار ضعاف البصر.' },
-        { q: 'هل يمكنني الإلغاء أو تغيير الموعد؟', a: 'نعم — يمكن للزوار الإلغاء حتى 24 ساعة قبل الزيارة لاسترداد كامل، أو تغيير الموعد عبر الرابط الموجود في بريد التذكرة.' },
+        {
+          q: 'ما هو Horus-Bot؟',
+          a: 'Horus-Bot روبوت إرشاد ذاتي يقود الجولة داخل المتحف، بينما يدعمك تطبيق الهاتف بالتذاكر، والخرائط، ومحتوى المعروضات، والتفاعل أثناء الزيارة.',
+        },
+        {
+          q: 'هل أحتاج إلى التطبيق؟',
+          a: 'نعم، التطبيق هو المكان الذي تستخدم فيه تذاكرك داخل المتحف وتقرن تذكرة جولة الروبوت بالروبوت الفعلي عند الوصول.',
+        },
+        {
+          q: 'أين أحجز التذاكر؟',
+          a: 'يمكنك حجز تذكرة دخول المتحف وتذكرة جولة Horus-Bot من الموقع. بعد الحجز ستظهر التذاكر في حسابك على الموقع وفي تطبيق الهاتف.',
+        },
+        {
+          q: 'هل رمز دخول المتحف هو نفسه رمز اقتران الروبوت؟',
+          a: 'لا. رمز تذكرة دخول المتحف يستخدم عند بوابة المتحف. اقتران الروبوت يحدث لاحقا داخل تطبيق الهاتف عن طريق مسح رمز QR الفعلي الموجود على الروبوت.',
+        },
+        {
+          q: 'ما طرق الدفع المتاحة؟',
+          a: 'الحجز الحالي يستخدم الدفع النقدي عند شباك المتحف. حالة الدفع تظهر كتسديد عند الشباك، ولا يوجد دفع إلكتروني داخل الموقع أو التطبيق حاليا.',
+        },
+        {
+          q: 'هل يمكنني إلغاء الحجز؟',
+          a: 'نعم، يمكن إلغاء الحجز من صفحة تذاكري حتى 24 ساعة قبل موعد الزيارة إذا لم تكن التذاكر مستخدمة أو منتهية أو مرتبطة بجولة روبوت بدأت بالفعل.',
+        },
+        {
+          q: 'هل يمكنني تغيير الموعد؟',
+          a: 'تغيير الموعد غير متاح حاليا. إذا كان الحجز مؤهلا للإلغاء، يمكنك إلغاءه ثم إنشاء حجز جديد بالموعد المناسب.',
+        },
+        {
+          q: 'ما اللغات المدعومة؟',
+          a: 'واجهة الموقع والتطبيق تدعم العربية والإنجليزية. لغة سرد جولة الروبوت يتم اختيارها ضمن إعدادات تذكرة جولة Horus-Bot.',
+        },
+        {
+          q: 'هل التجربة مناسبة لذوي الاحتياجات الخاصة؟',
+          a: 'تدعم خطط الجولة تفضيلات الوصول مثل المسارات الأسهل والوصف الصوتي، وتظهر هذه التفضيلات ضمن بيانات الجولة في تذكرتك.',
+        },
       ]
     : [
-        { q: 'What is Horus-Bot?', a: 'Horus-Bot is an autonomous robot guide that leads your museum tour in real time, while the mobile app supports you with navigation, exhibit content, tickets, and interaction.' },
-        { q: 'Do I have to use the app?', a: 'The app is strongly recommended because it gives visitors maps, exhibit content, tickets, tour progress, and the full connected experience.' },
-        { q: 'What if all robots are busy?', a: 'Your robot tour ticket will be ready in the app. Pairing happens at the museum by scanning the physical robot QR when a robot is available.' },
-        { q: 'Which languages are supported?', a: 'The experience supports Arabic, Egyptian Arabic, English, and additional languages depending on the museum setup.' },
-        { q: 'Is it suitable for children?', a: 'Yes — there is a family-friendly option with shorter stops, simpler narration, and fun puzzles after each section.' },
-        { q: 'Do I need internet?', a: 'Free Wi-Fi is available at the museum, and mobile data also works so visitors can stay connected throughout the visit.' },
-        { q: 'What happens if I get disconnected?', a: 'No worries — the experience continues, and the app reconnects automatically when the connection returns.' },
-        { q: 'Is the museum wheelchair accessible?', a: 'Yes — robot-led routes are designed to be step-free and wheelchair accessible, with extended audio descriptions available for low-vision visitors.' },
-        { q: 'Can I cancel or reschedule?', a: 'Yes — visitors can cancel up to 24 hours before the visit for a full refund, or reschedule using the link in the ticket email.' },
+        {
+          q: 'What is Horus-Bot?',
+          a: 'Horus-Bot is an autonomous robot guide for the museum visit. The mobile app supports the same account, tickets, maps, exhibit content, and in-visit interaction.',
+        },
+        {
+          q: 'Do I need the mobile app?',
+          a: 'Yes. The website is for pre-visit booking and account management. Robot pairing and the live tour happen later inside the mobile app.',
+        },
+        {
+          q: 'Where do I book tickets?',
+          a: 'You can book the museum entry ticket and Horus-Bot robot tour ticket on the website. The same tickets appear in your account on both website and mobile app.',
+        },
+        {
+          q: 'Is the museum entry QR the same as the robot pairing QR?',
+          a: 'No. The Museum Entry QR is used at the museum gate. Robot pairing happens later in the mobile app by scanning the physical QR code on the robot.',
+        },
+        {
+          q: 'Which payment methods are supported?',
+          a: 'Bookings currently use cash payment at the museum counter. Payment status is shown as pay at counter; there is no online payment gateway in the current product.',
+        },
+        {
+          q: 'Can I cancel my booking?',
+          a: 'Yes. Eligible active bookings can be cancelled from My Tickets up to 24 hours before the visit, as long as the tickets have not been used, expired, or started as a robot tour.',
+        },
+        {
+          q: 'Can I change the visit time?',
+          a: 'Changing the visit time is not available in this version. If your booking is eligible, cancel it and create a new booking for the date and time you want.',
+        },
+        {
+          q: 'Which languages are supported?',
+          a: 'The website and app UI support English and Arabic. Robot tour narration language is selected separately for the Horus-Bot tour ticket.',
+        },
+        {
+          q: 'Does the experience support accessibility needs?',
+          a: 'Tour plans can include accessibility preferences such as easier routes and audio description needs, and those preferences are saved with the robot tour ticket.',
+        },
       ];
 
   return (
     <>
       <SectionHero
         label={isRTL ? 'الأسئلة الشائعة' : 'FAQ'}
-        title={isRTL ? 'أسئلة قد تشغل بالك' : 'Questions you might have'}
-        subtitle={isRTL ? 'إجابات واضحة قبل أن تحجز.' : 'Clear answers before you book.'}
+        title={isRTL ? 'إجابات واضحة قبل الزيارة' : 'Clear answers before you book'}
+        subtitle={
+          isRTL
+            ? 'اعرف أين تحجز، وكيف تستخدم التذاكر، ومتى يبدأ دور تطبيق الهاتف.'
+            : 'Understand booking, tickets, payment, cancellation, and the handoff to the mobile app.'
+        }
       />
 
       <section className="mx-auto max-w-3xl px-4 md:px-8 pb-16">
@@ -54,10 +112,10 @@ export default function FaqPage() {
       <section className="mx-auto max-w-3xl px-4 md:px-8 pb-24">
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-8 text-center">
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-3">
-            {isRTL ? 'لا تزال لديك أسئلة؟' : 'Still Have Questions?'}
+            {isRTL ? 'هل تريد تجهيز زيارتك؟' : 'Ready to plan your visit?'}
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            {isRTL ? 'احجز زيارتك واختبرها بنفسك.' : 'Book your visit and experience it for yourself.'}
+            {isRTL ? 'احجز تذكرتك الآن وستظهر في حسابك على الموقع والتطبيق.' : 'Book now and your tickets will appear in both the website and mobile app.'}
           </p>
           <Button asChild size="lg">
             <Link to="/book"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book your visit'}</Link>

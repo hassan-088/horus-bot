@@ -18,8 +18,8 @@ export function SiteFooter() {
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isRTL
-                ? 'طريقة جديدة لاستكشاف المتاحف — موجَّهة، شخصية، وسلِسة من البداية إلى النهاية.'
-                : 'A new way to experience museums — guided, personalized, and effortless from start to finish.'}
+                ? 'طريقة متصلة لتجهيز زيارة المتحف، حفظ التذاكر، ومتابعة الجولة داخل التطبيق.'
+                : 'A connected way to prepare your museum visit, save tickets, and continue the tour in the app.'}
             </p>
           </div>
 
@@ -57,7 +57,7 @@ export function SiteFooter() {
               </span>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              {isRTL ? 'قنواتنا الرسمية قريباً.' : 'Official channels coming soon.'}
+              {isRTL ? 'تابع Horus-Bot عبر القنوات الرسمية.' : 'Follow Horus-Bot through the official channels.'}
             </p>
           </div>
         </div>

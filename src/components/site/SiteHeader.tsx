@@ -19,7 +19,7 @@ const navItems = [
 
 export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();
-  const { user, signOut } = useAuth();
+  const { user, signOut, syncPreferredLanguage } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -30,6 +30,12 @@ export function SiteHeader() {
   };
   const location = useLocation();
   const [open, setOpen] = useState(false);
+
+  const handleLanguageToggle = async () => {
+    const next = language === 'en' ? 'ar' : 'en';
+    setLanguage(next);
+    await syncPreferredLanguage(next);
+  };
 
   // Lock body scroll while mobile menu is open
   useEffect(() => {
@@ -79,7 +85,7 @@ export function SiteHeader() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+            onClick={handleLanguageToggle}
             className="gap-1.5"
           >
             <Globe className="h-4 w-4" />
@@ -169,7 +175,7 @@ export function SiteHeader() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+                  onClick={handleLanguageToggle}
                   className="justify-start gap-1.5"
                 >
                   <Globe className="h-4 w-4" />

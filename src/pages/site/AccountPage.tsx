@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   User as UserIcon, Mail, Phone, Globe, Flag, LogOut, Pencil, Loader2, Ticket,
@@ -7,6 +7,10 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { SectionHero } from '@/components/site/SectionHero';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,7 +18,7 @@ import { useUserTickets } from '@/hooks/useUserTickets';
 import { toast } from 'sonner';
 
 export default function AccountPage() {
-  const { isRTL } = useApp();
+  const { isRTL, setLanguage } = useApp();
   const { user, profile, signOut, updateProfile } = useAuth();
   const { tickets } = useUserTickets();
   const navigate = useNavigate();
@@ -22,18 +26,33 @@ export default function AccountPage() {
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [fullName, setFullName] = useState(profile?.full_name ?? profile?.display_name ?? '');
+  const [displayName, setDisplayName] = useState(profile?.display_name ?? profile?.full_name ?? '');
   const [phone, setPhone] = useState(profile?.phone_number ?? '');
   const [nationality, setNationality] = useState(profile?.nationality ?? '');
-  const [prefLang, setPrefLang] = useState(profile?.preferred_language ?? 'english');
+  const [prefLang, setPrefLang] = useState<'english' | 'arabic'>(
+    profile?.preferred_language === 'arabic' ? 'arabic' : 'english',
+  );
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? '');
+  const [marketingOptIn, setMarketingOptIn] = useState(profile?.marketing_opt_in ?? false);
+
+  useEffect(() => {
+    setFullName(profile?.full_name ?? profile?.display_name ?? '');
+    setDisplayName(profile?.display_name ?? profile?.full_name ?? '');
+    setPhone(profile?.phone_number ?? '');
+    setNationality(profile?.nationality ?? '');
+    setPrefLang(profile?.preferred_language === 'arabic' ? 'arabic' : 'english');
+    setAvatarUrl(profile?.avatar_url ?? '');
+    setMarketingOptIn(profile?.marketing_opt_in ?? false);
+  }, [profile]);
 
   if (!user) {
     return (
       <>
         <SectionHero
           label={isRTL ? 'حسابي' : 'My Account'}
-          title={isRTL ? 'سجّل الدخول للمتابعة' : 'Sign in to continue'}
+          title={isRTL ? 'سجل الدخول للمتابعة' : 'Sign in to continue'}
           subtitle={isRTL
-            ? 'سجّل الدخول للوصول إلى ملفك الشخصي وتذاكرك.'
+            ? 'سجل الدخول للوصول إلى ملفك الشخصي وتذاكرك.'
             : 'Log in to access your profile and tickets.'}
         />
         <section className="mx-auto max-w-3xl px-4 md:px-8 pb-24 -mt-2">
@@ -49,17 +68,20 @@ export default function AccountPage() {
     setBusy(true);
     const { error } = await updateProfile({
       full_name: fullName.trim() || null,
-      display_name: fullName.trim() || null,
+      display_name: displayName.trim() || fullName.trim() || null,
       phone_number: phone.trim() || null,
       nationality: nationality.trim() || null,
-      preferred_language: prefLang || null,
+      preferred_language: prefLang,
+      avatar_url: avatarUrl.trim() || null,
+      marketing_opt_in: marketingOptIn,
     });
     setBusy(false);
     if (error) {
-      toast.error(isRTL ? 'تعذّر حفظ التغييرات.' : "Couldn't save your changes.");
+      toast.error(isRTL ? 'تعذر حفظ التغييرات.' : "Couldn't save your changes.");
       return;
     }
-    toast.success(isRTL ? 'تم حفظ ملفك.' : 'Profile saved.');
+    setLanguage(prefLang === 'arabic' ? 'ar' : 'en');
+    toast.success(isRTL ? 'تم حفظ الملف الشخصي.' : 'Profile saved.');
     setEditing(false);
   };
 
@@ -76,7 +98,7 @@ export default function AccountPage() {
     <>
       <SectionHero
         label={isRTL ? 'حسابي' : 'My Account'}
-        title={profile?.full_name || profile?.display_name || (isRTL ? 'مرحباً' : 'Welcome')}
+        title={profile?.full_name || profile?.display_name || (isRTL ? 'مرحبا' : 'Welcome')}
         subtitle={user.email ?? ''}
       />
 
@@ -97,17 +119,21 @@ export default function AccountPage() {
 
           {!editing ? (
             <div className="grid sm:grid-cols-2 gap-4 text-sm">
-              <Field icon={<UserIcon className="h-4 w-4" />} label={isRTL ? 'الاسم' : 'Full name'} value={profile?.full_name || profile?.display_name || '—'} />
-              <Field icon={<Mail className="h-4 w-4" />} label={isRTL ? 'البريد' : 'Email'} value={user.email ?? '—'} />
-              <Field icon={<Phone className="h-4 w-4" />} label={isRTL ? 'الهاتف' : 'Phone'} value={profile?.phone_number || '—'} />
-              <Field icon={<Flag className="h-4 w-4" />} label={isRTL ? 'الجنسية' : 'Nationality'} value={profile?.nationality || '—'} />
-              <Field icon={<Globe className="h-4 w-4" />} label={isRTL ? 'اللغة المفضّلة' : 'Preferred language'} value={profile?.preferred_language || '—'} />
+              <Field icon={<UserIcon className="h-4 w-4" />} label={isRTL ? 'الاسم الكامل' : 'Full name'} value={profile?.full_name || profile?.display_name || '-'} />
+              <Field icon={<Mail className="h-4 w-4" />} label={isRTL ? 'البريد الإلكتروني' : 'Email'} value={user.email ?? '-'} />
+              <Field icon={<Phone className="h-4 w-4" />} label={isRTL ? 'الهاتف' : 'Phone'} value={profile?.phone_number || '-'} />
+              <Field icon={<Flag className="h-4 w-4" />} label={isRTL ? 'الجنسية' : 'Nationality'} value={profile?.nationality || '-'} />
+              <Field icon={<Globe className="h-4 w-4" />} label={isRTL ? 'لغة الواجهة' : 'UI language'} value={languageLabel(profile?.preferred_language, isRTL)} />
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label>{isRTL ? 'الاسم الكامل' : 'Full name'}</Label>
                 <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{isRTL ? 'اسم العرض' : 'Display name'}</Label>
+                <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label>{isRTL ? 'الهاتف' : 'Phone'}</Label>
@@ -118,9 +144,31 @@ export default function AccountPage() {
                 <Input value={nationality} onChange={(e) => setNationality(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>{isRTL ? 'اللغة المفضّلة' : 'Preferred language'}</Label>
-                <Input value={prefLang} onChange={(e) => setPrefLang(e.target.value)} />
+                <Label>{isRTL ? 'لغة الواجهة' : 'UI language'}</Label>
+                <Select
+                  value={prefLang}
+                  onValueChange={(value) => setPrefLang(value === 'arabic' ? 'arabic' : 'english')}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="english">{isRTL ? 'الإنجليزية' : 'English'}</SelectItem>
+                    <SelectItem value="arabic">{isRTL ? 'العربية' : 'Arabic'}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>{isRTL ? 'رابط الصورة الشخصية' : 'Avatar URL'}</Label>
+                <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} />
+              </div>
+              <label className="sm:col-span-2 flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={marketingOptIn}
+                  onCheckedChange={(checked) => setMarketingOptIn(checked === true)}
+                />
+                {isRTL ? 'أرغب في استقبال أخبار وعروض المتحف' : 'Send me museum news and offers'}
+              </label>
               <div className="sm:col-span-2 flex justify-end">
                 <Button onClick={handleSave} disabled={busy}>
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : (isRTL ? 'حفظ' : 'Save')}
@@ -154,7 +202,7 @@ export default function AccountPage() {
           {pastTickets.length > 0 && (
             <p className="text-xs text-muted-foreground">
               {isRTL
-                ? `${pastTickets.length} حجز سابق في السجل.`
+                ? `${pastTickets.length} حجز سابق في سجلك.`
                 : `${pastTickets.length} past booking${pastTickets.length === 1 ? '' : 's'} in your history.`}
             </p>
           )}
@@ -168,6 +216,10 @@ export default function AccountPage() {
       </section>
     </>
   );
+}
+
+function languageLabel(value: string | null | undefined, isRTL: boolean) {
+  return value === 'arabic' ? (isRTL ? 'العربية' : 'Arabic') : (isRTL ? 'الإنجليزية' : 'English');
 }
 
 function Field({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {

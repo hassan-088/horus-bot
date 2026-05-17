@@ -72,7 +72,7 @@ export const translations = {
     chatGreeting: "Hi, I'm Horus-Bot 👋 I can help you with tickets, directions, exhibits, or your tour. What would you like to know?",
     chatSubtitle: 'Museum guide',
     chatErrorOnce: 'Something went wrong. Please try again.',
-    chatErrorRepeat: "Sorry, I'm having trouble right now. You can try again, or tap one of the options below.",
+    chatErrorRepeat: "Sorry, I'm having trouble. You can try again, or tap one of the options below.",
     typeMessage: 'Type a message...',
     ankhuTyping: 'Horus-Bot is typing...',
     ticketCheckoutNote: "You'll receive your ticket instantly after checkout.",
@@ -84,7 +84,7 @@ export const translations = {
     statusActive: 'Active',
     viewTicket: 'View Ticket',
     addToWallet: 'Add to Wallet',
-    walletSoon: 'Wallet pass coming soon',
+    walletSoon: 'Wallet pass is not available in this version',
     egyptianMuseum: 'Egyptian Museum',
     
     // Quiz
@@ -259,7 +259,7 @@ export const translations = {
     statusActive: 'فعّالة',
     viewTicket: 'عرض التذكرة',
     addToWallet: 'إضافة إلى المحفظة',
-    walletSoon: 'بطاقة المحفظة قريباً',
+    walletSoon: 'بطاقة المحفظة غير متاحة في هذا الإصدار',
     egyptianMuseum: 'المتحف المصري',
     
     // Quiz

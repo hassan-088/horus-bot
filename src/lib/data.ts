@@ -230,7 +230,7 @@ export const museumEvents: MuseumEvent[] = [
     type: 'workshop',
     titleEn: 'Mummy Wrapping Demo',
     titleAr: 'عرض تحنيط المومياء',
-    descriptionEn: 'Watch a live demonstration of ancient mummification techniques.',
+    descriptionEn: 'Watch a live presentation of ancient mummification techniques.',
     descriptionAr: 'شاهد عرضاً حياً لتقنيات التحنيط القديمة.',
     date: '2026-02-01',
     time: '3:00 PM',

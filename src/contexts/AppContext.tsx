@@ -24,6 +24,10 @@ const defaultState: AppState = {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+function normalizeLanguage(language: unknown): Language {
+  return language === 'ar' ? 'ar' : 'en';
+}
+
 function loadInitial(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_KEY);
@@ -32,7 +36,7 @@ function loadInitial(): AppState {
     // Drop the legacy key if present — we have migrated.
     if (localStorage.getItem(LEGACY_KEY)) localStorage.removeItem(LEGACY_KEY);
     return {
-      language: (parsed.language as Language) ?? defaultState.language,
+      language: normalizeLanguage(parsed.language),
       fontScale: (parsed.fontScale as FontScale) ?? defaultState.fontScale,
     };
   } catch {
@@ -65,7 +69,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     root.classList.add(`font-scale-${state.fontScale}`);
   }, [state.fontScale]);
 
-  const setLanguage = (language: Language) => setState((s) => ({ ...s, language }));
+  const setLanguage = (language: Language) => setState((s) => ({ ...s, language: normalizeLanguage(language) }));
   const setFontScale = (fontScale: FontScale) => setState((s) => ({ ...s, fontScale }));
 
   return (

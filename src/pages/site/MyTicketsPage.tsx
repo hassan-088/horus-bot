@@ -29,7 +29,13 @@ import { SectionHero } from '@/components/site/SectionHero';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useExhibits, type WebsiteExhibit } from '@/hooks/useExhibits';
-import { useUserTickets, type UserTicket } from '@/hooks/useUserTickets';
+import {
+  canCancelUserTicket,
+  isWithinCancellationDeadline,
+  useUserTickets,
+  type TicketStatus,
+  type UserTicket,
+} from '@/hooks/useUserTickets';
 import { toast } from 'sonner';
 
 export default function MyTicketsPage() {
@@ -49,7 +55,11 @@ export default function MyTicketsPage() {
     const { error } = await cancelTicket(confirmTk.id);
     setBusy(false);
     if (error) {
-      toast.error(isRTL ? 'تعذر إلغاء الحجز.' : 'Could not cancel the booking.');
+      toast.error(
+        error.includes('24 hours')
+          ? cancellationDeadlineMessage(isRTL)
+          : isRTL ? 'تعذر إلغاء الحجز.' : 'Could not cancel the booking.',
+      );
       return;
     }
     toast.success(isRTL ? 'تم إلغاء الحجز.' : 'Booking cancelled.');
@@ -210,14 +220,16 @@ function TicketCard({
   exhibits: WebsiteExhibit[];
   onCancel?: () => void;
 }) {
-  const cancelled = tk.status !== 'active';
+  const inactive = tk.status !== 'active';
+  const canCancel = canCancelUserTicket(tk);
+  const withinDeadline = isWithinCancellationDeadline(tk);
   const exhibitNames = resolveExhibitNames(tk.selected_exhibits ?? [], exhibits, isRTL);
   const routeTitle = isRTL
     ? tk.route_title_ar || tk.route_title_en
     : tk.route_title_en || tk.route_title_ar;
 
   return (
-    <Card className={`p-6 space-y-4 ${cancelled ? 'opacity-70' : ''}`}>
+    <Card className={`p-6 space-y-4 ${inactive ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
@@ -235,9 +247,9 @@ function TicketCard({
         </div>
         <Badge
           variant="secondary"
-          className={cancelled ? 'bg-muted text-muted-foreground border-0' : 'bg-primary/15 text-primary border-0'}
+          className={inactive ? 'bg-muted text-muted-foreground border-0' : 'bg-primary/15 text-primary border-0'}
         >
-          {cancelled ? (isRTL ? 'ملغاة' : 'Cancelled') : (isRTL ? 'نشطة' : 'Active')}
+          {statusLabel(tk.status, isRTL)}
         </Badge>
       </div>
 
@@ -245,6 +257,7 @@ function TicketCard({
         <InfoBox label={isRTL ? 'الزوار' : 'Visitors'} value={`${tk.total_tickets}`} />
         <InfoBox label={isRTL ? 'الإجمالي' : 'Total'} value={`${tk.total_price} ${tk.currency}`} />
         <InfoBox label={isRTL ? 'حالة الدفع' : 'Payment status'} value={paymentStatusLabel(isRTL)} />
+        <InfoBox label={isRTL ? 'حالة الحجز' : 'Booking status'} value={statusLabel(tk.status, isRTL)} />
       </div>
 
       {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
@@ -282,7 +295,7 @@ function TicketCard({
         <PassCard
           icon={<Ticket className="h-4 w-4 text-primary" />}
           title={isRTL ? 'تذكرة دخول المتحف' : 'Museum Entry Ticket'}
-          status={tk.status}
+          status={statusLabel(tk.museum_status, isRTL)}
         >
           <div className="grid sm:grid-cols-3 gap-2 text-sm">
             <InfoBox label={isRTL ? 'التذاكر' : 'Tickets'} value={`${tk.total_tickets}`} />
@@ -297,7 +310,7 @@ function TicketCard({
         <PassCard
           icon={<Bot className="h-4 w-4 text-primary" />}
           title={isRTL ? 'تذكرة جولة Horus-Bot' : 'Horus-Bot Robot Tour Ticket'}
-          status={tk.status}
+          status={statusLabel(tk.robot_status, isRTL)}
         >
           <div className="grid sm:grid-cols-3 gap-2 text-sm">
             {routeTitle && <InfoBox label={isRTL ? 'المسار' : 'Route'} value={routeTitle} />}
@@ -322,10 +335,10 @@ function TicketCard({
           ) : (
             <div className="space-y-1.5">
               <div className="text-[11px] text-muted-foreground">
-                {isRTL ? 'Selected exhibits' : 'Selected exhibits'}
+                {isRTL ? 'القطع المختارة' : 'Selected exhibits'}
               </div>
               <p className="text-xs text-muted-foreground">
-                {isRTL ? 'Route details unavailable for this older ticket.' : 'Route details unavailable for this older ticket.'}
+                {isRTL ? 'تفاصيل المسار غير متاحة لهذه التذكرة القديمة.' : 'Route details unavailable for this older ticket.'}
               </p>
             </div>
           )}
@@ -337,13 +350,36 @@ function TicketCard({
         </PassCard>
       </div>
 
-      {!cancelled && onCancel && (
+      {canCancel && onCancel && (
         <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={onCancel}>
           <XIcon className="h-3.5 w-3.5" /> {isRTL ? 'إلغاء الحجز' : 'Cancel booking'}
         </Button>
       )}
+      {!canCancel && withinDeadline && tk.status === 'active' && (
+        <p className="text-xs text-muted-foreground">{cancellationDeadlineMessage(isRTL)}</p>
+      )}
     </Card>
   );
+}
+
+function statusLabel(status: TicketStatus, isRTL: boolean) {
+  const labels: Record<TicketStatus, { en: string; ar: string }> = {
+    active: { en: 'Active', ar: 'نشطة' },
+    cancelled: { en: 'Cancelled', ar: 'ملغاة' },
+    completed: { en: 'Completed', ar: 'مكتملة' },
+    expired: { en: 'Expired', ar: 'منتهية' },
+    paired: { en: 'Paired', ar: 'مقترنة' },
+    in_progress: { en: 'In progress', ar: 'قيد التنفيذ' },
+    pending: { en: 'Pending', ar: 'قيد الانتظار' },
+    used: { en: 'Used', ar: 'مستخدمة' },
+  };
+  return isRTL ? labels[status].ar : labels[status].en;
+}
+
+function cancellationDeadlineMessage(isRTL: boolean) {
+  return isRTL
+    ? 'يمكنك إلغاء الحجز حتى 24 ساعة قبل موعد الزيارة.'
+    : 'Cancellation is available up to 24 hours before your visit.';
 }
 
 function InfoBox({ label, value }: { label: string; value: string }) {

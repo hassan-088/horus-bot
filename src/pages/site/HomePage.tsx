@@ -241,20 +241,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SYSTEM STATUS */}
+      {/* PRODUCT STATUS */}
       <section className="mx-auto max-w-5xl px-4 md:px-8 py-20">
         <div className="text-center mb-12">
-          <div className="section-label mb-4 text-primary">{isRTL ? 'حالة المنتج' : 'System Status'}</div>
+          <div className="section-label mb-4 text-primary">{isRTL ? 'جاهزية التجربة' : 'Product Readiness'}</div>
           <h2 className="font-serif text-3xl md:text-4xl text-foreground">
-            {isRTL ? 'منتج جاهز للعرض، لا مجرّد فكرة' : 'A Product Ready to Demonstrate, Not Just a Concept'}
+            {isRTL ? 'نظام زيارة متصل من الحجز حتى الجولة' : 'A Connected Visit System from Booking to Tour'}
           </h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {[
-            { en: 'Functional prototype completed', ar: 'نموذج أوّلي عامل مكتمل' },
-            { en: 'Robot and app experience connected', ar: 'تجربة الروبوت والتطبيق متصلة بالكامل' },
-            { en: 'Guided museum journey demonstrated', ar: 'تم عرض رحلة متحف موجَّهة كاملة' },
-            { en: 'Built for real museum environments', ar: 'مبنيٌّ للعمل في بيئات المتاحف الحقيقية' },
+            { en: 'Website booking and account management are connected', ar: 'الحجز وإدارة الحساب متصلان عبر الموقع' },
+            { en: 'Tickets sync with the mobile app account', ar: 'التذاكر متزامنة مع حساب تطبيق الهاتف' },
+            { en: 'Museum entry and robot tour passes stay separate', ar: 'تذكرة الدخول وجولة الروبوت واضحتان ومنفصلتان' },
+            { en: 'Robot pairing starts later in the mobile app', ar: 'اقتران الروبوت يبدأ لاحقا داخل تطبيق الهاتف' },
           ].map((item) => (
             <div key={item.en} className="flex items-start gap-3 rounded-xl border border-border/50 bg-card/60 p-5">
               <ShieldCheck className="h-5 w-5 text-primary shrink-0 mt-0.5" />
@@ -264,8 +264,8 @@ export default function HomePage() {
         </div>
         <p className="mt-6 text-center text-xs text-muted-foreground italic">
           {isRTL
-            ? 'صورة النموذج الأوّلي قريباً — يُستخدم للتنقّل واختبار النظام في بيئات المتحف الحقيقية.'
-            : 'Prototype photo coming soon — used for navigation and system testing in real museum conditions.'}
+            ? 'استخدم الموقع لتجهيز زيارتك، ثم افتح التطبيق داخل المتحف للتذاكر والجولة والاقتران بالروبوت.'
+            : 'Use the website to prepare your visit, then use the mobile app at the museum for tickets, robot pairing, and the live tour.'}
         </p>
       </section>
 

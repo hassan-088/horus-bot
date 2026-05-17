@@ -14,7 +14,7 @@ import { useAuth, friendlyAuthError } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { PASSWORD_RULES, isStrongPassword, firstPasswordError, isValidPhone } from '@/lib/passwordRules';
+import { PASSWORD_RULES, firstPasswordError, isValidPhone } from '@/lib/passwordRules';
 import { cn } from '@/lib/utils';
 import ankhLogo from '@/assets/ankh.png';
 
@@ -32,7 +32,7 @@ export default function AuthScreen() {
   const [confirm, setConfirm] = useState('');
   const [phone, setPhone] = useState('');
   const [nationality, setNationality] = useState('');
-  const [preferredLanguage, setPreferredLanguage] = useState('english');
+  const [preferredLanguage, setPreferredLanguage] = useState<'english' | 'arabic'>('english');
 
   const [errors, setErrors] = useState<{
     fullName?: string; email?: string; password?: string; confirm?: string; phone?: string;
@@ -49,6 +49,10 @@ export default function AuthScreen() {
   const isArabic = language === 'ar';
 
   useEffect(() => {
+    setPreferredLanguage(language === 'ar' ? 'arabic' : 'english');
+  }, [language]);
+
+  useEffect(() => {
     if (user) navigate('/account', { replace: true });
   }, [user, navigate]);
 
@@ -56,28 +60,28 @@ export default function AuthScreen() {
     const e: typeof errors = {};
     if (isSignUp) {
       if (!fullName.trim() || fullName.trim().length < 2) {
-        e.fullName = isArabic ? 'الرجاء إدخال اسمك الكامل.' : 'Please enter your full name.';
+        e.fullName = isArabic ? 'يرجى إدخال اسمك الكامل.' : 'Please enter your full name.';
       }
     }
     if (!email.trim()) {
-      e.email = isArabic ? 'الرجاء إدخال بريدك الإلكتروني.' : 'Please enter your email.';
+      e.email = isArabic ? 'يرجى إدخال بريدك الإلكتروني.' : 'Please enter your email.';
     } else if (!emailSchema.safeParse(email).success) {
-      e.email = isArabic ? 'الرجاء إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.';
+      e.email = isArabic ? 'يرجى إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.';
     }
     if (!password) {
-      e.password = isArabic ? 'الرجاء إدخال كلمة المرور.' : 'Please enter your password.';
+      e.password = isArabic ? 'يرجى إدخال كلمة المرور.' : 'Please enter your password.';
     } else if (isSignUp) {
       const pwErr = firstPasswordError(password, isArabic);
       if (pwErr) e.password = pwErr;
     }
     if (isSignUp) {
       if (!confirm) {
-        e.confirm = isArabic ? 'الرجاء تأكيد كلمة المرور.' : 'Please confirm your password.';
+        e.confirm = isArabic ? 'يرجى تأكيد كلمة المرور.' : 'Please confirm your password.';
       } else if (confirm !== password) {
         e.confirm = isArabic ? 'كلمتا المرور غير متطابقتين.' : 'Passwords do not match.';
       }
       if (phone.trim() && !isValidPhone(phone)) {
-        e.phone = isArabic ? 'الرجاء إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
+        e.phone = isArabic ? 'يرجى إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
       }
     }
     setErrors(e);
@@ -107,7 +111,7 @@ export default function AuthScreen() {
         if (error) {
           toast.error(friendlyAuthError(error, isArabic));
         } else {
-          toast.success(isArabic ? 'مرحباً بعودتك!' : 'Welcome back!');
+          toast.success(isArabic ? 'مرحبا بعودتك!' : 'Welcome back!');
           navigate('/account', { replace: true });
         }
       }
@@ -118,11 +122,11 @@ export default function AuthScreen() {
 
   const handleForgot = async () => {
     if (!forgotEmail.trim()) {
-      toast.error(isArabic ? 'الرجاء إدخال بريدك الإلكتروني.' : 'Please enter your email.');
+      toast.error(isArabic ? 'يرجى إدخال بريدك الإلكتروني.' : 'Please enter your email.');
       return;
     }
     if (!emailSchema.safeParse(forgotEmail).success) {
-      toast.error(isArabic ? 'الرجاء إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.');
+      toast.error(isArabic ? 'يرجى إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.');
       return;
     }
     setForgotBusy(true);
@@ -140,17 +144,17 @@ export default function AuthScreen() {
   const t = {
     title: isSignUp
       ? (isArabic ? 'إنشاء حساب' : 'Create Account')
-      : (isArabic ? 'مرحباً بعودتك إلى Horus-Bot' : 'Welcome back to Horus-Bot'),
+      : (isArabic ? 'مرحبا بعودتك إلى Horus-Bot' : 'Welcome back to Horus-Bot'),
     subtitle: isSignUp
       ? (isArabic ? 'انضم إلى رحلتك في المتحف.' : 'Join your museum journey.')
-      : (isArabic ? 'سجّل الدخول للوصول إلى تذاكرك وجولاتك.' : 'Log in to access your tickets and tours.'),
+      : (isArabic ? 'سجل الدخول للوصول إلى تذاكرك وجولاتك.' : 'Log in to access your tickets and tours.'),
     fullName: isArabic ? 'الاسم الكامل' : 'Full name',
     email: isArabic ? 'البريد الإلكتروني' : 'Email',
     password: isArabic ? 'كلمة المرور' : 'Password',
     confirm: isArabic ? 'تأكيد كلمة المرور' : 'Confirm password',
     phone: isArabic ? 'رقم الهاتف (اختياري)' : 'Phone number (optional)',
     nationality: isArabic ? 'الجنسية (اختياري)' : 'Nationality (optional)',
-    prefLang: isArabic ? 'اللغة المفضّلة (اختياري)' : 'Preferred language (optional)',
+    prefLang: isArabic ? 'لغة الواجهة (اختياري)' : 'UI language (optional)',
     submit: isSignUp
       ? (isArabic ? 'إنشاء حساب' : 'Create Account')
       : (isArabic ? 'تسجيل الدخول' : 'Sign In'),
@@ -162,7 +166,7 @@ export default function AuthScreen() {
       : (isArabic ? 'إنشاء حساب' : 'Sign Up'),
     back: isArabic ? 'رجوع' : 'Back',
     forgot: isArabic ? 'نسيت كلمة المرور؟' : 'Forgot password?',
-    pwRulesIntro: isArabic ? 'يجب أن تتضمن كلمة المرور:' : 'Password must contain at least:',
+    pwRulesIntro: isArabic ? 'يجب أن تتضمن كلمة المرور على الأقل:' : 'Password must contain at least:',
   };
 
   return (
@@ -315,12 +319,16 @@ export default function AuthScreen() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="prefLang">{t.prefLang}</Label>
-                  <Select value={preferredLanguage} onValueChange={setPreferredLanguage}>
+                  <Select
+                    value={preferredLanguage}
+                    onValueChange={(value) =>
+                      setPreferredLanguage(value === 'arabic' ? 'arabic' : 'english')
+                    }
+                  >
                     <SelectTrigger id="prefLang"><Globe className="h-4 w-4 mr-1" /><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="english">{isArabic ? 'الإنجليزية' : 'English'}</SelectItem>
                       <SelectItem value="arabic">{isArabic ? 'العربية' : 'Arabic'}</SelectItem>
-                      <SelectItem value="egyptian_arabic">{isArabic ? 'العامية المصرية' : 'Egyptian Arabic'}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -353,7 +361,7 @@ export default function AuthScreen() {
             <DialogTitle>{isArabic ? 'إعادة تعيين كلمة المرور' : 'Reset your password'}</DialogTitle>
             <DialogDescription>
               {isArabic
-                ? 'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين.'
+                ? 'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.'
                 : "Enter your email and we'll send you a reset link."}
             </DialogDescription>
           </DialogHeader>

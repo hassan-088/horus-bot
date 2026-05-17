@@ -3,7 +3,9 @@ import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { AppProvider } from '@/contexts/AppContext';
+import { useApp } from '@/contexts/AppContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SiteLayout } from '@/components/layout/SiteLayout';
 import { RequireAuth } from '@/components/auth/RequireAuth';
@@ -26,10 +28,19 @@ import NotFound from './pages/NotFound';
 
 const queryClient = new QueryClient();
 
+function AccountSyncedAuthProvider({ children }: { children: ReactNode }) {
+  const { setLanguage } = useApp();
+  return (
+    <AuthProvider onPreferredLanguageLoaded={setLanguage}>
+      {children}
+    </AuthProvider>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
-      <AuthProvider>
+      <AccountSyncedAuthProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -70,7 +81,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
-      </AuthProvider>
+      </AccountSyncedAuthProvider>
     </AppProvider>
   </QueryClientProvider>
 );

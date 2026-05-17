@@ -275,7 +275,7 @@ export default function BookPage() {
 
   const confirmAndPay = async () => {
     if (pay !== 'cash') {
-      toast.error(isRTL ? 'الحجز متاح نقداً فقط حالياً.' : 'Bookings can only be completed with cash right now.');
+      toast.error(isRTL ? 'يكتمل هذا الحجز نقداً عند شباك المتحف.' : 'This booking is completed with cash at the museum counter.');
       return;
     }
     const routeArtifactIds = selectedRecommendedRoute?.artifact_ids.filter((id) => ARTIFACT_ID_PATTERN.test(id));
@@ -354,8 +354,8 @@ export default function BookPage() {
     { id: 'card', labelEn: 'Card payment', labelAr: 'بطاقة', icon: CreditCard,
       disabled: true,
       note: {
-        en: 'Card checkout is not available yet. Complete this booking using cash at the museum counter.',
-        ar: 'الدفع بالبطاقة غير متاح حالياً. أتمم الحجز نقداً عند شبّاك المتحف.',
+        en: 'Card checkout is not available for this booking. Complete it using cash at the museum counter.',
+        ar: 'الدفع بالبطاقة غير متاح لهذا الحجز. أتمم الحجز نقداً عند شباك المتحف.',
       },
     },
     { id: 'cash', labelEn: 'Cash at museum counter', labelAr: 'نقداً عند شبّاك المتحف', icon: Wallet },
