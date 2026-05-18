@@ -63,8 +63,34 @@ export default function HomePage() {
         </div>
       </SectionHero>
 
+      <section className="mx-auto max-w-6xl px-4 md:px-8 py-10 md:py-14">
+        <div className="rounded-[2rem] border border-primary/20 bg-card/65 p-4 shadow-soft backdrop-blur md:p-5">
+          <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">
+            {[
+              { icon: Ticket, en: 'Prepare before arrival', ar: 'استعد قبل الوصول' },
+              { icon: Bot, en: 'Meet Horus-Bot inside the museum', ar: 'قابل Horus-Bot داخل المتحف' },
+              { icon: Camera, en: 'Keep the memory after the tour', ar: 'احتفظ بالذكرى بعد الجولة' },
+            ].map((item, index) => (
+              <div key={item.en} className="flex items-center gap-3 rounded-2xl bg-background/35 px-4 py-3 ring-1 ring-primary/10">
+                <item.icon className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-sm font-medium text-foreground">{isRTL ? item.ar : item.en}</span>
+              </div>
+            )).flatMap((node, index) => (
+              index < 2
+                ? [node, <div key={`line-${index}`} className="hidden h-px w-8 bg-primary/30 md:block" />]
+                : [node]
+            ))}
+          </div>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground">
+            {isRTL
+              ? 'يحوّل Horus-Bot مسار المتحف إلى قصة موجَّهة، بينما يبقي التطبيق الأساسيات قريبة منك.'
+              : 'Horus-Bot turns the museum route into a guided story, while the app keeps the essentials close.'}
+          </p>
+        </div>
+      </section>
+
       {/* EXPERIENCE PREVIEW */}
-      <section className="mx-auto max-w-7xl px-4 md:px-8 py-12 md:py-24">
+      <section className="mx-auto max-w-7xl px-4 md:px-8 py-10 md:py-24">
         <div className="relative overflow-hidden rounded-[2rem] ring-1 ring-primary/20 shadow-[0_28px_90px_-28px_hsl(var(--primary)/0.45)]">
           <img
             src={onboardingImage}
