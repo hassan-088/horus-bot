@@ -29,7 +29,6 @@ import { PASSWORD_RULES, isStrongPassword, isValidPhone } from '@/lib/passwordRu
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
-import gemImage from '@/assets/gem.jpg';
 
 type StepKey = 'account' | 'tickets' | 'tour' | 'datetime' | 'language' | 'personalize' | 'payment';
 type PayMethod = 'card' | 'cash';
@@ -123,7 +122,7 @@ export default function BookPage() {
       : 'Confirm now and pay calmly at the museum counter.',
   };
   const panelClass = [
-    'rounded-[1.75rem] border-primary/15 bg-card/95 shadow-soft shadow-primary/5 backdrop-blur-sm',
+    'rounded-[2rem] border-primary/20 bg-card/90 shadow-soft backdrop-blur',
     '[&_input]:h-11 [&_input]:rounded-xl [&_input]:border-primary/20 [&_input]:bg-background/90 [&_input]:shadow-inner [&_input]:shadow-primary/5',
     '[&_input::placeholder]:text-muted-foreground/55 [&_input:focus-visible]:ring-primary/25',
     '[&_textarea]:rounded-2xl [&_textarea]:border-primary/20 [&_textarea]:bg-background/90 [&_textarea]:shadow-inner [&_textarea]:shadow-primary/5',
@@ -436,9 +435,7 @@ export default function BookPage() {
   return (
     <>
       <SectionHero
-        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-14 after:bg-gradient-to-t after:from-background after:to-transparent [&>div:last-child]:py-12 md:[&>div:last-child]:py-16 [&_h1]:text-4xl md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:mt-4"
-        backgroundImage={gemImage}
-        backgroundAlt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
+        className="bg-background [&>div:last-child]:py-10 md:[&>div:last-child]:py-14 [&_h1]:text-4xl md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:mt-4"
         label={isRTL ? 'الحجز' : 'Book'}
         title={isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
         subtitle={
@@ -449,11 +446,10 @@ export default function BookPage() {
       />
 
       <div className="relative overflow-hidden bg-background">
-        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/0.08),transparent_58%)]" />
 
-      <section className="mx-auto grid max-w-6xl gap-6 px-4 pt-4 md:px-8 md:pt-6 lg:grid-cols-[minmax(0,1fr)_320px] pb-12">
+      <section className="mx-auto grid max-w-6xl gap-6 border-b border-primary/10 px-4 pb-16 pt-2 md:px-8 md:pb-20 md:pt-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
-        <div className="mb-5 rounded-[1.5rem] border border-primary/20 bg-card/95 p-4 shadow-soft shadow-primary/5 backdrop-blur-sm">
+        <div className="mb-5 rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -471,7 +467,6 @@ export default function BookPage() {
           <BookingStepper
             steps={stepLabels}
             currentIndex={stepIdx}
-            progressLabel={isRTL ? `\u0627\u0644\u062e\u0637\u0648\u0629 ${stepIdx + 1} \u0645\u0646 ${allSteps.length}` : `Step ${stepIdx + 1} of ${allSteps.length}`}
           />
         </div>
 
