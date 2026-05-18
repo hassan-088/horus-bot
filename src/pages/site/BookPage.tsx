@@ -30,7 +30,6 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import gemImage from '@/assets/gem.jpg';
-import onboardingImage from '@/assets/onboarding.jpg';
 
 type StepKey = 'account' | 'tickets' | 'tour' | 'datetime' | 'language' | 'personalize' | 'payment';
 type PayMethod = 'card' | 'cash';
@@ -124,12 +123,12 @@ export default function BookPage() {
       : 'Confirm now and pay calmly at the museum counter.',
   };
   const panelClass = [
-    'rounded-[1.75rem] border-primary/15 bg-card/70 shadow-soft shadow-primary/5 backdrop-blur',
-    '[&_input]:h-11 [&_input]:rounded-xl [&_input]:border-primary/10 [&_input]:bg-background/45 [&_input]:shadow-inner [&_input]:shadow-primary/5',
+    'rounded-[1.75rem] border-primary/15 bg-card/95 shadow-soft shadow-primary/5 backdrop-blur-sm',
+    '[&_input]:h-11 [&_input]:rounded-xl [&_input]:border-primary/20 [&_input]:bg-background/90 [&_input]:shadow-inner [&_input]:shadow-primary/5',
     '[&_input::placeholder]:text-muted-foreground/55 [&_input:focus-visible]:ring-primary/25',
-    '[&_textarea]:rounded-2xl [&_textarea]:border-primary/10 [&_textarea]:bg-background/45 [&_textarea]:shadow-inner [&_textarea]:shadow-primary/5',
+    '[&_textarea]:rounded-2xl [&_textarea]:border-primary/20 [&_textarea]:bg-background/90 [&_textarea]:shadow-inner [&_textarea]:shadow-primary/5',
     '[&_textarea::placeholder]:text-muted-foreground/55 [&_textarea:focus-visible]:ring-primary/25',
-    '[&_[role=combobox]]:h-11 [&_[role=combobox]]:rounded-xl [&_[role=combobox]]:border-primary/10 [&_[role=combobox]]:bg-background/45 [&_[role=combobox]:focus]:ring-primary/25',
+    '[&_[role=combobox]]:h-11 [&_[role=combobox]]:rounded-xl [&_[role=combobox]]:border-primary/20 [&_[role=combobox]]:bg-background/90 [&_[role=combobox]:focus]:ring-primary/25',
   ].join(' ');
 
   const goNext = () => setStepIdx((i) => Math.min(i + 1, allSteps.length - 1));
@@ -437,7 +436,7 @@ export default function BookPage() {
   return (
     <>
       <SectionHero
-        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
+        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-14 after:bg-gradient-to-t after:from-background after:to-transparent [&>div:last-child]:py-12 md:[&>div:last-child]:py-16 [&_h1]:text-4xl md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:mt-4"
         backgroundImage={gemImage}
         backgroundAlt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
         label={isRTL ? 'الحجز' : 'Book'}
@@ -449,22 +448,12 @@ export default function BookPage() {
         }
       />
 
-      <div className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] opacity-45">
-          <img
-            src={onboardingImage}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            className="h-full w-full scale-105 object-cover blur-sm"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/92 to-background" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,hsl(var(--primary)/0.18),transparent_48%)]" />
-        </div>
+      <div className="relative overflow-hidden bg-background">
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-64 bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/0.08),transparent_58%)]" />
 
-      <section className="mx-auto grid max-w-6xl gap-6 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px] -mt-5 pb-12">
+      <section className="mx-auto grid max-w-6xl gap-6 px-4 pt-4 md:px-8 md:pt-6 lg:grid-cols-[minmax(0,1fr)_320px] pb-12">
         <div className="min-w-0">
-        <div className="mb-5 rounded-[1.5rem] border border-primary/20 bg-card/70 p-4 shadow-soft shadow-primary/5 backdrop-blur">
+        <div className="mb-5 rounded-[1.5rem] border border-primary/20 bg-card/95 p-4 shadow-soft shadow-primary/5 backdrop-blur-sm">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -479,7 +468,11 @@ export default function BookPage() {
                 : (isRTL ? 'اختر التذاكر' : 'Select tickets')}
             </span>
           </div>
-          <BookingStepper steps={stepLabels} currentIndex={stepIdx} />
+          <BookingStepper
+            steps={stepLabels}
+            currentIndex={stepIdx}
+            progressLabel={isRTL ? `\u0627\u0644\u062e\u0637\u0648\u0629 ${stepIdx + 1} \u0645\u0646 ${allSteps.length}` : `Step ${stepIdx + 1} of ${allSteps.length}`}
+          />
         </div>
 
         {/* STEP: ACCOUNT */}
@@ -496,7 +489,7 @@ export default function BookPage() {
               </p>
             </div>
 
-            <div className="flex gap-1.5 rounded-2xl border border-primary/10 bg-background/35 p-1.5">
+            <div className="flex gap-1.5 rounded-2xl border border-primary/10 bg-background/80 p-1.5">
               <button
                 type="button"
                 onClick={() => { setAuthMode('signup'); setAuthErrors({}); }}
@@ -568,7 +561,7 @@ export default function BookPage() {
                 </div>
                 {authErrors.password && <p className="text-xs text-destructive">{authErrors.password}</p>}
                 {authMode === 'signup' && (
-                  <div className="mt-1 space-y-1 rounded-2xl border border-primary/10 bg-background/35 p-3">
+                  <div className="mt-1 space-y-1 rounded-2xl border border-primary/10 bg-background/75 p-3">
                     {PASSWORD_RULES.map((r) => {
                       const ok = r.test(password);
                       return (
@@ -674,7 +667,7 @@ export default function BookPage() {
                   {group === 'eg' ? (isRTL ? 'المصريون' : 'Egyptians') : (isRTL ? 'الأجانب' : 'Foreigners')}
                 </h3>
                 {CATEGORY_ROWS.filter((r) => r.group === group).map((row) => (
-                  <div key={row.key} className="flex items-center justify-between gap-3 p-3 md:p-4 rounded-2xl border border-primary/10 bg-background/35">
+                  <div key={row.key} className="flex items-center justify-between gap-3 p-3 md:p-4 rounded-2xl border border-primary/10 bg-background/75">
                     <div>
                       <p className="font-semibold">{isRTL ? row.ar : row.en}</p>
                       <p className="text-sm text-muted-foreground">{museumTicketPrices[row.key]} {CURRENCY}</p>
@@ -744,7 +737,7 @@ export default function BookPage() {
                     onClick={() => selectRobotTourType(t.id)}
                     className={cn(
                       'text-start rounded-2xl border p-4 md:p-5 transition-colors',
-                      active ? 'border-primary bg-primary/10 ring-2 ring-primary/20' : 'border-primary/10 bg-background/35 hover:border-primary/50',
+                      active ? 'border-primary bg-primary/10 ring-2 ring-primary/20' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                     )}
                   >
                     <div className="flex items-center gap-2 mb-2">
@@ -763,7 +756,7 @@ export default function BookPage() {
             </div>
 
             {routesLoading && (
-                <div className="rounded-2xl border border-primary/10 bg-background/35 p-4 text-sm text-muted-foreground flex items-center gap-2">
+                <div className="rounded-2xl border border-primary/10 bg-background/75 p-4 text-sm text-muted-foreground flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
                 {isRTL
                   ? '\u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0645\u0633\u0627\u0631\u0627\u062a...'
@@ -790,7 +783,7 @@ export default function BookPage() {
                         onClick={() => applyRecommendedRoute(route)}
                         className={cn(
                           'text-start rounded-2xl border p-4 transition-colors',
-                          active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
+                          active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                         )}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -812,7 +805,7 @@ export default function BookPage() {
               </div>
             )}
             {!routesLoading && activeRecommendedRoutes.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-primary/20 bg-background/35 p-4 text-sm text-muted-foreground space-y-3">
+              <div className="rounded-2xl border border-dashed border-primary/20 bg-background/75 p-4 text-sm text-muted-foreground space-y-3">
                 <p>{productMessage('routes', isRTL)}</p>
                 <Button type="button" variant="outline" size="sm" onClick={retryRecommendedRoutes}>
                   {productMessage('tryAgain', isRTL)}
@@ -854,7 +847,7 @@ export default function BookPage() {
                     onClick={() => setTime(slot)}
                     className={cn(
                       'h-11 rounded-xl border text-sm font-medium transition-colors',
-                      time === slot ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
+                      time === slot ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                     )}
                   >
                     {slot}
@@ -895,7 +888,7 @@ export default function BookPage() {
                   }}
                   className={cn(
                     'h-12 rounded-xl border text-sm font-medium transition-colors',
-                    tourLanguage === l.id ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
+                    tourLanguage === l.id ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                   )}
                 >
                   {isRTL ? l.ar : l.en}
@@ -943,7 +936,7 @@ export default function BookPage() {
                         onClick={() => setDuration(d)}
                         className={cn(
                           'h-11 rounded-xl border text-sm font-medium transition-colors',
-                          duration === d ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
+                          duration === d ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                         )}
                       >
                         {d} {isRTL ? 'د' : 'min'}
@@ -955,12 +948,12 @@ export default function BookPage() {
                 <div className="space-y-2">
                   <Label>{isRTL ? 'القطع المختارة' : 'Selected exhibits'}</Label>
                   {exhibitsLoading && exhibits.length === 0 ? (
-                    <div className="flex items-center gap-2 rounded-2xl border border-primary/10 bg-background/35 p-3 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 rounded-2xl border border-primary/10 bg-background/75 p-3 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       {isRTL ? 'جاري تحميل القطع...' : 'Loading exhibits...'}
                     </div>
                   ) : exhibits.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-primary/20 bg-background/35 p-4 text-sm text-muted-foreground space-y-3">
+                    <div className="rounded-2xl border border-dashed border-primary/20 bg-background/75 p-4 text-sm text-muted-foreground space-y-3">
                       <p>{productMessage('exhibits', isRTL)}</p>
                       <Button type="button" variant="outline" size="sm" onClick={retryExhibits}>
                         {productMessage('tryAgain', isRTL)}
@@ -969,7 +962,7 @@ export default function BookPage() {
                   ) : (
                     <>
                       {exhibitsError && (
-                        <div className="rounded-2xl border border-primary/10 bg-background/35 p-3 text-sm text-muted-foreground">
+                        <div className="rounded-2xl border border-primary/10 bg-background/75 p-3 text-sm text-muted-foreground">
                           {productMessage('savedContent', isRTL)}
                         </div>
                       )}
@@ -983,7 +976,7 @@ export default function BookPage() {
                             onClick={() => setSelectedExhibits((arr) => toggleInArray(arr, exhibit.id))}
                             className={cn(
                               'min-h-16 rounded-2xl border p-3 text-left transition-colors',
-                              active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
+                              active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                             )}
                           >
                             <div className="flex items-start gap-2">
@@ -1023,7 +1016,7 @@ export default function BookPage() {
                           onClick={() => setInterests((arr) => toggleInArray(arr, opt.id))}
                           className={cn(
                             'rounded-full border px-4 py-2 text-sm transition-colors flex items-center gap-1.5',
-                            active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/15 bg-background/35 hover:border-primary/50',
+                            active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/15 bg-background/75 hover:border-primary/50',
                           )}
                         >
                           {active && <Check className="h-3.5 w-3.5" />}
@@ -1046,7 +1039,7 @@ export default function BookPage() {
                           onClick={() => setAccessibility((arr) => toggleInArray(arr, opt.id))}
                           className={cn(
                             'rounded-full border px-4 py-2 text-sm transition-colors flex items-center gap-1.5',
-                            active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/15 bg-background/35 hover:border-primary/50',
+                            active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/15 bg-background/75 hover:border-primary/50',
                           )}
                         >
                           {active && <Check className="h-3.5 w-3.5" />}
@@ -1067,7 +1060,7 @@ export default function BookPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center justify-between rounded-xl border border-primary/10 bg-background/35 p-3">
+                  <div className="flex items-center justify-between rounded-xl border border-primary/10 bg-background/75 p-3">
                     <span className="text-sm">{isRTL ? 'وضع الأطفال' : 'Kids mode'}</span>
                     <button
                       type="button"
@@ -1078,7 +1071,7 @@ export default function BookPage() {
                       <span className={cn('block h-5 w-5 rounded-full bg-background transition-transform', kidsMode ? 'translate-x-5' : 'translate-x-0.5')} />
                     </button>
                   </div>
-                  <div className="flex items-center justify-between rounded-xl border border-primary/10 bg-background/35 p-3">
+                  <div className="flex items-center justify-between rounded-xl border border-primary/10 bg-background/75 p-3">
                     <span className="text-sm">{isRTL ? 'محطات تصوير' : 'Photo spots'}</span>
                     <button
                       type="button"
@@ -1137,7 +1130,7 @@ export default function BookPage() {
                     disabled={opt.disabled}
                     className={cn(
                       'w-full flex items-start gap-3 p-4 rounded-2xl border text-left transition-colors',
-                      active ? 'border-primary bg-primary/10' : 'border-primary/10 bg-background/35 hover:border-primary/50',
+                      active ? 'border-primary bg-primary/10' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                       opt.disabled && 'cursor-not-allowed opacity-60 hover:border-primary/10',
                     )}
                   >
@@ -1197,33 +1190,6 @@ export default function BookPage() {
           />
         </aside>
       </section>
-
-        <section className="mx-auto max-w-5xl px-4 pb-16 md:px-8 md:pb-20">
-          <div className="relative overflow-hidden rounded-[2rem] border border-primary/15 bg-card/55 p-5 text-center shadow-soft shadow-primary/5 backdrop-blur md:p-8">
-            <div className="pointer-events-none absolute inset-0 opacity-35">
-              <img
-                src={gemImage}
-                alt=""
-                aria-hidden="true"
-                loading="lazy"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background" />
-            </div>
-            <div className="relative mx-auto max-w-2xl">
-              <p className="font-serif text-xl text-foreground md:text-2xl">
-                {isRTL
-                  ? '\u0628\u0639\u062f \u0627\u0644\u062d\u062c\u0632\u060c \u062a\u0635\u0644 \u0648\u0642\u062f \u0628\u062f\u0623\u062a \u0627\u0644\u0642\u0635\u0629 \u0628\u0647\u062f\u0648\u0621.'
-                  : 'After booking, you arrive with the story already beginning.'}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {isRTL
-                  ? '\u062a\u0628\u0642\u0649 \u062a\u0630\u0643\u0631\u062a\u0643 \u0648\u062c\u0648\u0644\u0629 Horus-Bot \u0642\u0631\u064a\u0628\u062a\u064a\u0646 \u0645\u0646\u0643 \u062d\u062a\u0649 \u064a\u062d\u064a\u0646 \u0645\u0648\u0639\u062f \u0627\u0644\u0632\u064a\u0627\u0631\u0629.'
-                  : 'Your ticket and Horus-Bot guided tour stay close until it is time to step inside.'}
-              </p>
-            </div>
-          </div>
-        </section>
       </div>
 
       <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
@@ -1285,7 +1251,7 @@ function BookingSummaryPanel({
           </p>
         </div>
         <div className="space-y-3 text-sm">
-          <div className="space-y-2 rounded-2xl border border-primary/10 bg-background/35 p-3">
+          <div className="space-y-2 rounded-2xl border border-primary/10 bg-background/75 p-3">
             <SummaryLine label={isRTL ? '\u0627\u0644\u062e\u0637\u0648\u0629 \u0627\u0644\u0622\u0646' : 'Now shaping'} value={currentStepLabel} />
             <SummaryLine label={isRTL ? '\u0627\u0644\u0632\u0648\u0627\u0631' : 'Visitors'} value={String(totalTickets || 0)} />
             <SummaryLine label={isRTL ? '\u0627\u0644\u0648\u0635\u0648\u0644' : 'Arrival'} value={`${date} • ${time}`} />
