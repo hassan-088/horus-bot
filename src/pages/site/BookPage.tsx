@@ -439,8 +439,8 @@ export default function BookPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
+      <section className="relative bg-background">
+        <div className="pointer-events-none absolute inset-x-0 top-0 bottom-[-96px] z-0 overflow-hidden">
           <img
             src={gemImage}
             alt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
@@ -449,9 +449,10 @@ export default function BookPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background/95" />
           <div className="absolute inset-0 bg-background/40" />
-          <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-background via-background/90 to-transparent backdrop-blur-sm" />
+          <div className="absolute inset-x-0 bottom-0 z-[1] h-80 bg-gradient-to-b from-transparent via-background/90 to-background" />
+          <div className="absolute inset-x-0 bottom-[-80px] h-40 bg-background blur-3xl" />
         </div>
-        <div className="pointer-events-none absolute inset-0">
+        <div className="pointer-events-none absolute inset-0 z-[2]">
           <div
             className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
             style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 60%)' }}
@@ -472,9 +473,10 @@ export default function BookPage() {
 
       <div className="relative bg-background">
 
-      <section className="mx-auto mb-16 grid max-w-7xl items-start gap-7 border-b border-primary/10 px-4 pt-6 md:mb-20 md:px-8 md:pt-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="min-w-0">
-        <div className="mb-5 rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
+      <section className="relative mx-auto mb-16 max-w-7xl overflow-visible border-b border-primary/10 px-4 pt-6 md:mb-20 md:px-8 md:pt-8">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="min-w-0 space-y-6">
+        <div className="rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -1196,20 +1198,23 @@ export default function BookPage() {
         )}
         </div>
 
-        <aside className="relative z-10 hidden lg:block">
-          <BookingSummaryPanel
-            isRTL={isRTL}
-            totalTickets={totalTickets}
-            museumPrice={museumPrice}
-            tourPrice={tourPrice}
-            totalPrice={totalPrice}
-            tourType={tourType}
-            tourLabel={summaryTourLabel}
-            date={date}
-            time={time}
-            currentStepLabel={currentStepLabel}
-          />
+        <aside className="relative z-10 hidden self-start lg:block">
+          <div className="sticky top-24">
+            <BookingSummaryPanel
+              isRTL={isRTL}
+              totalTickets={totalTickets}
+              museumPrice={museumPrice}
+              tourPrice={tourPrice}
+              totalPrice={totalPrice}
+              tourType={tourType}
+              tourLabel={summaryTourLabel}
+              date={date}
+              time={time}
+              currentStepLabel={currentStepLabel}
+            />
+          </div>
         </aside>
+        </div>
       </section>
       </div>
 
@@ -1262,7 +1267,7 @@ function BookingSummaryPanel({
   currentStepLabel: string;
 }) {
   return (
-    <div className="sticky top-24 space-y-4">
+    <div className="space-y-4">
       <Card className="rounded-[2rem] border-primary/30 bg-card/90 p-5 shadow-[0_24px_70px_-34px_hsl(var(--primary)/0.7)] backdrop-blur">
         <div className="mb-5">
           <div className="section-label mb-2">{isRTL ? '\u0645\u0644\u062e\u0635 \u0627\u0644\u0632\u064a\u0627\u0631\u0629' : 'Visit Summary'}</div>
@@ -1330,7 +1335,7 @@ function BookingSummaryCard({
   currentStepLabel: string;
 }) {
   return (
-    <div className="sticky top-24 space-y-4">
+    <div className="space-y-4">
       <Card className="p-6 shadow-soft">
         <div className="mb-5">
           <div className="section-label mb-2">{isRTL ? 'ملخص الحجز' : 'Booking Summary'}</div>
