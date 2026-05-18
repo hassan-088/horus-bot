@@ -440,8 +440,33 @@ export default function BookPage() {
 
   return (
     <>
+      <section className="bg-background px-4 pb-5 pt-5 md:px-8 md:pb-7 md:pt-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="relative overflow-hidden rounded-[2rem] ring-1 ring-primary/20 shadow-[0_28px_90px_-28px_hsl(var(--primary)/0.45)]">
+            <img
+              src={gemImage}
+              alt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
+              loading="eager"
+              className="h-[260px] w-full object-cover md:h-[340px]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/45 to-background/5" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_28%,transparent_0%,hsl(var(--background)/0.24)_62%,hsl(var(--background)/0.78)_100%)]" />
+            <div className="absolute inset-x-0 bottom-0 px-5 pb-7 pt-16 text-center md:px-8 md:pb-10">
+              <div className="section-label mb-3">{isRTL ? 'Ø§Ù„Ø­Ø¬Ø²' : 'Book'}</div>
+              <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
+                {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
+              </h1>
+              <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-lg">
+                {isRTL
+                  ? '\u0627\u062e\u062a\u0631 \u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641\u060c \u0634\u0643\u0644 \u062c\u0648\u0644\u062a\u0643 \u0627\u0644\u0645\u0631\u0634\u062f\u0629\u060c \u0648\u0627\u0635\u0644 \u062c\u0627\u0647\u0632\u0627 \u0644\u0644\u0633\u064a\u0631 \u0641\u064a \u0627\u0644\u062a\u0627\u0631\u064a\u062e.'
+                  : 'Choose museum entry, shape the guided tour, and arrive ready to walk through history.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
       <SectionHero
-        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-12 after:bg-gradient-to-t after:from-background after:to-transparent [&>div:last-child]:py-10 md:[&>div:last-child]:py-14 [&_h1]:text-4xl md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:mt-4"
+        className="hidden"
         backgroundImage={gemImage}
         backgroundAlt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
         label={isRTL ? 'الحجز' : 'Book'}
@@ -455,7 +480,7 @@ export default function BookPage() {
 
       <div className="relative overflow-hidden bg-background">
 
-      <section className="mx-auto grid max-w-6xl gap-6 border-b border-primary/10 px-4 pb-16 pt-2 md:px-8 md:pb-20 md:pt-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <section className="mx-auto grid max-w-7xl gap-7 border-b border-primary/10 px-4 pb-16 pt-2 md:px-8 md:pb-20 md:pt-4 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0">
         <div className="mb-5 rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1179,7 +1204,7 @@ export default function BookPage() {
         )}
         </div>
 
-        <aside className="hidden lg:block">
+        <aside className="relative z-10 hidden lg:block">
           <BookingSummaryPanel
             isRTL={isRTL}
             totalTickets={totalTickets}
@@ -1245,8 +1270,8 @@ function BookingSummaryPanel({
   currentStepLabel: string;
 }) {
   return (
-    <div className="sticky top-24 space-y-4">
-      <Card className="rounded-[2rem] border-primary/20 bg-card/70 p-5 shadow-soft backdrop-blur">
+    <div className="sticky top-20 space-y-4">
+      <Card className="rounded-[2rem] border-primary/30 bg-card/90 p-5 shadow-[0_24px_70px_-34px_hsl(var(--primary)/0.7)] backdrop-blur">
         <div className="mb-5">
           <div className="section-label mb-2">{isRTL ? '\u0645\u0644\u062e\u0635 \u0627\u0644\u0632\u064a\u0627\u0631\u0629' : 'Visit Summary'}</div>
           <h2 className="font-serif text-2xl">{isRTL ? '\u0632\u064a\u0627\u0631\u062a\u0643 \u0625\u0644\u0649 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Your museum visit'}</h2>
@@ -1257,7 +1282,7 @@ function BookingSummaryPanel({
           </p>
         </div>
         <div className="space-y-3 text-sm">
-          <div className="space-y-2 rounded-2xl bg-background/45 p-3 ring-1 ring-primary/15">
+          <div className="space-y-2 rounded-2xl bg-background/75 p-4 ring-1 ring-primary/20">
             <SummaryLine label={isRTL ? '\u0627\u0644\u062e\u0637\u0648\u0629 \u0627\u0644\u0622\u0646' : 'Now shaping'} value={currentStepLabel} />
             <SummaryLine label={isRTL ? '\u0627\u0644\u0632\u0648\u0627\u0631' : 'Visitors'} value={String(totalTickets || 0)} />
             <SummaryLine label={isRTL ? '\u0627\u0644\u062a\u0627\u0631\u064a\u062e' : 'Visit date'} value={date} />
@@ -1265,13 +1290,13 @@ function BookingSummaryPanel({
             <SummaryLine label={isRTL ? '\u0627\u0644\u062c\u0648\u0644\u0629' : 'Tour'} value={tourLabel} />
             <SummaryLine label={isRTL ? '\u0646\u0648\u0639 \u0627\u0644\u062c\u0648\u0644\u0629' : 'Tour type'} value={tourType === 'personalized' ? (isRTL ? '\u0645\u062e\u0635\u0635\u0629' : 'Personalized') : (isRTL ? '\u0642\u064a\u0627\u0633\u064a\u0629' : 'Standard')} />
           </div>
-          <div className="space-y-1 border-t border-primary/15 pt-3">
+          <div className="space-y-2 border-t border-primary/15 pt-3">
             <SummaryLine label={isRTL ? '\u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Museum Entry Ticket'} value={`${museumPrice} ${CURRENCY}`} />
             <SummaryLine label={isRTL ? '\u062c\u0648\u0644\u0629 Horus-Bot \u0627\u0644\u0645\u0631\u0634\u062f\u0629' : 'Horus-Bot Guided Tour'} value={`${tourPrice} ${CURRENCY}`} />
             <SummaryLine label={isRTL ? '\u0627\u0644\u062f\u0641\u0639' : 'Payment'} value={isRTL ? '\u0639\u0646\u062f \u0627\u0644\u0634\u0628\u0627\u0643' : 'Pay at Counter'} />
           </div>
-          <div className="flex items-center justify-between rounded-2xl border border-primary/15 bg-primary/10 p-3 text-base">
-            <span>{isRTL ? '\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a' : 'Total'}</span>
+          <div className="flex items-center justify-between rounded-2xl border border-primary/20 bg-primary/15 p-4 text-base">
+            <span>{isRTL ? '\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0645\u0633\u062a\u062d\u0642' : 'Total due'}</span>
             <span className="font-bold text-primary">{totalPrice} {CURRENCY}</span>
           </div>
         </div>
