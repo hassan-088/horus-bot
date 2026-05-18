@@ -29,6 +29,8 @@ import { PASSWORD_RULES, isStrongPassword, isValidPhone } from '@/lib/passwordRu
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
+import gemImage from '@/assets/gem.jpg';
+import onboardingImage from '@/assets/onboarding.jpg';
 
 type StepKey = 'account' | 'tickets' | 'tour' | 'datetime' | 'language' | 'personalize' | 'payment';
 type PayMethod = 'card' | 'cash';
@@ -435,6 +437,9 @@ export default function BookPage() {
   return (
     <>
       <SectionHero
+        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
+        backgroundImage={gemImage}
+        backgroundAlt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
         label={isRTL ? 'الحجز' : 'Book'}
         title={isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
         subtitle={
@@ -444,7 +449,20 @@ export default function BookPage() {
         }
       />
 
-      <section className="mx-auto grid max-w-6xl gap-6 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px] -mt-5 pb-20">
+      <div className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px] opacity-45">
+          <img
+            src={onboardingImage}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            className="h-full w-full scale-105 object-cover blur-sm"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/92 to-background" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,hsl(var(--primary)/0.18),transparent_48%)]" />
+        </div>
+
+      <section className="mx-auto grid max-w-6xl gap-6 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px] -mt-5 pb-12">
         <div className="min-w-0">
         <div className="mb-5 rounded-[1.5rem] border border-primary/20 bg-card/70 p-4 shadow-soft shadow-primary/5 backdrop-blur">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1179,6 +1197,34 @@ export default function BookPage() {
           />
         </aside>
       </section>
+
+        <section className="mx-auto max-w-5xl px-4 pb-16 md:px-8 md:pb-20">
+          <div className="relative overflow-hidden rounded-[2rem] border border-primary/15 bg-card/55 p-5 text-center shadow-soft shadow-primary/5 backdrop-blur md:p-8">
+            <div className="pointer-events-none absolute inset-0 opacity-35">
+              <img
+                src={gemImage}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background" />
+            </div>
+            <div className="relative mx-auto max-w-2xl">
+              <p className="font-serif text-xl text-foreground md:text-2xl">
+                {isRTL
+                  ? '\u0628\u0639\u062f \u0627\u0644\u062d\u062c\u0632\u060c \u062a\u0635\u0644 \u0648\u0642\u062f \u0628\u062f\u0623\u062a \u0627\u0644\u0642\u0635\u0629 \u0628\u0647\u062f\u0648\u0621.'
+                  : 'After booking, you arrive with the story already beginning.'}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {isRTL
+                  ? '\u062a\u0628\u0642\u0649 \u062a\u0630\u0643\u0631\u062a\u0643 \u0648\u062c\u0648\u0644\u0629 Horus-Bot \u0642\u0631\u064a\u0628\u062a\u064a\u0646 \u0645\u0646\u0643 \u062d\u062a\u0649 \u064a\u062d\u064a\u0646 \u0645\u0648\u0639\u062f \u0627\u0644\u0632\u064a\u0627\u0631\u0629.'
+                  : 'Your ticket and Horus-Bot guided tour stay close until it is time to step inside.'}
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
         <DialogContent className="max-w-sm rounded-2xl text-center">
