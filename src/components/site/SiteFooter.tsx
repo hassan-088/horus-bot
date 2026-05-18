@@ -18,13 +18,13 @@ export function SiteFooter() {
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {isRTL
-                ? 'طريقة متصلة لتجهيز زيارة المتحف، حفظ التذاكر، ومتابعة الجولة داخل التطبيق.'
-                : 'A connected way to prepare your museum visit, save tickets, and continue the tour in the app.'}
+                ? 'يساعد Horus-Bot الزوار على تجهيز زيارة المتحف، إبقاء التذاكر قريبة، ومتابعة الجولة الموجَّهة داخل التطبيق.'
+                : 'Horus-Bot helps visitors prepare their museum visit, keep tickets close, and continue the guided journey in the app.'}
             </p>
             <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs leading-relaxed text-muted-foreground">
               {isRTL
-                ? 'منصة ما قبل الزيارة للحجز والحسابات، مع تطبيق مرافق للجولة الحية داخل المتحف.'
-                : 'Pre-visit booking and account platform, paired with a companion app for the in-museum Live Tour.'}
+                ? 'احجز قبل الوصول، ثم دع Horus-Bot يقود القصة داخل المتحف.'
+                : 'Book before arrival, then let Horus-Bot lead the story inside the museum.'}
             </p>
           </div>
 
