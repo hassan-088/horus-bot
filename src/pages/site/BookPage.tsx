@@ -12,7 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { SectionHero } from '@/components/site/SectionHero';
 import { BookingStepper } from '@/components/site/BookingStepper';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth, friendlyAuthError } from '@/contexts/AuthContext';
@@ -447,11 +446,11 @@ export default function BookPage() {
               src={gemImage}
               alt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
               loading="eager"
-              className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-70"
+              className="pointer-events-none absolute inset-x-1/2 top-0 z-0 h-full w-screen -translate-x-1/2 object-cover opacity-70"
             />
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/45 via-background/70 to-background" />
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_18%,transparent_0%,hsl(var(--background)/0.18)_48%,hsl(var(--background)/0.86)_100%)]" />
-            <div>
+            <div className="pointer-events-none absolute inset-x-1/2 top-0 z-0 h-full w-screen -translate-x-1/2 bg-gradient-to-b from-background/45 via-background/70 to-background" />
+            <div className="pointer-events-none absolute inset-x-1/2 top-0 z-0 h-full w-screen -translate-x-1/2 bg-[radial-gradient(circle_at_50%_18%,transparent_0%,hsl(var(--background)/0.18)_48%,hsl(var(--background)/0.86)_100%)]" />
+            <div className="relative z-10">
               <div className="section-label mb-3">{isRTL ? 'Ø§Ù„Ø­Ø¬Ø²' : 'Book'}</div>
               <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
                 {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
@@ -465,18 +464,6 @@ export default function BookPage() {
           </div>
         </div>
       </section>
-      <SectionHero
-        className="hidden"
-        backgroundImage={gemImage}
-        backgroundAlt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
-        label={isRTL ? 'الحجز' : 'Book'}
-        title={isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
-        subtitle={
-          isRTL
-            ? '\u0627\u062e\u062a\u0631 \u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641\u060c \u0634\u0643\u0644 \u062c\u0648\u0644\u062a\u0643 \u0627\u0644\u0645\u0631\u0634\u062f\u0629\u060c \u0648\u0627\u0635\u0644 \u062c\u0627\u0647\u0632\u0627 \u0644\u0644\u0633\u064a\u0631 \u0641\u064a \u0627\u0644\u062a\u0627\u0631\u064a\u062e.'
-            : 'Choose museum entry, shape the guided tour, and arrive ready to walk through history.'
-        }
-      />
 
       <div className="relative overflow-hidden bg-background">
 
