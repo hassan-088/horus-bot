@@ -121,7 +121,14 @@ export default function BookPage() {
       ? '\u0623\u0643\u062f \u0627\u0644\u062d\u062c\u0632 \u0627\u0644\u0622\u0646 \u0648\u0627\u062f\u0641\u0639 \u0628\u0647\u062f\u0648\u0621 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
       : 'Confirm now and pay calmly at the museum counter.',
   };
-  const panelClass = 'rounded-[1.75rem] border-primary/10 bg-card/75 shadow-soft backdrop-blur';
+  const panelClass = [
+    'rounded-[1.75rem] border-primary/15 bg-card/70 shadow-soft shadow-primary/5 backdrop-blur',
+    '[&_input]:h-11 [&_input]:rounded-xl [&_input]:border-primary/10 [&_input]:bg-background/45 [&_input]:shadow-inner [&_input]:shadow-primary/5',
+    '[&_input::placeholder]:text-muted-foreground/55 [&_input:focus-visible]:ring-primary/25',
+    '[&_textarea]:rounded-2xl [&_textarea]:border-primary/10 [&_textarea]:bg-background/45 [&_textarea]:shadow-inner [&_textarea]:shadow-primary/5',
+    '[&_textarea::placeholder]:text-muted-foreground/55 [&_textarea:focus-visible]:ring-primary/25',
+    '[&_[role=combobox]]:h-11 [&_[role=combobox]]:rounded-xl [&_[role=combobox]]:border-primary/10 [&_[role=combobox]]:bg-background/45 [&_[role=combobox]:focus]:ring-primary/25',
+  ].join(' ');
 
   const goNext = () => setStepIdx((i) => Math.min(i + 1, allSteps.length - 1));
   const goBack = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -439,7 +446,7 @@ export default function BookPage() {
 
       <section className="mx-auto grid max-w-6xl gap-6 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px] -mt-5 pb-20">
         <div className="min-w-0">
-        <div className="mb-5 rounded-[1.5rem] border border-primary/20 bg-card/75 p-4 shadow-soft backdrop-blur">
+        <div className="mb-5 rounded-[1.5rem] border border-primary/20 bg-card/70 p-4 shadow-soft shadow-primary/5 backdrop-blur">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -448,7 +455,7 @@ export default function BookPage() {
               <h2 className="font-serif text-xl text-foreground">{currentStepLabel}</h2>
               <p className="mt-1 max-w-xl text-sm text-muted-foreground">{stepHelp[currentStep]}</p>
             </div>
-            <span className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <span className="w-fit rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
               {totalTickets > 0
                 ? (isRTL ? `${totalTickets} زائر` : `${totalTickets} visitor${totalTickets === 1 ? '' : 's'}`)
                 : (isRTL ? 'اختر التذاكر' : 'Select tickets')}
@@ -471,13 +478,13 @@ export default function BookPage() {
               </p>
             </div>
 
-            <div className="flex gap-2 rounded-lg bg-muted p-1">
+            <div className="flex gap-1.5 rounded-2xl border border-primary/10 bg-background/35 p-1.5">
               <button
                 type="button"
                 onClick={() => { setAuthMode('signup'); setAuthErrors({}); }}
                 className={cn(
-                  'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-                  authMode === 'signup' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground',
+                  'flex-1 rounded-xl px-3 py-2 text-sm font-medium transition-colors',
+                  authMode === 'signup' ? 'bg-primary/12 text-foreground shadow-sm shadow-primary/10 ring-1 ring-primary/15' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 {isRTL ? 'إنشاء حساب' : 'Create account'}
@@ -486,15 +493,15 @@ export default function BookPage() {
                 type="button"
                 onClick={() => { setAuthMode('login'); setAuthErrors({}); }}
                 className={cn(
-                  'flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-                  authMode === 'login' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground',
+                  'flex-1 rounded-xl px-3 py-2 text-sm font-medium transition-colors',
+                  authMode === 'login' ? 'bg-primary/12 text-foreground shadow-sm shadow-primary/10 ring-1 ring-primary/15' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 {isRTL ? 'تسجيل الدخول' : 'Log in'}
               </button>
             </div>
 
-            <form onSubmit={handleAuthSubmit} className="space-y-4" noValidate>
+            <form onSubmit={handleAuthSubmit} className="space-y-4 md:space-y-5" noValidate>
               {authMode === 'signup' && (
                 <div className="space-y-1.5">
                   <Label htmlFor="bp-name">{isRTL ? 'الاسم الكامل' : 'Full name'}</Label>
@@ -543,7 +550,7 @@ export default function BookPage() {
                 </div>
                 {authErrors.password && <p className="text-xs text-destructive">{authErrors.password}</p>}
                 {authMode === 'signup' && (
-                  <div className="rounded-lg border border-border/60 bg-muted/40 p-3 mt-1 space-y-1">
+                  <div className="mt-1 space-y-1 rounded-2xl border border-primary/10 bg-background/35 p-3">
                     {PASSWORD_RULES.map((r) => {
                       const ok = r.test(password);
                       return (
@@ -655,11 +662,11 @@ export default function BookPage() {
                       <p className="text-sm text-muted-foreground">{museumTicketPrices[row.key]} {CURRENCY}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Button variant="outline" size="icon" className="h-9 w-9 rounded-full" onClick={() => updateQuantity(row.key, -1)} aria-label="decrease">
+                      <Button variant="outline" size="icon" className="h-9 w-9 rounded-full border-primary/15 bg-background/40 hover:bg-primary/10" onClick={() => updateQuantity(row.key, -1)} aria-label="decrease">
                         <Minus className="w-4 h-4" />
                       </Button>
                       <span className="w-8 text-center font-semibold tabular-nums">{quantities[row.key]}</span>
-                      <Button variant="outline" size="icon" className="h-9 w-9 rounded-full" onClick={() => updateQuantity(row.key, 1)} aria-label="increase">
+                      <Button variant="outline" size="icon" className="h-9 w-9 rounded-full border-primary/15 bg-background/40 hover:bg-primary/10" onClick={() => updateQuantity(row.key, 1)} aria-label="increase">
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
@@ -738,7 +745,7 @@ export default function BookPage() {
             </div>
 
             {routesLoading && (
-              <div className="rounded-xl border border-border/60 p-4 text-sm text-muted-foreground flex items-center gap-2">
+                <div className="rounded-2xl border border-primary/10 bg-background/35 p-4 text-sm text-muted-foreground flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
                 {isRTL
                   ? '\u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0645\u0633\u0627\u0631\u0627\u062a...'
@@ -787,7 +794,7 @@ export default function BookPage() {
               </div>
             )}
             {!routesLoading && activeRecommendedRoutes.length === 0 && (
-              <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground space-y-3">
+              <div className="rounded-2xl border border-dashed border-primary/20 bg-background/35 p-4 text-sm text-muted-foreground space-y-3">
                 <p>{productMessage('routes', isRTL)}</p>
                 <Button type="button" variant="outline" size="sm" onClick={retryRecommendedRoutes}>
                   {productMessage('tryAgain', isRTL)}
@@ -930,12 +937,12 @@ export default function BookPage() {
                 <div className="space-y-2">
                   <Label>{isRTL ? 'القطع المختارة' : 'Selected exhibits'}</Label>
                   {exhibitsLoading && exhibits.length === 0 ? (
-                    <div className="flex items-center gap-2 rounded-xl border border-border/60 p-3 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 rounded-2xl border border-primary/10 bg-background/35 p-3 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       {isRTL ? 'جاري تحميل القطع...' : 'Loading exhibits...'}
                     </div>
                   ) : exhibits.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground space-y-3">
+                    <div className="rounded-2xl border border-dashed border-primary/20 bg-background/35 p-4 text-sm text-muted-foreground space-y-3">
                       <p>{productMessage('exhibits', isRTL)}</p>
                       <Button type="button" variant="outline" size="sm" onClick={retryExhibits}>
                         {productMessage('tryAgain', isRTL)}
@@ -944,7 +951,7 @@ export default function BookPage() {
                   ) : (
                     <>
                       {exhibitsError && (
-                        <div className="rounded-xl border border-border/60 p-3 text-sm text-muted-foreground">
+                        <div className="rounded-2xl border border-primary/10 bg-background/35 p-3 text-sm text-muted-foreground">
                           {productMessage('savedContent', isRTL)}
                         </div>
                       )}
@@ -1113,10 +1120,10 @@ export default function BookPage() {
                     className={cn(
                       'w-full flex items-start gap-3 p-4 rounded-2xl border text-left transition-colors',
                       active ? 'border-primary bg-primary/10' : 'border-primary/10 bg-background/35 hover:border-primary/50',
-                      opt.disabled && 'cursor-not-allowed opacity-60 hover:border-border',
+                      opt.disabled && 'cursor-not-allowed opacity-60 hover:border-primary/10',
                     )}
                   >
-                    <div className={cn('h-10 w-10 rounded-lg flex items-center justify-center shrink-0', active ? 'bg-primary/15' : 'bg-muted')}>
+                    <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center shrink-0', active ? 'bg-primary/15' : 'bg-background/50')}>
                       <Icon className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex-1">
@@ -1137,7 +1144,7 @@ export default function BookPage() {
               <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'نوع الجولة' : 'Tour'}</span><span className="capitalize">{tourType}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'دخول المتحف' : 'Museum entry'}</span><span>{museumPrice} {CURRENCY}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'جولة الروبوت' : 'Robot tour'}</span><span>{tourPrice} {CURRENCY}</span></div>
-              <div className="flex justify-between border-t border-border/50 pt-2 mt-2"><span>{isRTL ? 'الإجمالي' : 'Total'}</span><span className="font-bold">{totalPrice} {CURRENCY}</span></div>
+              <div className="flex justify-between border-t border-primary/15 pt-2 mt-2"><span>{isRTL ? 'الإجمالي' : 'Total'}</span><span className="font-bold">{totalPrice} {CURRENCY}</span></div>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -1243,7 +1250,7 @@ function BookingSummaryPanel({
                 : (isRTL ? '\u0623\u0628\u0631\u0632 \u0645\u062d\u0637\u0627\u062a Horus-Bot' : 'Horus-Bot Highlights')}
             />
           </div>
-          <div className="space-y-1 border-t border-border/60 pt-3">
+          <div className="space-y-1 border-t border-primary/15 pt-3">
             <SummaryLine label={isRTL ? '\u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Museum Entry Ticket'} value={`${museumPrice} ${CURRENCY}`} />
             <SummaryLine label={isRTL ? '\u062c\u0648\u0644\u0629 Horus-Bot \u0627\u0644\u0645\u0631\u0634\u062f\u0629' : 'Horus-Bot Guided Tour'} value={`${tourPrice} ${CURRENCY}`} />
           </div>
