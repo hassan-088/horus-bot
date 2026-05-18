@@ -440,18 +440,18 @@ export default function BookPage() {
 
   return (
     <>
-      <section className="bg-background px-4 pb-5 pt-5 md:px-8 md:pb-7 md:pt-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="relative overflow-hidden rounded-[2rem] ring-1 ring-primary/20 shadow-[0_28px_90px_-28px_hsl(var(--primary)/0.45)]">
+      <section className="relative isolate overflow-hidden bg-background px-4 pb-5 pt-5 md:px-8 md:pb-7 md:pt-8">
+        <div className="relative z-10 mx-auto max-w-5xl py-8 text-center md:py-12">
+          <div className="contents">
             <img
               src={gemImage}
               alt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
               loading="eager"
-              className="h-[260px] w-full object-cover md:h-[340px]"
+              className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-70"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/45 to-background/5" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_28%,transparent_0%,hsl(var(--background)/0.24)_62%,hsl(var(--background)/0.78)_100%)]" />
-            <div className="absolute inset-x-0 bottom-0 px-5 pb-7 pt-16 text-center md:px-8 md:pb-10">
+            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/45 via-background/70 to-background" />
+            <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_18%,transparent_0%,hsl(var(--background)/0.18)_48%,hsl(var(--background)/0.86)_100%)]" />
+            <div>
               <div className="section-label mb-3">{isRTL ? 'Ø§Ù„Ø­Ø¬Ø²' : 'Book'}</div>
               <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
                 {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
