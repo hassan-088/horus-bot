@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Bot, Smartphone, Languages, Route, Ticket, Users, Compass, Building2, ShieldCheck, CheckCircle2, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { SectionHero } from '@/components/site/SectionHero';
 import { StepCard } from '@/components/site/StepCard';
 import { useApp } from '@/contexts/AppContext';
@@ -163,7 +162,7 @@ export default function HomePage() {
                 : 'Horus-Bot helps museums deliver guided experiences at scale, serve more visitors with less pressure on staff, and create a smoother journey across large spaces.'}
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-5">
             {[
               { icon: Users, en: 'Reduce pressure on human guides', ar: 'تخفيف الضغط على المرشدين البشريين' },
               { icon: Building2, en: 'Serve more visitors at the same time', ar: 'خدمة عدد أكبر من الزوار في الوقت ذاته' },
@@ -171,10 +170,10 @@ export default function HomePage() {
               { icon: Languages, en: 'Support multilingual audiences with ease', ar: 'دعم الجمهور متعدد اللغات بسهولة' },
               { icon: Route, en: 'Improve visitor flow across galleries', ar: 'تحسين انسياب الزوار بين القاعات' },
             ].map((item) => (
-              <Card key={item.en} className="p-5">
+              <div key={item.en} className="border-t border-primary/25 pt-4">
                 <item.icon className="h-5 w-5 text-primary mb-3" />
                 <p className="text-sm text-foreground/90 leading-snug">{isRTL ? item.ar : item.en}</p>
-              </Card>
+              </div>
             ))}
           </div>
         </div>

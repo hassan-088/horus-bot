@@ -1,7 +1,6 @@
-import { Target, Eye, Users, Map, BookOpen, Languages, BatteryLow, Compass, Route, Volume2, Award, Building2, Bot, Smartphone, Accessibility } from 'lucide-react';
+import { Target, Eye, Users, Map, BookOpen, Languages, BatteryLow, Compass, Route, Award, Building2, Bot, Smartphone, Accessibility } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { SectionHero } from '@/components/site/SectionHero';
-import { FeatureCard } from '@/components/site/FeatureCard';
 import { useApp } from '@/contexts/AppContext';
 
 export default function AboutPage() {
@@ -29,6 +28,13 @@ export default function AboutPage() {
     { icon: Award, title: isRTL ? 'تفاعل يبقى في الذاكرة' : 'Interaction That Sticks', desc: isRTL ? 'لحظات تفاعلية موزَّعة طوال الجولة تُبقي الزوار منخرطين وتساعدهم على تذكُّر ما عاشوه.' : 'Interactive moments throughout the tour keep visitors engaged and help them remember what they experienced.' },
   ];
 
+  const scope = [
+    { icon: Bot, en: 'Autonomous robot guidance inside the museum', ar: 'إرشاد روبوتي ذاتي داخل المتحف' },
+    { icon: Smartphone, en: 'Companion app for tickets, pairing, maps, and tour continuity', ar: 'تطبيق مرافق للتذاكر والاقتران والخرائط واستمرارية الجولة' },
+    { icon: Route, en: 'Website booking and route planning before arrival', ar: 'حجز وتخطيط للمسار عبر الموقع قبل الوصول' },
+    { icon: Accessibility, en: 'Accessibility-aware visitor preferences', ar: 'تفضيلات زيارة تراعي احتياجات الوصول' },
+  ];
+
   return (
     <>
       <SectionHero
@@ -37,30 +43,59 @@ export default function AboutPage() {
         subtitle={isRTL ? 'مبنيٌّ ليجعل زيارة المتحف أكثر وضوحاً وتفاعلاً، وأسهل في الإدارة داخل بيئات المتاحف الحقيقية.' : 'Built to make museum visits clearer, more engaging, and easier to manage in real museum environments.'}
       />
 
-      {/* PROBLEM */}
-      <section className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-        <div className="section-label mb-4 text-destructive/80">{isRTL ? 'المشكلة' : 'The Problem'}</div>
-        <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'ما يواجهه الزوار والمتاحف اليوم' : 'What Visitors and Museums Deal With Today'}</h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {problems.map((p) => <FeatureCard key={p.title} icon={p.icon} title={p.title} description={p.desc} />)}
+      <section className="mx-auto grid max-w-7xl gap-10 px-4 md:px-8 py-20 lg:grid-cols-[0.85fr_1.15fr]">
+        <div>
+          <div className="section-label mb-4 text-destructive/80">{isRTL ? 'المشكلة' : 'The Problem'}</div>
+          <h2 className="font-serif text-3xl md:text-5xl mb-5">{isRTL ? 'المتاحف الكبيرة تحتاج إرشاداً أوضح، وليس ضوضاء أكثر' : 'Large museums need clearer guidance, not more noise'}</h2>
+          <p className="text-muted-foreground leading-relaxed">
+            {isRTL
+              ? 'حورس-بوت يبدأ من مشكلة تشغيلية وإنسانية واضحة: الزائر يريد طريقاً مفهوماً وقصة جيدة، والمتحف يحتاج تجربة قابلة للتوسع.'
+              : 'Horus-Bot starts from a clear operational and human problem: visitors need a readable path and a good story; museums need an experience that can scale.'}
+          </p>
+        </div>
+        <div className="divide-y divide-border/60">
+          {problems.map((p) => (
+            <div key={p.title} className="grid gap-3 py-5 sm:grid-cols-[40px_1fr]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                <p.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg text-foreground">{p.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* SOLUTION */}
       <section className="bg-sidebar/15">
-        <div className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-          <div className="section-label mb-4 text-primary">{isRTL ? 'الحل' : 'The Solution'}</div>
-          <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'كيف يعالج حورس-بوت هذه التحديات' : 'How Horus-Bot Solves These Challenges'}</h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {solutions.map((s) => <FeatureCard key={s.title} icon={s.icon} title={s.title} description={s.desc} />)}
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-8 py-20 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-3xl border border-primary/20 bg-card/70 p-6 md:p-8">
+            <div className="section-label mb-4 text-primary">{isRTL ? 'الحل' : 'The Solution'}</div>
+            <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'نظام زيارة متصل، لا مجرد روبوت' : 'A connected visit system, not just a robot'}</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isRTL
+                ? 'الموقع يجهّز الزيارة، التطبيق يحمل التذاكر والجولة، والروبوت يقود التجربة داخل المتحف. كل جزء له دور واضح.'
+                : 'The website prepares the visit, the app carries tickets and the tour, and the robot guides the in-museum experience. Each part has a clear role.'}
+            </p>
+          </div>
+          <div className="space-y-4">
+            {solutions.map((s) => (
+              <div key={s.title} className="flex gap-4">
+                <s.icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                <div>
+                  <h3 className="font-serif text-lg">{s.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* MISSION & VISION */}
       <section className="mx-auto max-w-7xl px-4 md:px-8 py-20">
         <div className="grid gap-5 md:grid-cols-2">
-          <Card className="p-7">
+          <Card className="p-7 md:p-8">
             <Target className="h-6 w-6 text-primary mb-4" />
             <h3 className="font-serif text-xl mb-3">{isRTL ? 'مهمتنا' : 'Mission'}</h3>
             <p className="text-muted-foreground leading-relaxed">
@@ -69,7 +104,7 @@ export default function AboutPage() {
                 : 'Make museum visits clearer, more engaging, and accessible for every visitor.'}
             </p>
           </Card>
-          <Card className="p-7">
+          <Card className="p-7 md:p-8">
             <Eye className="h-6 w-6 text-primary mb-4" />
             <h3 className="font-serif text-xl mb-3">{isRTL ? 'رؤيتنا' : 'Vision'}</h3>
             <p className="text-muted-foreground leading-relaxed">
@@ -81,39 +116,48 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* TEAM */}
       <section className="bg-sidebar/15">
-        <div className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-          <div className="section-label mb-4">{isRTL ? 'الفريق' : 'Team'}</div>
-          <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'من يبني حورس-بوت' : 'Who builds Horus-Bot'}</h2>
-          <p className="text-muted-foreground max-w-3xl mb-10 leading-relaxed">
-            {isRTL
-              ? 'يطوّر حورس-بوت فريق يجمع بين تصميم المنتج، الروبوتات، وتجارب الزوار المدعومة بالذكاء.'
-              : 'Horus-Bot is developed by a team combining product design, robotics, and AI-driven visitor experiences.'}
-          </p>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {team.map((m) => (
-              <Card key={m.name} className="p-7 text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/15 ring-1 ring-primary/30">
-                  <Users className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="font-serif text-base">{m.name}</h3>
-                <p className="text-sm text-muted-foreground mt-1.5 leading-snug">{m.role}</p>
-              </Card>
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-8 py-20 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <div className="section-label mb-4">{isRTL ? 'الموقع' : 'Positioning'}</div>
+            <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'مشروع متحف-تقني بحدود واضحة' : 'A museum-tech product with clear boundaries'}</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isRTL
+                ? 'حورس-بوت ليس صفحة تسويق فقط ولا تطبيقاً منفصلاً فقط؛ هو تجربة زيارة كاملة موزعة بين الموقع والتطبيق والروبوت.'
+                : 'Horus-Bot is not just a marketing site or a standalone app; it is a complete visit experience distributed across website, app, and robot.'}
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {scope.map((item) => (
+              <div key={item.en} className="rounded-2xl border border-border/60 bg-card/60 p-5">
+                <item.icon className="mb-3 h-5 w-5 text-primary" />
+                <p className="text-sm leading-relaxed text-foreground/90">{isRTL ? item.ar : item.en}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CAPABILITIES */}
       <section className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-        <div className="section-label mb-4">{isRTL ? 'القدرات' : 'Capabilities'}</div>
-        <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'ما يقدّمه النظام للزوار والمتاحف' : 'What the System Delivers to Visitors and Museums'}</h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <FeatureCard icon={Bot} title={isRTL ? 'إرشاد ذاتي القيادة' : 'Autonomous Guidance'} description={isRTL ? 'يتنقّل بأمان داخل قاعات المتحف المعقّدة ويدعم جولات موجَّهة منظَّمة.' : 'Moves safely through complex museum spaces and supports structured guided visits.'} />
-          <FeatureCard icon={Volume2} title={isRTL ? 'شروحات ذكية للمعروضات' : 'Intelligent Exhibit Narration'} description={isRTL ? 'يقدّم شروحات واضحة للمعروضات ويُجيب على أسئلة الزوار أثناء الجولة.' : 'Delivers clear exhibit explanations and responds to visitor questions during the tour.'} />
-          <FeatureCard icon={Smartphone} title={isRTL ? 'تطبيق زائر مرافق' : 'Companion Visitor App'} description={isRTL ? 'يدعم التنقل، استكشاف المعروضات، التذاكر، والتفاعل عبر الزيارة بأكملها.' : 'Supports navigation, exhibit exploration, tickets, and interaction across the entire visit.'} />
-          <FeatureCard icon={Accessibility} title={isRTL ? 'تفاعل في متناول الجميع' : 'Accessible Interaction'} description={isRTL ? 'مزايا إمكانية الوصول تجعل التجربة أكثر سلاسة وشمولاً لمختلف الزوار.' : 'Provides accessibility features that make the experience smoother and more inclusive for different visitors.'} />
+        <div className="mb-10 max-w-3xl">
+          <div className="section-label mb-4">{isRTL ? 'الفريق' : 'Team'}</div>
+          <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'تخصصات تعمل حول رحلة واحدة' : 'Disciplines working around one visit journey'}</h2>
+          <p className="text-muted-foreground leading-relaxed">
+            {isRTL
+              ? 'يطوّر حورس-بوت فريق يجمع بين تصميم المنتج، الروبوتات، وتجارب الزوار المدعومة بالذكاء.'
+              : 'Horus-Bot is developed by a team combining product design, robotics, and AI-driven visitor experiences.'}
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-4">
+            {team.map((m) => (
+              <div key={m.name} className="border-s border-primary/30 ps-4">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="font-serif text-base">{m.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1.5 leading-snug">{m.role}</p>
+              </div>
+            ))}
         </div>
       </section>
     </>

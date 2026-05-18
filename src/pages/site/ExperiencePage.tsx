@@ -1,7 +1,7 @@
 import { Ticket, Bot, Navigation, Award, Accessibility, Smartphone, QrCode, Headphones, MapPin, MessageSquare, Camera, Volume2, Type, Map } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { SectionHero } from '@/components/site/SectionHero';
-import { FeatureCard } from '@/components/site/FeatureCard';
 import { useApp } from '@/contexts/AppContext';
 import onboardingImage from '@/assets/onboarding.jpg';
 import gemImage from '@/assets/gem.jpg';
@@ -11,21 +11,35 @@ import maskImage from '@/assets/exhibit-golden-mask.jpg';
 export default function ExperiencePage() {
   const { isRTL } = useApp();
 
-  const Stage = ({ label, title, intro, items, image, imageAlt }: { label: string; title: string; intro?: string; items: { icon: any; title: string; desc: string }[]; image?: string; imageAlt?: string }) => (
-    <section className="mx-auto max-w-7xl px-4 md:px-8 py-16 md:py-20">
-      {image && (
-        <div className="relative mb-10 overflow-hidden rounded-2xl ring-1 ring-primary/15">
-          <img src={image} alt={imageAlt || ''} loading="lazy" className="aspect-[21/9] w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
-        </div>
-      )}
-      <div className="section-label mb-4">{label}</div>
-      <h2 className="font-serif text-3xl md:text-4xl mb-4">{title}</h2>
-      {intro && <p className="text-muted-foreground max-w-3xl mb-10 leading-relaxed">{intro}</p>}
-      {!intro && <div className="mb-10" />}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((it) => <FeatureCard key={it.title} icon={it.icon} title={it.title} description={it.desc} />)}
+  const Stage = ({ label, title, intro, items, image, imageAlt }: { label: string; title: string; intro?: string; items: { icon: LucideIcon; title: string; desc: string }[]; image?: string; imageAlt?: string }) => (
+    <section className="mx-auto grid max-w-7xl gap-10 px-4 md:px-8 py-16 md:grid-cols-[0.9fr_1.1fr] md:py-20">
+      <div className="md:sticky md:top-24 md:self-start">
+        {image && (
+          <div className="relative mb-7 overflow-hidden rounded-3xl ring-1 ring-primary/15">
+            <img src={image} alt={imageAlt || ''} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
+          </div>
+        )}
+        <div className="section-label mb-4">{label}</div>
+        <h2 className="font-serif text-3xl md:text-4xl mb-4">{title}</h2>
+        {intro && <p className="text-muted-foreground leading-relaxed">{intro}</p>}
+      </div>
+      <div className="relative space-y-6">
+        <div className="absolute bottom-3 start-5 top-3 hidden w-px bg-border md:block" />
+        {items.map((it, index) => (
+          <div key={it.title} className="relative grid gap-4 rounded-2xl border border-border/50 bg-card/45 p-5 sm:grid-cols-[44px_1fr]">
+            <div className="z-10 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/25">
+              <it.icon className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                {isRTL ? `محطة ${index + 1}` : `Moment ${index + 1}`}
+              </p>
+              <h3 className="font-serif text-lg text-foreground">{it.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{it.desc}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, Briefcase, MapPin, Ticket, Smartphone } from 'lucide-react';
+import { Mail, Briefcase, MapPin, Ticket, Smartphone, Building2 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 export function SiteFooter() {
@@ -21,6 +21,11 @@ export function SiteFooter() {
                 ? 'طريقة متصلة لتجهيز زيارة المتحف، حفظ التذاكر، ومتابعة الجولة داخل التطبيق.'
                 : 'A connected way to prepare your museum visit, save tickets, and continue the tour in the app.'}
             </p>
+            <p className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs leading-relaxed text-muted-foreground">
+              {isRTL
+                ? 'منصة ما قبل الزيارة للحجز والحسابات، مع تطبيق مرافق للجولة الحية داخل المتحف.'
+                : 'Pre-visit booking and account platform, paired with a companion app for the in-museum Live Tour.'}
+            </p>
           </div>
 
           <div>
@@ -31,12 +36,17 @@ export function SiteFooter() {
               <li><Link to="/tickets-info" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'التذاكر' : 'Tickets'}</Link></li>
               <li><Link to="/app" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'التطبيق' : 'App'}</Link></li>
               <li><Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'الأسئلة' : 'FAQ'}</Link></li>
+              <li><Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">{isRTL ? 'تواصل' : 'Contact'}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="section-label mb-4">{isRTL ? 'تواصل' : 'Contact'}</h4>
+            <h4 className="section-label mb-4">{isRTL ? 'للمتاحف' : 'For Museums'}</h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <Building2 className="h-4 w-4 text-primary mt-0.5" />
+                <span>{isRTL ? 'للمتاحف والفضاءات الثقافية التي تريد تجربة جولات أكثر تنظيماً.' : 'For museums and cultural spaces building a more guided visitor experience.'}</span>
+              </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
                 <a className="hover:text-primary transition-colors" href="mailto:support@horus-bot.com">support@horus-bot.com</a>

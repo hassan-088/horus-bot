@@ -130,7 +130,7 @@ export function SiteHeader() {
               {isRTL ? 'تسجيل الدخول' : 'Log in'}
             </Button>
           )}
-          <Button size="sm" onClick={() => navigate('/book')}>
+          <Button size="sm" onClick={() => navigate('/book')} className="shadow-soft">
             {isRTL ? 'احجز زيارتك' : 'Book Visit'}
           </Button>
         </div>
@@ -238,7 +238,7 @@ export function SiteHeader() {
                     {isRTL ? 'تسجيل الدخول' : 'Log in'}
                   </Button>
                 )}
-                <Button onClick={() => { setOpen(false); navigate('/book'); }}>
+                <Button onClick={() => { setOpen(false); navigate('/book'); }} className="mt-1">
                   {isRTL ? 'احجز زيارتك' : 'Book Visit'}
                 </Button>
               </div>

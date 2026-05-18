@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
-import { MessageSquare, Bell, Map, BookOpen, Smartphone, Compass, Award, Sparkles, Ticket, QrCode } from 'lucide-react';
+import { MessageSquare, Map, BookOpen, Smartphone, Ticket, QrCode } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SectionHero } from '@/components/site/SectionHero';
-import { FeatureCard } from '@/components/site/FeatureCard';
 import { useApp } from '@/contexts/AppContext';
 import gemMapImage from '@/assets/gem-complex-map.png';
 
@@ -16,6 +15,35 @@ export default function AppPage() {
     { icon: Map, label: isRTL ? 'الملاحة الحية' : 'Live navigation' },
     { icon: BookOpen, label: isRTL ? 'تفاصيل المعروضات' : 'Exhibit details' },
     { icon: MessageSquare, label: isRTL ? 'اسأل المرشد' : 'Ask the guide' },
+  ];
+  const appMoments = [
+    {
+      icon: Ticket,
+      labelEn: 'Before the visit',
+      labelAr: 'قبل الزيارة',
+      titleEn: 'Tickets are ready before arrival',
+      titleAr: 'تذاكرك جاهزة قبل الوصول',
+      bodyEn: 'Your Museum Entry Ticket and Horus-Bot Tour Ticket stay linked to the same account used on the website.',
+      bodyAr: 'تذكرة دخول المتحف وتذكرة جولة Horus-Bot تبقيان مرتبطتين بالحساب نفسه المستخدم على الموقع.',
+    },
+    {
+      icon: QrCode,
+      labelEn: 'At the museum',
+      labelAr: 'داخل المتحف',
+      titleEn: 'Pair with the physical robot',
+      titleAr: 'اقترن بالروبوت الفعلي',
+      bodyEn: 'Robot Pairing happens by scanning the physical QR on the robot, after your visit is booked.',
+      bodyAr: 'يتم اقتران الروبوت عبر مسح رمز QR الفعلي على الروبوت بعد إتمام الحجز.',
+    },
+    {
+      icon: Map,
+      labelEn: 'During the tour',
+      labelAr: 'أثناء الجولة',
+      titleEn: 'Follow the Live Tour',
+      titleAr: 'تابع الجولة الحية',
+      bodyEn: 'The app carries the live map, exhibit details, questions, and tour progress while the robot guides the route.',
+      bodyAr: 'يحمل التطبيق الخريطة الحية وتفاصيل المعروضات والأسئلة وتقدم الجولة بينما يقود الروبوت المسار.',
+    },
   ];
 
   const actions = (
@@ -58,29 +86,30 @@ export default function AppPage() {
       </div>
 
       <section className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-        <div className="section-label mb-4">{isRTL ? 'مصمم حول زيارتك' : 'Designed Around Your Visit'}</div>
-        <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'كل ما تحتاجه داخل المتحف' : 'Everything You Need Inside the Museum'}</h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <FeatureCard
-            icon={Compass}
-            title={isRTL ? 'مسارك واضح' : 'Your Route Stays Clear'}
-            description={isRTL ? 'تابع موقعك، محطتك التالية، وتقدم الجولة من شاشة واحدة.' : 'Follow your location, next stop, and tour progress from one place.'}
-          />
-          <FeatureCard
-            icon={BookOpen}
-            title={isRTL ? 'محتوى المعروضات' : 'Exhibit Content'}
-            description={isRTL ? 'اقرأ تفاصيل المعروضات واستمع إلى السرد المناسب لجولتك.' : 'Read exhibit details and follow narration selected for your tour.'}
-          />
-          <FeatureCard
-            icon={MessageSquare}
-            title={isRTL ? 'أسئلة أثناء الجولة' : 'Questions During the Tour'}
-            description={isRTL ? 'اطرح أسئلتك أثناء الزيارة واحصل على إجابات مرتبطة بالمعروضات والجولة.' : 'Ask during the visit and receive answers connected to exhibits and your tour.'}
-          />
-          <FeatureCard
-            icon={Bell}
-            title={isRTL ? 'تحديثات الزيارة' : 'Visit Updates'}
-            description={isRTL ? 'تابع حالة الجولة، التقدم، وأي إرشادات مرتبطة بتجربتك.' : 'Keep track of tour state, progress, and guidance tied to your visit.'}
-          />
+        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <div className="section-label mb-4">{isRTL ? 'دور التطبيق' : 'App Role'}</div>
+            <h2 className="font-serif text-3xl md:text-5xl mb-5">{isRTL ? 'التطبيق هو رفيق الزيارة داخل المتحف' : 'The app is the in-museum companion'}</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isRTL
+                ? 'الموقع ينهي الحجز. التطبيق يحمل ما يحدث عند الوصول: التذاكر، اقتران الروبوت، الجولة الحية، والأسئلة.'
+                : 'The website completes the booking. The app carries what happens on arrival: tickets, Robot Pairing, the Live Tour, and questions.'}
+            </p>
+          </div>
+          <div className="space-y-5">
+            {appMoments.map((moment) => (
+              <div key={moment.labelEn} className="grid gap-4 rounded-2xl border border-border/60 bg-card/55 p-5 sm:grid-cols-[48px_1fr]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/25">
+                  <moment.icon className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">{isRTL ? moment.labelAr : moment.labelEn}</p>
+                  <h3 className="mt-1 font-serif text-xl">{isRTL ? moment.titleAr : moment.titleEn}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{isRTL ? moment.bodyAr : moment.bodyEn}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -93,29 +122,18 @@ export default function AppPage() {
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.06]"
         />
         <div className="relative mx-auto max-w-7xl px-4 md:px-8 py-20">
-          <div className="section-label mb-4">{isRTL ? 'شاشات أساسية' : 'Core Screens'}</div>
-          <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'ما ستستخدمه داخل المتحف' : 'What You Use at the Museum'}</h2>
-          <div className="grid gap-5 grid-cols-2 lg:grid-cols-5">
+          <div className="mb-10 max-w-2xl">
+            <div className="section-label mb-4">{isRTL ? 'شاشات أساسية' : 'Core Screens'}</div>
+            <h2 className="font-serif text-3xl md:text-4xl">{isRTL ? 'شاشات قليلة، كل منها له وظيفة واضحة' : 'A few screens, each with a clear job'}</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {screens.map((s) => (
-              <div key={s.label} className="space-y-3">
-                <Card className="aspect-[9/16] bg-gradient-to-br from-card via-card to-primary/10 p-4 flex flex-col ring-1 ring-primary/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="h-1.5 w-10 rounded-full bg-primary/40" />
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                  </div>
-                  <div className="flex-1 rounded-xl bg-background/50 ring-1 ring-border/40 flex flex-col items-center justify-center gap-3">
-                    <div className="h-12 w-12 rounded-2xl bg-primary/15 flex items-center justify-center ring-1 ring-primary/30">
-                      <s.icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <p className="text-[11px] text-muted-foreground font-medium px-2 text-center">{s.label}</p>
-                  </div>
-                  <div className="mt-3 space-y-1.5">
-                    <div className="h-1.5 rounded-full bg-muted" />
-                    <div className="h-1.5 w-2/3 rounded-full bg-muted" />
-                  </div>
-                </Card>
-                <p className="text-xs text-center text-muted-foreground font-medium">{s.label}</p>
-              </div>
+              <Card key={s.label} className="flex items-center gap-3 p-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/25">
+                  <s.icon className="h-5 w-5 text-primary" />
+                </div>
+                <p className="text-sm font-medium text-foreground">{s.label}</p>
+              </Card>
             ))}
           </div>
         </div>
