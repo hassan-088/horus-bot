@@ -439,35 +439,39 @@ export default function BookPage() {
 
   return (
     <>
-      <section className="relative isolate overflow-hidden bg-background px-4 pb-5 pt-5 md:px-8 md:pb-7 md:pt-8">
-        <div className="relative z-10 mx-auto max-w-5xl py-8 text-center md:py-12">
-          <div className="contents">
-            <img
-              src={gemImage}
-              alt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
-              loading="eager"
-              className="pointer-events-none absolute inset-x-1/2 top-0 z-0 h-full w-screen -translate-x-1/2 object-cover opacity-70"
-            />
-            <div className="pointer-events-none absolute inset-x-1/2 top-0 z-0 h-full w-screen -translate-x-1/2 bg-gradient-to-b from-background/45 via-background/70 to-background" />
-            <div className="pointer-events-none absolute inset-x-1/2 top-0 z-0 h-full w-screen -translate-x-1/2 bg-[radial-gradient(circle_at_50%_18%,transparent_0%,hsl(var(--background)/0.18)_48%,hsl(var(--background)/0.86)_100%)]" />
-            <div className="relative z-10">
-              <div className="section-label mb-3">{isRTL ? 'Ø§Ù„Ø­Ø¬Ø²' : 'Book'}</div>
-              <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
-                {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
-              </h1>
-              <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-lg">
-                {isRTL
-                  ? '\u0627\u062e\u062a\u0631 \u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641\u060c \u0634\u0643\u0644 \u062c\u0648\u0644\u062a\u0643 \u0627\u0644\u0645\u0631\u0634\u062f\u0629\u060c \u0648\u0627\u0635\u0644 \u062c\u0627\u0647\u0632\u0627 \u0644\u0644\u0633\u064a\u0631 \u0641\u064a \u0627\u0644\u062a\u0627\u0631\u064a\u062e.'
-                  : 'Choose museum entry, shape the guided tour, and arrive ready to walk through history.'}
-              </p>
-            </div>
-          </div>
+      <section className="relative overflow-hidden after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-32 after:bg-gradient-to-t after:from-background after:to-transparent">
+        <div className="pointer-events-none absolute inset-0 -z-20">
+          <img
+            src={gemImage}
+            alt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
+            loading="eager"
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background/95" />
+          <div className="absolute inset-0 bg-background/40" />
+        </div>
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div
+            className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
+            style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 60%)' }}
+          />
+        </div>
+        <div className="mx-auto max-w-5xl px-4 py-16 text-center md:px-8 md:py-20">
+          <div className="section-label mb-3">{isRTL ? 'Ø§Ù„Ø­Ø¬Ø²' : 'Book'}</div>
+          <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
+            {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-lg">
+            {isRTL
+              ? '\u0627\u062e\u062a\u0631 \u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641\u060c \u0634\u0643\u0644 \u062c\u0648\u0644\u062a\u0643 \u0627\u0644\u0645\u0631\u0634\u062f\u0629\u060c \u0648\u0627\u0635\u0644 \u062c\u0627\u0647\u0632\u0627 \u0644\u0644\u0633\u064a\u0631 \u0641\u064a \u0627\u0644\u062a\u0627\u0631\u064a\u062e.'
+              : 'Choose museum entry, shape the guided tour, and arrive ready to walk through history.'}
+          </p>
         </div>
       </section>
 
       <div className="relative overflow-hidden bg-background">
 
-      <section className="mx-auto grid max-w-7xl gap-7 border-b border-primary/10 px-4 pb-16 pt-2 md:px-8 md:pb-20 md:pt-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="mx-auto mb-16 grid max-w-7xl items-start gap-7 border-b border-primary/10 px-4 pt-6 md:mb-20 md:px-8 md:pt-8 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0">
         <div className="mb-5 rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
