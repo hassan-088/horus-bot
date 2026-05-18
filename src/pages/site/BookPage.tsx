@@ -473,8 +473,8 @@ export default function BookPage() {
 
       <div className="relative bg-background">
 
-      <section className="relative mx-auto mb-16 max-w-7xl overflow-visible border-b border-primary/10 px-4 pt-6 md:mb-20 md:px-8 md:pt-8">
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="relative mx-auto mb-16 max-w-7xl overflow-visible border-b border-primary/10 px-4 pt-6 sm:px-6 md:mb-20 md:pt-8 lg:px-8">
+        <div className="grid items-start gap-8 overflow-visible lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-6">
         <div className="rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1198,7 +1198,7 @@ export default function BookPage() {
         )}
         </div>
 
-        <aside className="relative z-10 hidden self-start lg:block">
+        <aside className="relative z-10 hidden self-start lg:sticky lg:top-24 lg:block">
           <div className="sticky top-24">
             <BookingSummaryPanel
               isRTL={isRTL}
