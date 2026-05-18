@@ -449,7 +449,7 @@ export default function BookPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background/95" />
           <div className="absolute inset-0 bg-background/40" />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-background via-background/90 to-transparent backdrop-blur-sm" />
         </div>
         <div className="pointer-events-none absolute inset-0">
           <div
@@ -470,7 +470,7 @@ export default function BookPage() {
         </div>
       </section>
 
-      <div className="relative overflow-hidden bg-background">
+      <div className="relative bg-background">
 
       <section className="mx-auto mb-16 grid max-w-7xl items-start gap-7 border-b border-primary/10 px-4 pt-6 md:mb-20 md:px-8 md:pt-8 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0">

@@ -20,6 +20,8 @@ import {
 } from '@/lib/bookingContract';
 import { isAccessError, isConnectionError, productMessage } from '@/lib/productMessages';
 
+export type { TourType } from '@/lib/bookingContract';
+
 export type TicketStatus =
   | 'active'
   | 'cancelled'
