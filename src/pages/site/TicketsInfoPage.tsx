@@ -85,6 +85,8 @@ export default function TicketsInfoPage() {
       ],
     },
   ];
+  const entryTiers = tiers.slice(0, 6);
+  const tourTiers = tiers.slice(6);
 
   return (
     <>
@@ -122,34 +124,62 @@ export default function TicketsInfoPage() {
       </div>
 
       <section className="mx-auto max-w-7xl px-4 md:px-8 pb-20">
-        <div className="grid gap-5 md:grid-cols-3">
-          {tiers.map((t) => (
-            <Card key={t.name} className={`p-7 relative ${t.featured ? 'border-primary/50 shadow-[0_0_40px_-10px_hsl(var(--primary)/0.4)]' : ''}`}>
-              {t.featured && (
-                <div className="absolute -top-3 start-7 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                  {isRTL ? 'الأكثر طلبا' : 'Most popular'}
+        <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+          <Card className="p-6 md:p-8">
+            <div className="mb-6">
+              <div className="section-label mb-2">{isRTL ? 'تذكرة دخول المتحف' : 'Museum Entry Ticket'}</div>
+              <h2 className="font-serif text-2xl md:text-3xl">{isRTL ? 'اختر فئة الزائر' : 'Choose each visitor category'}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {isRTL ? 'تُحسب تذاكر الدخول لكل زائر حسب فئته.' : 'Museum entry is charged per visitor based on category.'}
+              </p>
+            </div>
+            <div className="divide-y divide-border/60">
+              {entryTiers.map((t) => (
+                <div key={t.name} className="grid gap-3 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
+                  <div>
+                    <h3 className="font-serif text-lg">{t.name}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{t.perks[0]}</p>
+                  </div>
+                  <div className="flex items-baseline gap-1 sm:justify-end">
+                    <span className="font-serif text-2xl text-foreground">{t.price} {CURRENCY}</span>
+                    <span className="text-xs text-muted-foreground">/ {t.unit}</span>
+                  </div>
                 </div>
-              )}
-              <div className="section-label mb-2">{t.name}</div>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="font-serif text-4xl text-foreground">{t.price} {CURRENCY}</span>
-                <span className="text-sm text-muted-foreground">/ {t.unit}</span>
-              </div>
-              <ul className="space-y-3 mb-7">
-                {t.perks.map((p) => (
-                  <li key={p} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" /> <span>{p}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button asChild className="w-full" variant={t.featured ? 'default' : 'outline'}>
-                <Link to="/book"><TicketIcon className="h-4 w-4" /> {isRTL ? 'احجز الآن' : 'Book Visit'}</Link>
-              </Button>
+              ))}
+            </div>
+          </Card>
+
+          <div className="space-y-4">
+            <Card className="border-primary/40 bg-primary/5 p-6 md:p-8">
+              <div className="section-label mb-2">{isRTL ? 'تذكرة جولة Horus-Bot' : 'Horus-Bot Tour Ticket'}</div>
+              <h2 className="font-serif text-2xl md:text-3xl">{isRTL ? 'إضافة واحدة لكل حجز' : 'One tour add-on per booking'}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {isRTL ? 'اختر الجولة القياسية أو المخصصة عند الحجز.' : 'Choose standard or personalized tour during booking.'}
+              </p>
             </Card>
-          ))}
+            {tourTiers.map((t) => (
+              <Card key={t.name} className="p-6">
+                <div className="section-label mb-2">{t.name}</div>
+                <div className="flex items-baseline gap-1 mb-4">
+                  <span className="font-serif text-3xl text-foreground">{t.price} {CURRENCY}</span>
+                  <span className="text-sm text-muted-foreground">/ {t.unit}</span>
+                </div>
+                <ul className="space-y-2">
+                  {t.perks.map((p) => (
+                    <li key={p} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" /> <span>{p}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            ))}
+          </div>
         </div>
-        <div className="mt-6 text-center text-sm">
-          <Link to="/tickets-mine" className="text-primary hover:underline">
+        <div className="mt-8 flex flex-col items-center gap-3 text-center">
+          <Button asChild size="lg">
+            <Link to="/book"><TicketIcon className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Visit'}</Link>
+          </Button>
+          <Link to="/tickets-mine" className="text-sm text-primary hover:underline">
             {isRTL ? 'حجزت بالفعل؟ اعرض تذاكرك' : 'Already booked? View your tickets'}
           </Link>
         </div>

@@ -97,6 +97,7 @@ export default function BookPage() {
     if (s === 'personalize') return isRTL ? 'التفضيلات' : 'Preferences';
     return isRTL ? 'الدفع' : 'Payment';
   });
+  const currentStepLabel = stepLabels[stepIdx] ?? '';
 
   const goNext = () => setStepIdx((i) => Math.min(i + 1, allSteps.length - 1));
   const goBack = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -412,8 +413,22 @@ export default function BookPage() {
         }
       />
 
-      <section className="mx-auto max-w-3xl px-4 md:px-8 -mt-4 pb-24">
-        <div className="mb-8">
+      <section className="mx-auto grid max-w-6xl gap-8 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_340px] -mt-4 pb-24">
+        <div className="min-w-0">
+        <div className="mb-6 rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
+          <div className="mb-3 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                {isRTL ? `الخطوة ${stepIdx + 1} من ${allSteps.length}` : `Step ${stepIdx + 1} of ${allSteps.length}`}
+              </p>
+              <h2 className="font-serif text-xl text-foreground">{currentStepLabel}</h2>
+            </div>
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              {totalTickets > 0
+                ? (isRTL ? `${totalTickets} زائر` : `${totalTickets} visitor${totalTickets === 1 ? '' : 's'}`)
+                : (isRTL ? 'اختر التذاكر' : 'Select tickets')}
+            </span>
+          </div>
           <BookingStepper steps={stepLabels} currentIndex={stepIdx} />
         </div>
 
@@ -838,48 +853,6 @@ export default function BookPage() {
               ))}
             </div>
 
-            {false && activeRecommendedRoutes.length > 0 && (
-              <div className="space-y-3">
-                <div>
-                  <Label>{isRTL ? 'المسارات المقترحة' : 'Recommended Routes'}</Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {isRTL
-                      ? 'اختر مسارا جاهزا لملء محطات الجولة وتفضيلاتها.'
-                      : 'Choose a ready route to fill the tour stops and preferences.'}
-                  </p>
-                </div>
-                <div className="grid gap-2">
-                  {activeRecommendedRoutes.map((route) => {
-                    const active = selectedRouteId === route.id;
-                    return (
-                      <button
-                        key={route.id}
-                        type="button"
-                        onClick={() => applyRecommendedRoute(route)}
-                        className={cn(
-                          'text-start rounded-xl border p-4 transition-colors',
-                          active ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:border-primary/50',
-                        )}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="font-semibold">{isRTL ? route.title_ar : route.title_en}</p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              {isRTL ? route.description_ar : route.description_en}
-                            </p>
-                          </div>
-                          {active && <Check className="h-4 w-4 shrink-0" />}
-                        </div>
-                        <p className="mt-2 text-xs font-medium">
-                          {route.duration_min} {isRTL ? 'دقيقة' : 'min'} • {route.artifact_ids.length} {isRTL ? 'محطات' : 'stops'}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             <div className="flex justify-between gap-2">
               <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
               <Button onClick={goNext} className="h-12 px-6">
@@ -1158,6 +1131,21 @@ export default function BookPage() {
             </div>
           </Card>
         )}
+        </div>
+
+        <aside className="hidden lg:block">
+          <BookingSummaryCard
+            isRTL={isRTL}
+            totalTickets={totalTickets}
+            museumPrice={museumPrice}
+            tourPrice={tourPrice}
+            totalPrice={totalPrice}
+            tourType={tourType}
+            date={date}
+            time={time}
+            currentStepLabel={currentStepLabel}
+          />
+        </aside>
       </section>
 
       <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
@@ -1182,6 +1170,76 @@ export default function BookPage() {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function BookingSummaryCard({
+  isRTL,
+  totalTickets,
+  museumPrice,
+  tourPrice,
+  totalPrice,
+  tourType,
+  date,
+  time,
+  currentStepLabel,
+}: {
+  isRTL: boolean;
+  totalTickets: number;
+  museumPrice: number;
+  tourPrice: number;
+  totalPrice: number;
+  tourType: TourType;
+  date: string;
+  time: string;
+  currentStepLabel: string;
+}) {
+  return (
+    <div className="sticky top-24 space-y-4">
+      <Card className="p-6 shadow-soft">
+        <div className="mb-5">
+          <div className="section-label mb-2">{isRTL ? 'ملخص الحجز' : 'Booking Summary'}</div>
+          <h2 className="font-serif text-2xl">{isRTL ? 'زيارتك إلى المتحف' : 'Your museum visit'}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {isRTL ? 'راجع التفاصيل أثناء إكمال الخطوات.' : 'Review details as you complete each step.'}
+          </p>
+        </div>
+        <div className="space-y-3 text-sm">
+          <SummaryLine label={isRTL ? 'الخطوة الحالية' : 'Current step'} value={currentStepLabel} />
+          <SummaryLine label={isRTL ? 'الزوار' : 'Visitors'} value={String(totalTickets || 0)} />
+          <SummaryLine label={isRTL ? 'الموعد' : 'When'} value={`${date} • ${time}`} />
+          <SummaryLine label={isRTL ? 'الجولة' : 'Tour'} value={tourType === 'personalized' ? (isRTL ? 'مخصَّصة' : 'Personalized') : (isRTL ? 'قياسية' : 'Standard')} />
+          <div className="border-t border-border/60 pt-3">
+            <SummaryLine label={isRTL ? 'دخول المتحف' : 'Museum entry'} value={`${museumPrice} ${CURRENCY}`} />
+            <SummaryLine label={isRTL ? 'جولة Horus-Bot' : 'Horus-Bot tour'} value={`${tourPrice} ${CURRENCY}`} />
+          </div>
+          <div className="flex items-center justify-between rounded-xl bg-primary/10 p-3 text-base">
+            <span>{isRTL ? 'الإجمالي' : 'Total'}</span>
+            <span className="font-bold text-primary">{totalPrice} {CURRENCY}</span>
+          </div>
+        </div>
+      </Card>
+      <div className="rounded-2xl border border-primary/25 bg-primary/5 p-4 text-sm text-muted-foreground">
+        <ShieldCheck className="mb-3 h-5 w-5 text-primary" />
+        <p className="font-medium text-foreground">
+          {isRTL ? 'ما ستحصل عليه' : 'What you receive'}
+        </p>
+        <p className="mt-2 leading-relaxed">
+          {isRTL
+            ? 'تذكرة دخول المتحف وتذكرة جولة Horus-Bot محفوظتان في تذاكري. يتم الدفع عند شباك المتحف.'
+            : 'A Museum Entry Ticket and Horus-Bot Tour Ticket saved in My Tickets. Payment happens at the museum counter.'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function SummaryLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-right font-medium text-foreground rtl:text-left">{value}</span>
+    </div>
   );
 }
 

@@ -39,6 +39,7 @@ import {
   type UserTicket,
 } from '@/hooks/useUserTickets';
 import { productMessage } from '@/lib/productMessages';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 const ar = {
@@ -383,13 +384,14 @@ function TicketCard({
     : tk.route_title_en || tk.route_title_ar;
 
   return (
-    <Card className={'p-6 space-y-4 ' + (inactive ? 'opacity-70' : '')}>
-      <div className="flex items-start justify-between gap-3">
+    <Card className={'overflow-hidden p-0 ' + (inactive ? 'opacity-75' : '')}>
+      <div className="border-b border-border/60 bg-gradient-to-br from-card via-card to-primary/5 p-6">
+        <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
             {isRTL ? ar.summary : 'Booking summary'}
           </div>
-          <h3 className="font-serif text-xl">{tk.museum_name}</h3>
+          <h3 className="font-serif text-2xl">{tk.museum_name}</h3>
           <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1 flex-wrap">
             <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{tk.visit_date}</span>
             {tk.visit_time && <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{tk.visit_time}</span>}
@@ -401,18 +403,20 @@ function TicketCard({
         </div>
         <Badge
           variant="secondary"
-          className={inactive ? 'bg-muted text-muted-foreground border-0' : 'bg-primary/15 text-primary border-0'}
+          className={statusBadgeClass(tk.status)}
         >
           {statusLabel(tk.status, isRTL)}
         </Badge>
+        </div>
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-3">
-        <InfoBox label={isRTL ? ar.visitors : 'Visitors'} value={`${tk.total_tickets}`} />
-        <InfoBox label={isRTL ? ar.total : 'Total'} value={`${tk.total_price} ${tk.currency}`} />
-        <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
-        <InfoBox label={isRTL ? ar.bookingStatus : 'Booking status'} value={statusLabel(tk.status, isRTL)} />
-      </div>
+      <div className="space-y-5 p-6">
+        <div className="grid gap-3 sm:grid-cols-4">
+          <InfoBox label={isRTL ? ar.visitors : 'Visitors'} value={`${tk.total_tickets}`} />
+          <InfoBox label={isRTL ? ar.total : 'Total'} value={`${tk.total_price} ${tk.currency}`} />
+          <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
+          <InfoBox label={isRTL ? ar.bookingStatus : 'Booking status'} value={statusLabel(tk.status, isRTL)} />
+        </div>
 
       {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
         <div className="space-y-2">
@@ -435,17 +439,29 @@ function TicketCard({
         </div>
       )}
 
-      <div className="rounded-xl border-2 border-dashed border-border p-4 flex items-center gap-3">
-        <QrCode className="h-12 w-12 text-foreground shrink-0" />
-        <div className="min-w-0">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">
-            {isRTL ? ar.entryQr : 'Entry QR'}
+      <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <QrCode className="h-4 w-4 text-primary" />
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+            {isRTL ? ar.entryQr : 'Museum Entry QR'}
           </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="grid h-20 w-20 shrink-0 grid-cols-3 gap-1 rounded-xl border border-primary/25 bg-background p-2">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <span key={i} className={cn('rounded-sm', i % 2 === 0 ? 'bg-foreground' : 'bg-primary/35')} />
+            ))}
+          </div>
+        <div className="min-w-0">
           <p className="font-mono text-sm truncate">{tk.qr_value}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {isRTL ? ar.entryQrBody : 'Use this QR at the museum gate.'}
+          </p>
+        </div>
         </div>
       </div>
 
-      <div className="grid gap-3">
+      <div className="grid gap-4">
         <PassCard
           icon={<Ticket className="h-4 w-4 text-primary" />}
           title={isRTL ? ar.museumTicket : 'Museum Entry Ticket'}
@@ -513,8 +529,16 @@ function TicketCard({
       {!canCancel && cancellationReason && (
         <p className="text-xs text-muted-foreground">{cancellationReason}</p>
       )}
+      </div>
     </Card>
   );
+}
+
+function statusBadgeClass(status: TicketStatus) {
+  if (status === 'active') return 'bg-primary/15 text-primary border-0';
+  if (status === 'cancelled' || status === 'expired') return 'bg-muted text-muted-foreground border-0';
+  if (status === 'completed' || status === 'used') return 'bg-emerald-500/15 text-emerald-700 border-0';
+  return 'bg-amber-500/15 text-amber-700 border-0';
 }
 
 function statusLabel(status: TicketStatus, isRTL: boolean) {

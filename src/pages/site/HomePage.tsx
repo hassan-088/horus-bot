@@ -1,14 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Bot, Smartphone, Languages, Route, Ticket, MapPin, Users, Compass, Building2, ShieldCheck, CheckCircle2, Sparkles } from 'lucide-react';
+import { Bot, Smartphone, Languages, Route, Ticket, Users, Compass, Building2, ShieldCheck, CheckCircle2, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SectionHero } from '@/components/site/SectionHero';
-import { FeatureCard } from '@/components/site/FeatureCard';
 import { StepCard } from '@/components/site/StepCard';
 import { useApp } from '@/contexts/AppContext';
 import gemImage from '@/assets/gem.jpg';
 import onboardingImage from '@/assets/onboarding.jpg';
-import gemMapImage from '@/assets/gem-complex-map.png';
 
 export default function HomePage() {
   const { isRTL } = useApp();
@@ -22,9 +20,9 @@ export default function HomePage() {
         label={isRTL ? 'حورس-بوت • تجربة إرشاد المتاحف' : 'Horus-Bot • Museum Guidance Experience'}
         title={
           isRTL ? (
-            <>جولات متاحف ذكية يقودها <span className="text-primary">روبوت ذاتي القيادة</span></>
+            <>حورس-بوت يحوّل زيارة المتحف إلى <span className="text-primary">جولة روبوتية ذكية</span></>
           ) : (
-            <>Smart Museum Tours Guided by an <span className="text-primary">Autonomous Robot</span></>
+            <>Horus-Bot Turns Museum Visits into <span className="text-primary">Guided Robot Tours</span></>
           )
         }
         subtitle={
@@ -48,29 +46,23 @@ export default function HomePage() {
         }
       />
 
-      <div className="mx-auto max-w-3xl px-4 md:px-8 -mt-8 mb-4 text-center">
-        <p className="text-sm text-muted-foreground/90">
-          {isRTL
-            ? 'مصمَّم للمتاحف والفضاءات الثقافية التي تريد جولات موجَّهة أكثر سلاسة، وضوحاً، وقابليةً للتوسّع.'
-            : 'Built for museums and cultural spaces that want guided tours to feel smoother, clearer, and easier to scale.'}
-        </p>
-      </div>
+      <section className="mx-auto grid max-w-5xl gap-3 px-4 md:grid-cols-3 md:px-8 -mt-8 mb-8">
+        {[
+          { icon: Bot, en: 'Autonomous robot guidance', ar: 'إرشاد روبوتي ذاتي' },
+          { icon: QrCode, en: 'Website booking, app handoff', ar: 'حجز عبر الموقع وانتقال للتطبيق' },
+          { icon: ShieldCheck, en: 'Pay at Counter ticket flow', ar: 'تذاكر بالدفع عند الشباك' },
+        ].map((item) => (
+          <div key={item.en} className="rounded-2xl border border-primary/20 bg-card/80 p-4 shadow-soft backdrop-blur">
+            <item.icon className="mb-3 h-5 w-5 text-primary" />
+            <p className="text-sm font-medium text-foreground">{isRTL ? item.ar : item.en}</p>
+          </div>
+        ))}
+      </section>
 
       {/* PRODUCT OVERVIEW */}
-      <section className="mx-auto max-w-7xl px-4 md:px-8 py-20 md:py-28">
-        <div className="text-center mb-14 max-w-3xl mx-auto">
-          <div className="section-label mb-4">{isRTL ? 'نظرة على المنتج' : 'Product Overview'}</div>
-          <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-6">
-            {isRTL ? 'تجربة متحف ذكية متكاملة' : 'A Complete Smart Museum Experience'}
-          </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            {isRTL
-              ? 'يربط حورس-بوت بين الجولة الفعلية في المتحف وتجربة رقمية بسيطة. يقود الروبوت الزوار بين المعروضات، بينما يحتفظ التطبيق المرافق بالتذاكر والخرائط ومحتوى المعروضات والأسئلة وتقدّم الجولة في مكان واحد.'
-              : 'Horus-Bot connects the physical museum tour with a simple digital experience. The robot guides visitors between exhibits, while the companion app keeps tickets, maps, exhibit content, questions, and tour progress in one place.'}
-          </p>
-        </div>
+      <section className="mx-auto max-w-7xl px-4 md:px-8 py-16 md:py-24">
         {/* Visual band */}
-        <div className="relative mb-14 overflow-hidden rounded-3xl ring-1 ring-primary/20 shadow-[0_20px_60px_-20px_hsl(var(--primary)/0.35)]">
+        <div className="relative overflow-hidden rounded-3xl ring-1 ring-primary/20 shadow-[0_20px_60px_-20px_hsl(var(--primary)/0.35)]">
           <img
             src={onboardingImage}
             alt={isRTL ? 'زوار يستكشفون قاعات المتحف' : 'Visitors exploring museum galleries'}
@@ -78,115 +70,62 @@ export default function HomePage() {
             className="h-[280px] md:h-[380px] w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-            <p className="font-serif text-lg md:text-2xl text-foreground max-w-2xl">
-              {isRTL ? 'رحلة موجَّهة عبر أعظم مجموعات مصر.' : "A guided journey through Egypt's greatest collections."}
+          <div className="absolute inset-x-0 bottom-0 grid gap-6 p-6 md:grid-cols-[1.2fr_0.8fr] md:p-8">
+            <div>
+              <div className="section-label mb-3">{isRTL ? 'نظرة على المنتج' : 'Product Overview'}</div>
+              <p className="font-serif text-xl md:text-4xl text-foreground max-w-2xl">
+                {isRTL ? 'جولة متحف متصلة بين الروبوت، التطبيق، والتذكرة.' : 'One connected museum journey across robot, app, and ticket.'}
+              </p>
+            </div>
+            <p className="self-end text-sm leading-relaxed text-muted-foreground md:text-base">
+              {isRTL
+                ? 'يقود الروبوت الزوار بين المعروضات، بينما يحتفظ التطبيق بالتذاكر والخرائط ومحتوى الجولة في مكان واحد.'
+                : 'The robot leads visitors between exhibits while the app keeps tickets, maps, and tour content in one calm place.'}
             </p>
           </div>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-3">
-          <Card className="overflow-hidden p-0">
-            <div className="relative aspect-[16/9] overflow-hidden">
-              <img src={gemImage} alt={isRTL ? 'قاعة المتحف' : 'Museum hall'} loading="lazy" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/10 to-transparent" />
-            </div>
-            <div className="p-7">
-              <Bot className="h-6 w-6 text-primary mb-4" />
-              <h3 className="font-serif text-xl mb-2">{isRTL ? 'الروبوت المرشد' : 'The Robot Guide'}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {isRTL
-                  ? 'النجم الأساسي لتجربتك — يقودك بين قاعات المتحف ويتوقّف عند كل محطة ليرويها لك بوضوح.'
-                  : 'The star of your experience — leading you through museum spaces and bringing every stop to life with clear narration.'}
-              </p>
-            </div>
-          </Card>
-          <Card className="overflow-hidden p-0">
-            <div className="relative aspect-[16/9] overflow-hidden bg-sidebar/30">
-              <img src={gemMapImage} alt={isRTL ? 'خريطة الجولة' : 'Tour map'} loading="lazy" className="h-full w-full object-contain p-4" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-card/10 to-transparent" />
-            </div>
-            <div className="p-7">
-              <Smartphone className="h-6 w-6 text-primary mb-4" />
-              <h3 className="font-serif text-xl mb-2">{isRTL ? 'التطبيق المرافق' : 'The Companion App'}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {isRTL
-                  ? 'الرفيق الذي يبقي كل ما تحتاجه في يدك — التذاكر، الخرائط، محتوى المعروضات، والأسئلة.'
-                  : 'The helpful companion that keeps everything you need in your hand — tickets, maps, exhibit content, and questions.'}
-              </p>
-            </div>
-          </Card>
-          <Card className="overflow-hidden p-0">
-            <div className="relative aspect-[16/9] overflow-hidden">
-              <img src={onboardingImage} alt={isRTL ? 'تجربة الزوار' : 'Visitor experience'} loading="lazy" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/10 to-transparent" />
-            </div>
-            <div className="p-7">
-              <Sparkles className="h-6 w-6 text-primary mb-4" />
-              <h3 className="font-serif text-xl mb-2">{isRTL ? 'تجربة جولة موجَّهة' : 'Guided Tour Experience'}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {isRTL
-                  ? 'الروبوت والتطبيق معاً = تجربة متحف واحدة متّصلة، تتكيّف مع وقتك واهتماماتك ولغتك.'
-                  : 'Robot + app = one connected museum experience that adapts to your time, interests, and language.'}
-              </p>
-            </div>
-          </Card>
         </div>
       </section>
 
       {/* CORE CAPABILITIES */}
       <section className="bg-sidebar/15">
-        <div className="mx-auto max-w-7xl px-4 md:px-8 py-20 md:py-28">
-          <div className="text-center mb-14">
-            <div className="section-label mb-4">{isRTL ? 'القدرات الأساسية' : 'Core Capabilities'}</div>
-            <h2 className="font-serif text-3xl md:text-5xl text-foreground">
-              {isRTL ? 'كل ما تحتاجه جولة متحف موجَّهة' : 'Everything a Guided Museum Visit Needs'}
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-8 py-20 md:grid-cols-[0.85fr_1.15fr] md:py-28">
+          <div>
+            <div className="section-label mb-4">{isRTL ? 'القيمة الأساسية' : 'Product Value'}</div>
+            <h2 className="font-serif text-3xl md:text-5xl text-foreground mb-5">
+              {isRTL ? 'إرشاد حيّ بدون تعقيد للزائر أو المتحف' : 'Live guidance without complexity for visitors or museums'}
             </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isRTL
+                ? 'يركّز حورس-بوت على ما يهم في الزيارة: طريق واضح، شرح مناسب، وتذاكر محفوظة في حساب واحد.'
+                : 'Horus-Bot focuses the visit around what matters: a clear route, useful storytelling, and tickets saved in one account.'}
+            </p>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <FeatureCard
-              icon={Bot}
-              title={isRTL ? 'إرشاد وتنقّل بالروبوت' : 'Robot Navigation & Guidance'}
-              description={isRTL ? 'يقود الروبوت الزوار من معروضة إلى أخرى بإيقاع مريح، ممّا يقلّل التشتّت ويمنع تفويت أي محطة.' : 'The robot leads visitors from one exhibit to the next at a comfortable pace, reducing confusion and missed stops.'}
-            />
-            <FeatureCard
-              icon={Smartphone}
-              title={isRTL ? 'تطبيق جوال تفاعلي' : 'Interactive Mobile App'}
-              description={isRTL ? 'التذاكر، التنقّل، محتوى المعروضات، الأسئلة، ودعم الجولة المباشر — كل ذلك في تطبيق واحد بسيط.' : 'Tickets, navigation, exhibit content, questions, and Live Tour support all in one simple app.'}
-            />
-            <FeatureCard
-              icon={MapPin}
-              title={isRTL ? 'تنقّل داخلي في الوقت الفعلي' : 'Real-Time Indoor Navigation'}
-              description={isRTL ? 'يرى الزوار أين هم، أين الروبوت، وما هي المحطة التالية أثناء الجولة.' : 'Visitors can see where they are, where the robot is, and what comes next during the tour.'}
-            />
-            <FeatureCard
-              icon={Languages}
-              title={isRTL ? 'دعم متعدد اللغات' : 'Multilingual Support'}
-              description={isRTL ? 'يمكن للزوار متابعة الجولة بالعربية، العامية المصرية، الإنجليزية، ولغات أخرى مدعومة وفقاً لإعداد المتحف.' : 'Visitors can follow the tour in Arabic, Egyptian Arabic, English, and other supported languages depending on the museum setup.'}
-            />
-            <FeatureCard
-              icon={Route}
-              title={isRTL ? 'مسارات جولات شخصية' : 'Personalized Tour Paths'}
-              description={isRTL ? 'تُبنى المسارات حول وقت الزائر واهتماماته، فتشعر كل جولة بأنها أكثر ملاءمة وتركيزاً.' : 'Routes are shaped around visitor time and interests, making each tour feel more relevant and focused.'}
-            />
-            <FeatureCard
-              icon={Users}
-              title={isRTL ? 'تفاعل الزوار' : 'Visitor Engagement'}
-              description={isRTL ? 'اختبارات قصيرة، إنجازات، لحظات تفاعل، ونقاط تصوير تُبقي الزوار منخرطين وتساعدهم على تذكّر التجربة.' : 'Quizzes, achievements, interactive moments, and photo points help visitors stay engaged and remember the experience.'}
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { icon: Bot, titleEn: 'Robot-guided movement', titleAr: 'تنقّل يقوده الروبوت', descEn: 'Visitors move from stop to stop with a clear pace and fewer missed highlights.', descAr: 'ينتقل الزوار بين المحطات بإيقاع واضح وارتباك أقل.' },
+              { icon: Smartphone, titleEn: 'Companion app continuity', titleAr: 'استمرارية عبر التطبيق', descEn: 'Tickets, Robot Pairing, Live Tour, maps, and questions stay connected.', descAr: 'التذاكر، اقتران الروبوت، الجولة الحية، الخرائط، والأسئلة تبقى مترابطة.' },
+              { icon: Languages, titleEn: 'Multilingual visit support', titleAr: 'دعم لغات متعددة', descEn: 'The experience supports different visitor languages and narration preferences.', descAr: 'تدعم التجربة لغات الزوار وتفضيلات السرد المختلفة.' },
+              { icon: Route, titleEn: 'Routes shaped by the visit', titleAr: 'مسارات تناسب الزيارة', descEn: 'Standard and personalized routes keep the tour focused on time and interests.', descAr: 'المسارات القياسية والمخصصة تحافظ على تركيز الجولة حسب الوقت والاهتمامات.' },
+            ].map((item) => (
+              <div key={item.titleEn} className="border-b border-border/60 pb-5">
+                <item.icon className="mb-3 h-5 w-5 text-primary" />
+                <h3 className="font-serif text-lg text-foreground">{isRTL ? item.titleAr : item.titleEn}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{isRTL ? item.descAr : item.descEn}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
       <section className="mx-auto max-w-7xl px-4 md:px-8 py-20 md:py-28">
-        <div className="text-center mb-14">
-          <div className="section-label mb-4">{isRTL ? 'كيف تعمل' : 'How It Works'}</div>
+        <div className="mb-12 max-w-2xl">
+          <div className="section-label mb-4">{isRTL ? 'رحلة الزائر' : 'Visitor Journey'}</div>
           <h2 className="font-serif text-3xl md:text-5xl text-foreground">
-            {isRTL ? 'من الحجز إلى الجولة في أربع خطوات بسيطة' : 'From Booking to Tour in Four Simple Steps'}
+            {isRTL ? 'ابدأ من الموقع، وأكمل الجولة داخل التطبيق' : 'Start on the website, continue inside the app'}
           </h2>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 md:grid-cols-4">
           <StepCard
             step={1}
             title={isRTL ? 'احجز عبر الإنترنت' : 'Book Visit'}
@@ -242,14 +181,15 @@ export default function HomePage() {
       </section>
 
       {/* PRODUCT STATUS */}
-      <section className="mx-auto max-w-5xl px-4 md:px-8 py-20">
-        <div className="text-center mb-12">
-          <div className="section-label mb-4 text-primary">{isRTL ? 'جاهزية التجربة' : 'Product Readiness'}</div>
-          <h2 className="font-serif text-3xl md:text-4xl text-foreground">
-            {isRTL ? 'نظام زيارة متصل من الحجز حتى الجولة' : 'A Connected Visit System from Booking to Tour'}
-          </h2>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+      <section className="mx-auto max-w-6xl px-4 md:px-8 py-20">
+        <div className="rounded-3xl border border-primary/20 bg-card/70 p-6 md:p-10">
+          <div className="mb-8 max-w-2xl">
+            <div className="section-label mb-4 text-primary">{isRTL ? 'ثقة تشغيلية' : 'Operational Confidence'}</div>
+            <h2 className="font-serif text-3xl md:text-4xl text-foreground">
+              {isRTL ? 'نظام زيارة متصل من الحجز حتى الجولة' : 'A connected visit system from booking to tour'}
+            </h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
           {[
             { en: 'Website booking and account management are connected', ar: 'الحجز وإدارة الحساب متصلان عبر الموقع' },
             { en: 'Tickets sync with the mobile app account', ar: 'التذاكر متزامنة مع حساب تطبيق الهاتف' },
@@ -261,12 +201,13 @@ export default function HomePage() {
               <p className="text-sm text-foreground/90 leading-relaxed">{isRTL ? item.ar : item.en}</p>
             </div>
           ))}
+          </div>
+          <p className="mt-6 text-sm text-muted-foreground">
+            {isRTL
+              ? 'استخدم الموقع لتجهيز زيارتك، ثم افتح التطبيق داخل المتحف للتذاكر والجولة والاقتران بالروبوت.'
+              : 'Use the website to prepare your visit, then use the mobile app at the museum for tickets, Robot Pairing, and the Live Tour.'}
+          </p>
         </div>
-        <p className="mt-6 text-center text-xs text-muted-foreground italic">
-          {isRTL
-            ? 'استخدم الموقع لتجهيز زيارتك، ثم افتح التطبيق داخل المتحف للتذاكر والجولة والاقتران بالروبوت.'
-            : 'Use the website to prepare your visit, then use the mobile app at the museum for tickets, Robot Pairing, and the Live Tour.'}
-        </p>
       </section>
 
       {/* FINAL CTA */}

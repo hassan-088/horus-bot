@@ -10,12 +10,10 @@ import { toast } from 'sonner';
 
 const navItems = [
   { to: '/', labelEn: 'Home', labelAr: 'الرئيسية' },
-  { to: '/about', labelEn: 'About', labelAr: 'من نحن' },
   { to: '/experience', labelEn: 'Experience', labelAr: 'التجربة' },
   { to: '/tickets-info', labelEn: 'Tickets', labelAr: 'التذاكر' },
   { to: '/app', labelEn: 'App', labelAr: 'التطبيق' },
   { to: '/faq', labelEn: 'FAQ', labelAr: 'الأسئلة' },
-  { to: '/contact', labelEn: 'Contact', labelAr: 'تواصل' },
 ];
 
 export function SiteHeader() {

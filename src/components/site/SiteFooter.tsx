@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, Briefcase, MapPin, Instagram, Twitter, Facebook } from 'lucide-react';
+import { Mail, Briefcase, MapPin, Ticket, Smartphone } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 export function SiteFooter() {
@@ -37,27 +37,32 @@ export function SiteFooter() {
           <div>
             <h4 className="section-label mb-4">{isRTL ? 'تواصل' : 'Contact'}</h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary" /> support@horus-bot.com</li>
-              <li className="flex items-center gap-2"><Briefcase className="h-4 w-4 text-primary" /> museums@horus-bot.com</li>
+              <li className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-primary" />
+                <a className="hover:text-primary transition-colors" href="mailto:support@horus-bot.com">support@horus-bot.com</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4 text-primary" />
+                <a className="hover:text-primary transition-colors" href="mailto:museums@horus-bot.com">museums@horus-bot.com</a>
+              </li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Cairo, Egypt</li>
             </ul>
           </div>
 
           <div>
-            <h4 className="section-label mb-4">{isRTL ? 'تابعنا' : 'Follow'}</h4>
-            <div className="flex gap-3">
-              <span aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground">
-                <Instagram className="h-4 w-4" />
-              </span>
-              <span aria-label="Twitter" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground">
-                <Twitter className="h-4 w-4" />
-              </span>
-              <span aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/60 text-muted-foreground">
-                <Facebook className="h-4 w-4" />
-              </span>
+            <h4 className="section-label mb-4">{isRTL ? 'ابدأ الزيارة' : 'Start the Visit'}</h4>
+            <div className="space-y-2">
+              <Link to="/book" className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/15 transition-colors">
+                <Ticket className="h-4 w-4" />
+                {isRTL ? 'احجز زيارتك' : 'Book Visit'}
+              </Link>
+              <Link to="/app" className="flex items-center gap-2 rounded-xl border border-border/60 px-3 py-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Smartphone className="h-4 w-4" />
+                {isRTL ? 'كيف يعمل التطبيق' : 'How the app works'}
+              </Link>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              {isRTL ? 'تابع Horus-Bot عبر القنوات الرسمية.' : 'Follow Horus-Bot through the official channels.'}
+              {isRTL ? 'الحجز يتم عبر الموقع، واقتران الروبوت والجولة الحية داخل التطبيق.' : 'Book on the website. Robot Pairing and the Live Tour continue inside the app.'}
             </p>
           </div>
         </div>
