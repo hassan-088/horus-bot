@@ -98,6 +98,30 @@ export default function BookPage() {
     return isRTL ? 'الدفع' : 'Payment';
   });
   const currentStepLabel = stepLabels[stepIdx] ?? '';
+  const stepHelp: Record<StepKey, string> = {
+    account: isRTL
+      ? '\u0627\u062d\u0641\u0638 \u0632\u064a\u0627\u0631\u062a\u0643 \u0648\u062a\u0630\u0627\u0643\u0631\u0643 \u0641\u064a \u062d\u0633\u0627\u0628 \u0648\u0627\u062d\u062f.'
+      : 'Keep your visit and tickets ready in one account.',
+    tickets: isRTL
+      ? '\u0627\u062e\u062a\u0631 \u062a\u0630\u0627\u0643\u0631 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641 \u0644\u0643 \u0648\u0644\u0645\u0631\u0627\u0641\u0642\u064a\u0643.'
+      : 'Choose Museum Entry Tickets for you and your guests.',
+    tour: isRTL
+      ? '\u062d\u062f\u062f \u0643\u064a\u0641 \u062a\u0631\u064a\u062f \u0623\u0646 \u062a\u0634\u0639\u0631 \u0627\u0644\u062c\u0648\u0644\u0629 \u0645\u0639 Horus-Bot.'
+      : 'Choose how you want the Horus-Bot guided tour to feel.',
+    datetime: isRTL
+      ? '\u0627\u062e\u062a\u0631 \u0645\u0648\u0639\u062f\u0627 \u064a\u0646\u0627\u0633\u0628 \u0625\u064a\u0642\u0627\u0639 \u0632\u064a\u0627\u0631\u062a\u0643.'
+      : 'Choose when you would like to arrive for the visit.',
+    language: isRTL
+      ? '\u0627\u062e\u062a\u0631 \u0644\u063a\u0629 \u0627\u0644\u0642\u0635\u0629 \u0627\u0644\u062a\u064a \u0633\u064a\u0631\u0648\u064a\u0647\u0627 Horus-Bot.'
+      : 'Choose the story language Horus-Bot will use during the tour.',
+    personalize: isRTL
+      ? '\u0627\u0634\u0643\u0644 \u0627\u0644\u0631\u062d\u0644\u0629 \u062d\u0648\u0644 \u0648\u0642\u062a\u0643 \u0648\u0627\u0647\u062a\u0645\u0627\u0645\u0627\u062a\u0643.'
+      : 'Shape the visit around your time, pace, and interests.',
+    payment: isRTL
+      ? '\u0623\u0643\u062f \u0627\u0644\u062d\u062c\u0632 \u0627\u0644\u0622\u0646 \u0648\u0627\u062f\u0641\u0639 \u0628\u0647\u062f\u0648\u0621 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
+      : 'Confirm now and pay calmly at the museum counter.',
+  };
+  const panelClass = 'rounded-[1.75rem] border-primary/10 bg-card/75 shadow-soft backdrop-blur';
 
   const goNext = () => setStepIdx((i) => Math.min(i + 1, allSteps.length - 1));
   const goBack = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -394,36 +418,37 @@ export default function BookPage() {
     { id: 'card', labelEn: 'Card payment', labelAr: 'بطاقة', icon: CreditCard,
       disabled: true,
       note: {
-        en: 'Card payment is not available for this booking. Complete it using cash at the museum counter.',
+        en: 'Card payment is not active for this visit. Please pay at the museum counter.',
         ar: 'الدفع بالبطاقة غير متاح لهذا الحجز. أتمم الحجز نقداً عند شباك المتحف.',
       },
     },
-    { id: 'cash', labelEn: 'Cash at museum counter', labelAr: 'نقداً عند شبّاك المتحف', icon: Wallet },
+    { id: 'cash', labelEn: 'Pay at Counter', labelAr: 'نقداً عند شبّاك المتحف', icon: Wallet },
   ];
 
   return (
     <>
       <SectionHero
         label={isRTL ? 'الحجز' : 'Book'}
-        title={isRTL ? 'احجز زيارتك' : 'Book Visit'}
+        title={isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
         subtitle={
           isRTL
-            ? 'تذكرة دخول المتحف + جولة Horus-Bot في خطوات بسيطة.'
-            : 'Museum entry + Horus-Bot robot tour in a few simple steps.'
+            ? '\u0627\u062e\u062a\u0631 \u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641\u060c \u0634\u0643\u0644 \u062c\u0648\u0644\u062a\u0643 \u0627\u0644\u0645\u0631\u0634\u062f\u0629\u060c \u0648\u0627\u0635\u0644 \u062c\u0627\u0647\u0632\u0627 \u0644\u0644\u0633\u064a\u0631 \u0641\u064a \u0627\u0644\u062a\u0627\u0631\u064a\u062e.'
+            : 'Choose museum entry, shape the guided tour, and arrive ready to walk through history.'
         }
       />
 
-      <section className="mx-auto grid max-w-6xl gap-8 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_340px] -mt-4 pb-24">
+      <section className="mx-auto grid max-w-6xl gap-6 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px] -mt-5 pb-20">
         <div className="min-w-0">
-        <div className="mb-6 rounded-2xl border border-border/60 bg-card/70 p-4 shadow-soft">
-          <div className="mb-3 flex items-center justify-between gap-4">
+        <div className="mb-5 rounded-[1.5rem] border border-primary/20 bg-card/75 p-4 shadow-soft backdrop-blur">
+          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
                 {isRTL ? `الخطوة ${stepIdx + 1} من ${allSteps.length}` : `Step ${stepIdx + 1} of ${allSteps.length}`}
               </p>
               <h2 className="font-serif text-xl text-foreground">{currentStepLabel}</h2>
+              <p className="mt-1 max-w-xl text-sm text-muted-foreground">{stepHelp[currentStep]}</p>
             </div>
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <span className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
               {totalTickets > 0
                 ? (isRTL ? `${totalTickets} زائر` : `${totalTickets} visitor${totalTickets === 1 ? '' : 's'}`)
                 : (isRTL ? 'اختر التذاكر' : 'Select tickets')}
@@ -434,7 +459,7 @@ export default function BookPage() {
 
         {/* STEP: ACCOUNT */}
         {currentStep === 'account' && (
-          <Card className="p-6 md:p-8 space-y-5">
+          <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
               <h2 className="font-serif text-2xl mb-2">
                 {isRTL ? 'أنشئ حسابك على Horus-Bot' : 'Create your Horus-Bot account'}
@@ -442,7 +467,7 @@ export default function BookPage() {
               <p className="text-sm text-muted-foreground">
                 {isRTL
                   ? 'حسابك يحفظ تذاكرك ويربطها بتطبيق Horus-Bot وروبوت الجولة في المتحف.'
-                  : 'Your account saves your tickets and links them to the Horus-Bot app and the in-museum tour robot.'}
+                  : 'Create or enter your Horus-Bot account so your tickets are ready when you arrive.'}
               </p>
             </div>
 
@@ -608,13 +633,13 @@ export default function BookPage() {
 
         {/* STEP: TICKETS */}
         {currentStep === 'tickets' && (
-          <Card className="p-6 md:p-8 space-y-6">
+          <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'تذاكر دخول المتحف' : 'Museum Entry Tickets'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'تذاكر دخول المتحف' : 'Choose Museum Entry Tickets'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
                   ? 'الأسعار وفقاً لسياسة المتحف المصرية. الجنسية تحدّد الفئة.'
-                  : 'Pricing follows Egyptian museum policy. Choose categories that match your group.'}
+                  : 'Select who is visiting. Your Horus-Bot Guided Tour is added once per booking.'}
               </p>
             </div>
 
@@ -624,7 +649,7 @@ export default function BookPage() {
                   {group === 'eg' ? (isRTL ? 'المصريون' : 'Egyptians') : (isRTL ? 'الأجانب' : 'Foreigners')}
                 </h3>
                 {CATEGORY_ROWS.filter((r) => r.group === group).map((row) => (
-                  <div key={row.key} className="flex items-center justify-between gap-4 p-4 rounded-2xl border border-border bg-card">
+                  <div key={row.key} className="flex items-center justify-between gap-3 p-3 md:p-4 rounded-2xl border border-primary/10 bg-background/35">
                     <div>
                       <p className="font-semibold">{isRTL ? row.ar : row.en}</p>
                       <p className="text-sm text-muted-foreground">{museumTicketPrices[row.key]} {CURRENCY}</p>
@@ -643,7 +668,7 @@ export default function BookPage() {
               </div>
             ))}
 
-            <div className="p-4 bg-primary/10 rounded-2xl space-y-2">
+            <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span>{isRTL ? 'إجمالي التذاكر' : 'Total tickets'}</span>
                 <span className="font-semibold">{totalTickets}</span>
@@ -664,25 +689,25 @@ export default function BookPage() {
 
         {/* STEP: TOUR TYPE */}
         {currentStep === 'tour' && (
-          <Card className="p-6 md:p-8 space-y-5">
+          <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر جولة Horus-Bot' : 'Choose your Horus-Bot tour'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر جولة Horus-Bot' : 'Choose how the tour should feel'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
                   ? 'الروبوت يقود جولتك داخل المتحف ويرويك قصص القطع.'
-                  : 'A robot guide leads your visit inside the museum and tells you the stories behind the artifacts.'}
+                  : 'Horus-Bot will guide the route inside the museum and bring each stop into the story.'}
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-3">
               {([
                 { id: 'standard' as TourType, icon: Zap,
-                  titleEn: 'Standard Tour', titleAr: 'جولة قياسية',
-                  descEn: 'Predefined route, fixed highlights, simple setup.',
+                  titleEn: 'Horus-Bot Highlights', titleAr: 'جولة قياسية',
+                  descEn: 'A calm highlights route through the museum favorites.',
                   descAr: 'مسار جاهز ومحطات مختارة — بدون أي إعدادات إضافية.' },
                 { id: 'personalized' as TourType, icon: Sparkles,
-                  titleEn: 'Personalized Tour', titleAr: 'جولة مخصَّصة',
-                  descEn: 'Pick duration, themes, language, pace, and accessibility.',
+                  titleEn: 'Personalized Journey', titleAr: 'جولة مخصَّصة',
+                  descEn: 'Shape the route around your time, interests, language, and pace.',
                   descAr: 'اختر المدة، المواضيع، اللغة، الإيقاع، واحتياجات الوصول.' },
               ]).map((t) => {
                 const active = tourType === t.id;
@@ -693,19 +718,19 @@ export default function BookPage() {
                     type="button"
                     onClick={() => selectRobotTourType(t.id)}
                     className={cn(
-                      'text-start rounded-2xl border p-5 transition-colors',
-                      active ? 'border-primary bg-primary/5 ring-2 ring-primary/30' : 'border-border bg-card hover:border-primary/50',
+                      'text-start rounded-2xl border p-4 md:p-5 transition-colors',
+                      active ? 'border-primary bg-primary/10 ring-2 ring-primary/20' : 'border-primary/10 bg-background/35 hover:border-primary/50',
                     )}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <div className={cn('h-9 w-9 rounded-lg flex items-center justify-center', active ? 'bg-primary/15' : 'bg-muted')}>
+                      <div className={cn('h-9 w-9 rounded-xl flex items-center justify-center', active ? 'bg-primary/15' : 'bg-muted/70')}>
                         <Icon className="h-4 w-4 text-primary" />
                       </div>
                       <span className="font-serif text-lg">{isRTL ? t.titleAr : t.titleEn}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">{isRTL ? t.descAr : t.descEn}</p>
                     <p className="mt-3 text-sm font-semibold text-primary">
-                      {robotTourPrices[t.id]} {CURRENCY} / {isRTL ? 'حجز' : 'booking'}
+                      {robotTourPrices[t.id]} {CURRENCY} / {isRTL ? 'حجز' : 'visit'}
                     </p>
                   </button>
                 );
@@ -727,7 +752,7 @@ export default function BookPage() {
                   <p className="text-xs text-muted-foreground mt-1">
                     {isRTL
                       ? 'اختر مسارا جاهزا لملء محطات الجولة وتفضيلاتها.'
-                      : 'Choose a ready route to fill the tour stops and preferences.'}
+                      : 'Choose a suggested museum path, or keep shaping the visit yourself.'}
                   </p>
                 </div>
                 <div className="grid gap-2">
@@ -739,8 +764,8 @@ export default function BookPage() {
                         type="button"
                         onClick={() => applyRecommendedRoute(route)}
                         className={cn(
-                          'text-start rounded-xl border p-4 transition-colors',
-                          active ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card hover:border-primary/50',
+                          'text-start rounded-2xl border p-4 transition-colors',
+                          active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
                         )}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -781,11 +806,11 @@ export default function BookPage() {
 
         {/* STEP: DATE & TIME */}
         {currentStep === 'datetime' && (
-          <Card className="p-6 md:p-8 space-y-5">
+          <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر التاريخ والوقت' : 'Pick Date & Time'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر التاريخ والوقت' : 'Choose when you would like to visit'}</h2>
               <p className="text-sm text-muted-foreground">
-                {isRTL ? 'الأماكن محدودة لكل فترة.' : 'Spots are limited per time slot.'}
+                {isRTL ? 'الأماكن محدودة لكل فترة.' : 'Select a calm arrival time for your museum visit.'}
               </p>
             </div>
 
@@ -804,7 +829,7 @@ export default function BookPage() {
                     onClick={() => setTime(slot)}
                     className={cn(
                       'h-11 rounded-xl border text-sm font-medium transition-colors',
-                      time === slot ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50',
+                      time === slot ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
                     )}
                   >
                     {slot}
@@ -824,13 +849,13 @@ export default function BookPage() {
 
         {/* STEP: LANGUAGE */}
         {currentStep === 'language' && (
-          <Card className="p-6 md:p-8 space-y-5">
+          <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر لغة السرد' : 'Choose Tour Narration Language'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر لغة السرد' : 'Choose the story language'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
                   ? 'سيستخدم Horus-Bot هذه اللغة أثناء جولتك.'
-                  : 'Horus-Bot will use this language during your robot tour.'}
+                  : 'Horus-Bot will tell the museum story in this language during your guided tour.'}
               </p>
             </div>
 
@@ -845,7 +870,7 @@ export default function BookPage() {
                   }}
                   className={cn(
                     'h-12 rounded-xl border text-sm font-medium transition-colors',
-                    tourLanguage === l.id ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50',
+                    tourLanguage === l.id ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
                   )}
                 >
                   {isRTL ? l.ar : l.en}
@@ -867,17 +892,17 @@ export default function BookPage() {
 
         {/* STEP: PERSONALIZE */}
         {currentStep === 'personalize' && (
-          <Card className="p-6 md:p-8 space-y-6">
+          <Card className={cn(panelClass, 'p-5 md:p-8 space-y-6')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'تفضيلاتك' : 'Your Preferences'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'تفضيلاتك' : 'Shape the visit around you'}</h2>
               <p className="text-sm text-muted-foreground">
                 {tourType === 'personalized'
                   ? (isRTL
                     ? 'خصّص جولة Horus-Bot وفق وقتك واهتماماتك.'
-                    : 'Tailor your Horus-Bot tour around your time and interests.')
+                    : 'Let Horus-Bot adapt the route to the stories, pace, and support you prefer.')
                   : (isRTL
                     ? 'بضع تفضيلات أساسية — جولتك القياسية جاهزة بالفعل.'
-                    : 'A few basic preferences — your standard tour is otherwise ready.')}
+                    : 'A few gentle preferences. Your highlights tour is otherwise ready.')}
               </p>
             </div>
 
@@ -893,7 +918,7 @@ export default function BookPage() {
                         onClick={() => setDuration(d)}
                         className={cn(
                           'h-11 rounded-xl border text-sm font-medium transition-colors',
-                          duration === d ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50',
+                          duration === d ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
                         )}
                       >
                         {d} {isRTL ? 'د' : 'min'}
@@ -932,8 +957,8 @@ export default function BookPage() {
                             type="button"
                             onClick={() => setSelectedExhibits((arr) => toggleInArray(arr, exhibit.id))}
                             className={cn(
-                              'min-h-16 rounded-xl border p-3 text-left transition-colors',
-                              active ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50',
+                              'min-h-16 rounded-2xl border p-3 text-left transition-colors',
+                              active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/35 hover:border-primary/50',
                             )}
                           >
                             <div className="flex items-start gap-2">
@@ -973,7 +998,7 @@ export default function BookPage() {
                           onClick={() => setInterests((arr) => toggleInArray(arr, opt.id))}
                           className={cn(
                             'rounded-full border px-4 py-2 text-sm transition-colors flex items-center gap-1.5',
-                            active ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50',
+                            active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/15 bg-background/35 hover:border-primary/50',
                           )}
                         >
                           {active && <Check className="h-3.5 w-3.5" />}
@@ -996,7 +1021,7 @@ export default function BookPage() {
                           onClick={() => setAccessibility((arr) => toggleInArray(arr, opt.id))}
                           className={cn(
                             'rounded-full border px-4 py-2 text-sm transition-colors flex items-center gap-1.5',
-                            active ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50',
+                            active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/15 bg-background/35 hover:border-primary/50',
                           )}
                         >
                           {active && <Check className="h-3.5 w-3.5" />}
@@ -1017,7 +1042,7 @@ export default function BookPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center justify-between rounded-xl border border-border/60 p-3">
+                  <div className="flex items-center justify-between rounded-xl border border-primary/10 bg-background/35 p-3">
                     <span className="text-sm">{isRTL ? 'وضع الأطفال' : 'Kids mode'}</span>
                     <button
                       type="button"
@@ -1028,7 +1053,7 @@ export default function BookPage() {
                       <span className={cn('block h-5 w-5 rounded-full bg-background transition-transform', kidsMode ? 'translate-x-5' : 'translate-x-0.5')} />
                     </button>
                   </div>
-                  <div className="flex items-center justify-between rounded-xl border border-border/60 p-3">
+                  <div className="flex items-center justify-between rounded-xl border border-primary/10 bg-background/35 p-3">
                     <span className="text-sm">{isRTL ? 'محطات تصوير' : 'Photo spots'}</span>
                     <button
                       type="button"
@@ -1049,7 +1074,7 @@ export default function BookPage() {
                 id="bp-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder={isRTL ? 'أخبرنا بأي شيء يساعد على تخصيص زيارتك.' : 'Tell us anything that can help personalize your visit.'}
+                placeholder={isRTL ? 'أخبرنا بأي شيء يساعد على تخصيص زيارتك.' : 'Share anything that would make the visit feel smoother.'}
                 className="min-h-24"
               />
             </div>
@@ -1065,13 +1090,13 @@ export default function BookPage() {
 
         {/* STEP: PAYMENT */}
         {currentStep === 'payment' && (
-          <Card className="p-6 md:p-8 space-y-5">
+          <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? '\u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0627\u0644\u0634\u0628\u0627\u0643' : 'Pay at Counter'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? '\u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0627\u0644\u0634\u0628\u0627\u0643' : 'Pay at the museum counter'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
                   ? '\u0627\u0644\u062f\u0641\u0639 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u062d\u0627\u0644\u064a\u0627\u064b. \u0633\u064a\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u062d\u062c\u0632\u0643 \u0648\u062a\u062f\u0641\u0639 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
-                  : 'Online payment is not available yet. Your booking will be confirmed and paid at the museum counter.'}
+                  : 'Your booking is confirmed here. Payment happens calmly at the museum counter when you arrive.'}
               </p>
             </div>
 
@@ -1087,7 +1112,7 @@ export default function BookPage() {
                     disabled={opt.disabled}
                     className={cn(
                       'w-full flex items-start gap-3 p-4 rounded-2xl border text-left transition-colors',
-                      active ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/50',
+                      active ? 'border-primary bg-primary/10' : 'border-primary/10 bg-background/35 hover:border-primary/50',
                       opt.disabled && 'cursor-not-allowed opacity-60 hover:border-border',
                     )}
                   >
@@ -1106,7 +1131,7 @@ export default function BookPage() {
               })}
             </div>
 
-            <div className="p-4 bg-primary/10 rounded-2xl space-y-1.5 text-sm">
+            <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 space-y-1.5 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'إجمالي التذاكر' : 'Total visitors'}</span><span>{totalTickets}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'الموعد' : 'When'}</span><span>{date} • {time}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'نوع الجولة' : 'Tour'}</span><span className="capitalize">{tourType}</span></div>
@@ -1134,7 +1159,7 @@ export default function BookPage() {
         </div>
 
         <aside className="hidden lg:block">
-          <BookingSummaryCard
+          <BookingSummaryPanel
             isRTL={isRTL}
             totalTickets={totalTickets}
             museumPrice={museumPrice}
@@ -1170,6 +1195,76 @@ export default function BookPage() {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function BookingSummaryPanel({
+  isRTL,
+  totalTickets,
+  museumPrice,
+  tourPrice,
+  totalPrice,
+  tourType,
+  date,
+  time,
+  currentStepLabel,
+}: {
+  isRTL: boolean;
+  totalTickets: number;
+  museumPrice: number;
+  tourPrice: number;
+  totalPrice: number;
+  tourType: TourType;
+  date: string;
+  time: string;
+  currentStepLabel: string;
+}) {
+  return (
+    <div className="sticky top-24 space-y-4">
+      <Card className="rounded-[1.75rem] border-primary/15 bg-card/75 p-5 shadow-soft backdrop-blur">
+        <div className="mb-5">
+          <div className="section-label mb-2">{isRTL ? '\u0645\u0644\u062e\u0635 \u0627\u0644\u0632\u064a\u0627\u0631\u0629' : 'Visit Summary'}</div>
+          <h2 className="font-serif text-2xl">{isRTL ? '\u0632\u064a\u0627\u0631\u062a\u0643 \u0625\u0644\u0649 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Your museum visit'}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {isRTL
+              ? '\u0645\u0631\u0627\u062c\u0639\u0629 \u0647\u0627\u062f\u0626\u0629 \u0644\u0644\u0632\u064a\u0627\u0631\u0629 \u0627\u0644\u062a\u064a \u062a\u062c\u0647\u0632\u0647\u0627.'
+              : 'A quiet check of the visit you are preparing.'}
+          </p>
+        </div>
+        <div className="space-y-3 text-sm">
+          <div className="space-y-2 rounded-2xl border border-primary/10 bg-background/35 p-3">
+            <SummaryLine label={isRTL ? '\u0627\u0644\u062e\u0637\u0648\u0629 \u0627\u0644\u0622\u0646' : 'Now shaping'} value={currentStepLabel} />
+            <SummaryLine label={isRTL ? '\u0627\u0644\u0632\u0648\u0627\u0631' : 'Visitors'} value={String(totalTickets || 0)} />
+            <SummaryLine label={isRTL ? '\u0627\u0644\u0648\u0635\u0648\u0644' : 'Arrival'} value={`${date} • ${time}`} />
+            <SummaryLine
+              label={isRTL ? '\u0627\u0644\u062c\u0648\u0644\u0629 \u0627\u0644\u0645\u0631\u0634\u062f\u0629' : 'Guided tour'}
+              value={tourType === 'personalized'
+                ? (isRTL ? '\u0631\u062d\u0644\u0629 \u0645\u062e\u0635\u0635\u0629' : 'Personalized Journey')
+                : (isRTL ? '\u0623\u0628\u0631\u0632 \u0645\u062d\u0637\u0627\u062a Horus-Bot' : 'Horus-Bot Highlights')}
+            />
+          </div>
+          <div className="space-y-1 border-t border-border/60 pt-3">
+            <SummaryLine label={isRTL ? '\u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Museum Entry Ticket'} value={`${museumPrice} ${CURRENCY}`} />
+            <SummaryLine label={isRTL ? '\u062c\u0648\u0644\u0629 Horus-Bot \u0627\u0644\u0645\u0631\u0634\u062f\u0629' : 'Horus-Bot Guided Tour'} value={`${tourPrice} ${CURRENCY}`} />
+          </div>
+          <div className="flex items-center justify-between rounded-2xl border border-primary/15 bg-primary/10 p-3 text-base">
+            <span>{isRTL ? '\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a' : 'Total'}</span>
+            <span className="font-bold text-primary">{totalPrice} {CURRENCY}</span>
+          </div>
+        </div>
+      </Card>
+      <div className="rounded-[1.5rem] border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground">
+        <ShieldCheck className="mb-3 h-5 w-5 text-primary" />
+        <p className="font-medium text-foreground">
+          {isRTL ? '\u062c\u0627\u0647\u0632\u0629 \u0639\u0646\u062f \u0627\u0644\u0648\u0635\u0648\u0644' : 'Ready when you arrive'}
+        </p>
+        <p className="mt-2 leading-relaxed">
+          {isRTL
+            ? '\u0633\u062a\u0643\u0648\u0646 \u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641 \u0648\u062c\u0648\u0644\u0629 Horus-Bot \u0645\u062d\u0641\u0648\u0638\u062a\u064a\u0646 \u0641\u064a \u062a\u0630\u0627\u0643\u0631\u064a. \u064a\u062a\u0645 \u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
+            : 'Your Museum Entry Ticket and Horus-Bot Guided Tour are saved in My Tickets. Payment happens at the museum counter.'}
+        </p>
+      </div>
+    </div>
   );
 }
 
