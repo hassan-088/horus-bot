@@ -47,7 +47,7 @@ export default function HomePage() {
         <div className="mx-auto mt-8 max-w-4xl rounded-3xl border border-primary/25 bg-card/65 p-3 shadow-soft backdrop-blur-xl md:mt-10 md:p-4">
           <div className="grid gap-2.5 md:grid-cols-3 md:gap-3">
             {[
-              { icon: Ticket, en: 'Book your visit', ar: 'احجز زيارتك', detailEn: 'Arrive ready for the story', detailAr: 'صل وأنت جاهز للقصة' },
+              { icon: Ticket, en: 'Arrive ready', ar: 'صل وأنت جاهز', detailEn: 'Your ticket waits with the story', detailAr: 'تذكرتك تنتظر مع القصة' },
               { icon: Bot, en: 'Meet Horus-Bot', ar: 'قابل Horus-Bot', detailEn: 'Let the robot guide the way', detailAr: 'دع الروبوت يقود الطريق' },
               { icon: Sparkles, en: 'Walk through history', ar: 'امشِ عبر التاريخ', detailEn: 'Every stop feels alive', detailAr: 'كل محطة تنبض بالحياة' },
             ].map((item, index) => (
@@ -170,12 +170,11 @@ export default function HomePage() {
           </h2>
           <p className="text-base md:text-lg text-muted-foreground mb-9 max-w-2xl mx-auto">
             {isRTL
-              ? 'احجز زيارتك ودع جولة أكثر هدوءاً وذكاءً تتفتح حولك.'
-              : 'Book your visit and let a quieter, smarter museum journey unfold around you.'}
+              ? 'اختر موعدك ودع جولة أكثر هدوءاً وذكاءً تتفتح حولك.'
+              : 'Choose your visit time and let a quieter, smarter museum journey unfold around you.'}
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Button asChild size="lg"><Link to="/book"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Visit'}</Link></Button>
-            <Button asChild variant="outline" size="lg"><Link to="/experience"><Compass className="h-4 w-4" /> {isRTL ? 'استكشف التجربة' : 'Explore Experience'}</Link></Button>
+            <Button asChild size="lg"><Link to="/book"><Ticket className="h-4 w-4" /> {isRTL ? 'ابدأ الزيارة' : 'Start the Visit'}</Link></Button>
           </div>
         </div>
       </section>

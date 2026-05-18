@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, Briefcase, MapPin, Ticket, Smartphone, Building2 } from 'lucide-react';
+import { Mail, Briefcase, MapPin, Smartphone, Building2 } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 export function SiteFooter() {
@@ -61,14 +61,16 @@ export function SiteFooter() {
 
           <div>
             <h4 className="section-label mb-4">{isRTL ? 'ابدأ الزيارة' : 'Start the Visit'}</h4>
-            <div className="space-y-2">
-              <Link to="/book" className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/15 transition-colors">
-                <Ticket className="h-4 w-4" />
-                {isRTL ? 'احجز زيارتك' : 'Book Visit'}
+            <div className="space-y-2 text-sm">
+              <Link to="/book" className="block text-muted-foreground hover:text-primary transition-colors">
+                {isRTL ? 'ابدأ الزيارة' : 'Start the visit'}
               </Link>
-              <Link to="/app" className="flex items-center gap-2 rounded-xl border border-border/60 px-3 py-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/experience" className="block text-muted-foreground hover:text-primary transition-colors">
+                {isRTL ? 'استكشف التجربة' : 'Explore the experience'}
+              </Link>
+              <Link to="/app" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
                 <Smartphone className="h-4 w-4" />
-                {isRTL ? 'كيف يعمل التطبيق' : 'How the app works'}
+                {isRTL ? 'التطبيق المرافق' : 'Companion app'}
               </Link>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
