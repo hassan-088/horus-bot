@@ -22,7 +22,7 @@ const messages: Record<ProductMessageKey, { en: string; ar: string }> = {
   },
   permission: {
     en: "This content is currently unavailable.",
-    ar: "هذا المحتوى غير متاح حالياً.",
+    ar: "\u0647\u0630\u0627 \u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u062d\u0627\u0644\u064a\u0627\u064b.",
   },
   booking: {
     en: "We could not complete your booking. Please try again.",
@@ -30,7 +30,7 @@ const messages: Record<ProductMessageKey, { en: string; ar: string }> = {
   },
   tickets: {
     en: "We could not load your tickets.",
-    ar: "تعذر تحميل التذاكر الخاصة بك.",
+    ar: "\u062a\u0639\u0630\u0631 \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u062a\u0630\u0627\u0643\u0631 \u0627\u0644\u062e\u0627\u0635\u0629 \u0628\u0643.",
   },
   profile: {
     en: "We could not update your profile.",
@@ -42,15 +42,15 @@ const messages: Record<ProductMessageKey, { en: string; ar: string }> = {
   },
   exhibits: {
     en: "Exhibit information is currently unavailable.",
-    ar: "معلومات المعروضات غير متاحة حالياً.",
+    ar: "\u0645\u0639\u0644\u0648\u0645\u0627\u062a \u0627\u0644\u0645\u0639\u0631\u0648\u0636\u0627\u062a \u063a\u064a\u0631 \u0645\u062a\u0627\u062d\u0629 \u062d\u0627\u0644\u064a\u0627\u064b.",
   },
   routes: {
     en: "Recommended routes are currently unavailable.",
-    ar: "المسارات المقترحة غير متاحة حالياً.",
+    ar: "\u0627\u0644\u0645\u0633\u0627\u0631\u0627\u062a \u0627\u0644\u0645\u0642\u062a\u0631\u062d\u0629 \u063a\u064a\u0631 \u0645\u062a\u0627\u062d\u0629 \u062d\u0627\u0644\u064a\u0627\u064b.",
   },
   savedContent: {
     en: "Showing available saved content.",
-    ar: "يتم عرض المحتوى المتاح المحفوظ.",
+    ar: "\u064a\u062a\u0645 \u0639\u0631\u0636 \u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0627\u0644\u0645\u062a\u0627\u062d \u0627\u0644\u0645\u062d\u0641\u0648\u0638.",
   },
   tryAgain: {
     en: "Try again",

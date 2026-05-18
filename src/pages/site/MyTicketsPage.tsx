@@ -492,7 +492,7 @@ function TicketCard({
                 {isRTL ? ar.selectedExhibits : 'Selected exhibits'}
               </div>
               <p className="text-xs text-muted-foreground">
-                {isRTL ? ar.routeUnavailable : 'Route details are not available for this older ticket.'}
+                {isRTL ? ar.routeUnavailable : 'Route details unavailable for this older ticket.'}
               </p>
             </div>
           )}

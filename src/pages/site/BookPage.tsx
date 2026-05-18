@@ -23,7 +23,6 @@ import { sharedStandardRouteIds } from '@/lib/exhibitCatalog';
 import { productMessage } from '@/lib/productMessages';
 import {
   loadRecommendedRoutes,
-  recommendedRoutes,
   type RecommendedRoute,
 } from '@/lib/recommendedRoutes';
 import { PASSWORD_RULES, isStrongPassword, isValidPhone } from '@/lib/passwordRules';
@@ -62,7 +61,13 @@ export default function BookPage() {
   const { isRTL } = useApp();
   const { user, signIn, signUp } = useAuth();
   const { createBooking } = useUserTickets();
-  const { exhibits, loading: exhibitsLoading, error: exhibitsError, standardRoute } = useExhibits();
+  const {
+    exhibits,
+    loading: exhibitsLoading,
+    error: exhibitsError,
+    retry: retryExhibits,
+    standardRoute,
+  } = useExhibits();
   const navigate = useNavigate();
   const [tourType, setTourType] = useState<TourType>('standard');
 
@@ -136,6 +141,8 @@ export default function BookPage() {
   const [notes, setNotes] = useState('');
   const [selectedRouteId, setSelectedRouteId] = useState<string>('horus_highlights');
   const [languageTouched, setLanguageTouched] = useState(false);
+  const [routesLoading, setRoutesLoading] = useState(true);
+  const [routeRows, setRouteRows] = useState<RecommendedRoute[]>([]);
 
   // Payment
   const [pay, setPay] = useState<PayMethod>('cash');
@@ -150,18 +157,25 @@ export default function BookPage() {
   const standardSelectedExhibitIds =
     standardRoute.length === STANDARD_ROUTE_IDS.length
       ? standardRoute.map((exhibit) => exhibit.id)
-      : STANDARD_ROUTE_IDS;
-  const activeRecommendedRoutes = recommendedRoutes.filter((route) => route.is_active);
+      : [];
+  const activeRecommendedRoutes = routeRows.filter((route) => route.is_active);
   const selectedRecommendedRoute =
     activeRecommendedRoutes.find((route) => route.id === selectedRouteId) ?? null;
 
-  useEffect(() => {
+  const retryRecommendedRoutes = () => {
+    setRoutesLoading(true);
     const result = loadRecommendedRoutes();
     console.info('[Horus-Bot] Recommended routes loaded', {
       count: result.routes.length,
       activeCount: result.routes.filter((route) => route.is_active).length,
       warnings: result.warnings,
     });
+    setRouteRows(result.routes);
+    setRoutesLoading(false);
+  };
+
+  useEffect(() => {
+    retryRecommendedRoutes();
   }, []);
 
   // ---- Handlers ----
@@ -379,7 +393,7 @@ export default function BookPage() {
     { id: 'card', labelEn: 'Card payment', labelAr: 'بطاقة', icon: CreditCard,
       disabled: true,
       note: {
-        en: 'Card checkout is not available for this booking. Complete it using cash at the museum counter.',
+        en: 'Card payment is not available for this booking. Complete it using cash at the museum counter.',
         ar: 'الدفع بالبطاقة غير متاح لهذا الحجز. أتمم الحجز نقداً عند شباك المتحف.',
       },
     },
@@ -390,7 +404,7 @@ export default function BookPage() {
     <>
       <SectionHero
         label={isRTL ? 'الحجز' : 'Book'}
-        title={isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
+        title={isRTL ? 'احجز زيارتك' : 'Book Visit'}
         subtitle={
           isRTL
             ? 'تذكرة دخول المتحف + جولة Horus-Bot في خطوات بسيطة.'
@@ -683,7 +697,15 @@ export default function BookPage() {
               })}
             </div>
 
-            {activeRecommendedRoutes.length > 0 && (
+            {routesLoading && (
+              <div className="rounded-xl border border-border/60 p-4 text-sm text-muted-foreground flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                {isRTL
+                  ? '\u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0645\u0633\u0627\u0631\u0627\u062a...'
+                  : 'Loading recommended routes...'}
+              </div>
+            )}
+            {!routesLoading && activeRecommendedRoutes.length > 0 && (
               <div className="space-y-3">
                 <div>
                   <Label>{isRTL ? 'المسارات المقترحة' : 'Recommended Routes'}</Label>
@@ -724,11 +746,12 @@ export default function BookPage() {
                 </div>
               </div>
             )}
-            {activeRecommendedRoutes.length === 0 && (
-              <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                {isRTL
-                  ? productMessage('routes', true)
-                  : productMessage('routes')}
+            {!routesLoading && activeRecommendedRoutes.length === 0 && (
+              <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground space-y-3">
+                <p>{productMessage('routes', isRTL)}</p>
+                <Button type="button" variant="outline" size="sm" onClick={retryRecommendedRoutes}>
+                  {productMessage('tryAgain', isRTL)}
+                </Button>
               </div>
             )}
 
@@ -914,14 +937,21 @@ export default function BookPage() {
                       {isRTL ? 'جاري تحميل القطع...' : 'Loading exhibits...'}
                     </div>
                   ) : exhibits.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                      {exhibitsError
-                        ? productMessage('exhibits', isRTL)
-                        : productMessage('savedContent', isRTL)}
+                    <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground space-y-3">
+                      <p>{productMessage('exhibits', isRTL)}</p>
+                      <Button type="button" variant="outline" size="sm" onClick={retryExhibits}>
+                        {productMessage('tryAgain', isRTL)}
+                      </Button>
                     </div>
                   ) : (
-                    <div className="grid sm:grid-cols-2 gap-2">
-                      {exhibits.map((exhibit) => {
+                    <>
+                      {exhibitsError && (
+                        <div className="rounded-xl border border-border/60 p-3 text-sm text-muted-foreground">
+                          {productMessage('savedContent', isRTL)}
+                        </div>
+                      )}
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        {exhibits.map((exhibit) => {
                         const active = selectedExhibits.includes(exhibit.id);
                         return (
                           <button
@@ -934,18 +964,7 @@ export default function BookPage() {
                             )}
                           >
                             <div className="flex items-start gap-2">
-                              {exhibit.imageUrl ? (
-                                <img
-                                  src={exhibit.imageUrl}
-                                  alt={exhibit.altEn}
-                                  className="h-10 w-10 rounded-lg object-cover border border-border/50 shrink-0"
-                                  loading="lazy"
-                                />
-                              ) : (
-                                <span className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                                  <Sparkles className="h-4 w-4 text-muted-foreground" />
-                                </span>
-                              )}
+                              <ExhibitThumb exhibit={exhibit} isRTL={isRTL} />
                               <span className={cn(
                                 'mt-0.5 h-4 w-4 rounded-full border flex items-center justify-center shrink-0',
                                 active ? 'border-primary bg-primary text-primary-foreground' : 'border-muted-foreground/40',
@@ -954,13 +973,18 @@ export default function BookPage() {
                               </span>
                               <span>
                                 <span className="block text-sm font-medium">{isRTL && exhibit.titleAr ? exhibit.titleAr : exhibit.titleEn}</span>
-                                <span className="block text-xs text-muted-foreground mt-1">{exhibit.id}</span>
+                                {exhibit.summary && (
+                                  <span className="block text-xs text-muted-foreground mt-1 line-clamp-1">
+                                    {exhibit.summary}
+                                  </span>
+                                )}
                               </span>
                             </div>
                           </button>
                         );
                       })}
-                    </div>
+                      </div>
+                    </>
                   )}
                 </div>
 
@@ -1152,11 +1176,41 @@ export default function BookPage() {
           </DialogHeader>
           <DialogFooter className="sm:justify-center">
             <Button onClick={() => { setShowSuccess(false); navigate('/tickets-mine'); }}>
-              {isRTL ? '\u0639\u0631\u0636 \u062a\u0630\u0627\u0643\u0631\u064a' : 'View My Tickets'}
+              {isRTL ? '\u0639\u0631\u0636 \u062a\u0630\u0627\u0643\u0631\u064a' : 'My Tickets'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function ExhibitThumb({
+  exhibit,
+  isRTL,
+}: {
+  exhibit: { imageUrl: string | null; altEn: string; titleAr: string | null; titleEn: string };
+  isRTL: boolean;
+}) {
+  const [failed, setFailed] = useState(false);
+  const label = isRTL && exhibit.titleAr ? exhibit.titleAr : exhibit.titleEn;
+  if (!exhibit.imageUrl || failed) {
+    return (
+      <span
+        aria-label={label}
+        className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center shrink-0 border border-border/50"
+      >
+        <Sparkles className="h-4 w-4 text-muted-foreground" />
+      </span>
+    );
+  }
+  return (
+    <img
+      src={exhibit.imageUrl}
+      alt={exhibit.altEn || label}
+      className="h-10 w-10 rounded-lg object-cover border border-border/50 shrink-0"
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
   );
 }

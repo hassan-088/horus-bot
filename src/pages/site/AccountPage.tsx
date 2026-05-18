@@ -236,7 +236,7 @@ export default function AccountPage() {
 
         <Card className="p-6 md:p-8 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl">{isRTL ? 'تذاكري' : 'My tickets'}</h2>
+            <h2 className="font-serif text-xl">{isRTL ? 'تذاكري' : 'My Tickets'}</h2>
             <Button asChild variant="ghost" size="sm">
               <Link to="/tickets-mine"><Ticket className="h-4 w-4" /> {isRTL ? 'عرض الكل' : 'View all'}</Link>
             </Button>
@@ -252,7 +252,7 @@ export default function AccountPage() {
           </p>
           {activeTickets.length === 0 && (
             <Button asChild className="self-start">
-              <Link to="/book">{isRTL ? 'احجز زيارتك' : 'Book your visit'}</Link>
+              <Link to="/book">{isRTL ? 'احجز زيارتك' : 'Book Visit'}</Link>
             </Button>
           )}
           {pastTickets.length > 0 && (

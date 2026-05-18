@@ -76,6 +76,7 @@ export function useExhibits() {
   const [exhibits, setExhibits] = useState<WebsiteExhibit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -95,14 +96,17 @@ export function useExhibits() {
       } catch (e) {
         if (!mounted) return;
         console.error('[Horus-Bot] Exhibit load failed', e);
+        const fallback = fallbackRows();
+        setExhibits(fallback);
         setError(
-          isConnectionError(e)
-            ? `${productMessage('exhibits')} ${productMessage('savedContent')}`
-            : isAccessError(e)
-              ? productMessage('permission')
-              : productMessage('exhibits'),
+          fallback.length > 0
+            ? productMessage('savedContent')
+            : isConnectionError(e)
+              ? productMessage('network')
+              : isAccessError(e)
+                ? productMessage('permission')
+                : productMessage('exhibits'),
         );
-        setExhibits(fallbackRows());
       } finally {
         if (mounted) setLoading(false);
       }
@@ -112,7 +116,7 @@ export function useExhibits() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [retryKey]);
 
   const standardRoute = useMemo(() => {
     const ordered = exhibits
@@ -126,5 +130,7 @@ export function useExhibits() {
       .filter((exhibit): exhibit is WebsiteExhibit => Boolean(exhibit));
   }, [exhibits]);
 
-  return { exhibits, loading, error, standardRoute };
+  const retry = () => setRetryKey((value) => value + 1);
+
+  return { exhibits, loading, error, retry, standardRoute };
 }

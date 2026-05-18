@@ -89,9 +89,11 @@ export function loadRecommendedRoutes(): RecommendedRouteLoadResult {
     const routes = parseRecommendedRoutes().sort(
       (a, b) => a.route_order - b.route_order,
     );
+    const warnings = validateRecommendedRoutes(routes);
+    const invalidRouteIds = invalidRouteIdsFromWarnings(warnings);
     return {
-      routes,
-      warnings: validateRecommendedRoutes(routes),
+      routes: routes.filter((route) => !invalidRouteIds.has(route.id)),
+      warnings,
     };
   } catch (error) {
     return {
@@ -106,3 +108,15 @@ export function loadRecommendedRoutes(): RecommendedRouteLoadResult {
 }
 
 export const recommendedRoutes = loadRecommendedRoutes().routes;
+
+function invalidRouteIdsFromWarnings(warnings: string[]): Set<string> {
+  const ids = new Set<string>();
+  for (const warning of warnings) {
+    if (!warning.includes(': invalid artifact id') && !warning.includes(': unknown artifact id')) {
+      continue;
+    }
+    const [routeId] = warning.split(':');
+    if (routeId) ids.add(routeId);
+  }
+  return ids;
+}

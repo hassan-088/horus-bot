@@ -127,10 +127,10 @@ export default function ContactPage() {
             {isRTL ? 'تفضّل بداية أسرع؟' : 'Prefer a Faster Start?'}
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            {isRTL ? 'احجز زيارتك واختبر حورس-بوت بنفسك.' : 'Book your visit and experience Horus-Bot firsthand.'}
+            {isRTL ? 'احجز زيارتك واختبر حورس-بوت بنفسك.' : 'Book a visit and experience Horus-Bot firsthand.'}
           </p>
           <Button asChild size="lg">
-            <Link to="/book"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book your visit'}</Link>
+            <Link to="/book"><Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Visit'}</Link>
           </Button>
         </div>
       </section>

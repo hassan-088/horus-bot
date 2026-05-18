@@ -119,7 +119,7 @@ export function SiteHeader() {
             <>
               <Button variant="ghost" size="sm" onClick={() => navigate('/tickets-mine')} className="gap-1.5">
                 <TicketIcon className="h-4 w-4" />
-                {isRTL ? 'تذاكري' : 'My tickets'}
+                {isRTL ? 'تذاكري' : 'My Tickets'}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => navigate('/account')} className="gap-1.5">
                 <UserIcon className="h-4 w-4" />
@@ -133,7 +133,7 @@ export function SiteHeader() {
             </Button>
           )}
           <Button size="sm" onClick={() => navigate('/book')}>
-            {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
+            {isRTL ? 'احجز زيارتك' : 'Book Visit'}
           </Button>
         </div>
 
@@ -210,7 +210,7 @@ export function SiteHeader() {
                   <>
                     <Button variant="ghost" onClick={() => { setOpen(false); navigate('/tickets-mine'); }} className="justify-start gap-1.5">
                       <TicketIcon className="h-4 w-4" />
-                      {isRTL ? 'تذاكري' : 'My tickets'}
+                      {isRTL ? 'تذاكري' : 'My Tickets'}
                     </Button>
                     <Button variant="ghost" onClick={() => { setOpen(false); navigate('/account'); }} className="justify-start gap-1.5">
                       <UserIcon className="h-4 w-4" />
@@ -241,7 +241,7 @@ export function SiteHeader() {
                   </Button>
                 )}
                 <Button onClick={() => { setOpen(false); navigate('/book'); }}>
-                  {isRTL ? 'احجز زيارتك' : 'Book Your Visit'}
+                  {isRTL ? 'احجز زيارتك' : 'Book Visit'}
                 </Button>
               </div>
             </nav>
