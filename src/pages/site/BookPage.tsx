@@ -29,6 +29,7 @@ import { PASSWORD_RULES, isStrongPassword, isValidPhone } from '@/lib/passwordRu
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
+import gemImage from '@/assets/gem.jpg';
 
 type StepKey = 'account' | 'tickets' | 'tour' | 'datetime' | 'language' | 'personalize' | 'payment';
 type PayMethod = 'card' | 'cash';
@@ -193,6 +194,11 @@ export default function BookPage() {
   const activeRecommendedRoutes = routeRows.filter((route) => route.is_active);
   const selectedRecommendedRoute =
     activeRecommendedRoutes.find((route) => route.id === selectedRouteId) ?? null;
+  const summaryTourLabel = selectedRecommendedRoute
+    ? (isRTL && selectedRecommendedRoute.title_ar ? selectedRecommendedRoute.title_ar : selectedRecommendedRoute.title_en)
+    : tourType === 'personalized'
+      ? (isRTL ? '\u0631\u062d\u0644\u0629 \u0645\u062e\u0635\u0635\u0629' : 'Personalized Journey')
+      : (isRTL ? '\u0623\u0628\u0631\u0632 \u0645\u062d\u0637\u0627\u062a Horus-Bot' : 'Horus-Bot Highlights');
 
   const retryRecommendedRoutes = () => {
     setRoutesLoading(true);
@@ -435,7 +441,9 @@ export default function BookPage() {
   return (
     <>
       <SectionHero
-        className="bg-background [&>div:last-child]:py-10 md:[&>div:last-child]:py-14 [&_h1]:text-4xl md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:mt-4"
+        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-12 after:bg-gradient-to-t after:from-background after:to-transparent [&>div:last-child]:py-10 md:[&>div:last-child]:py-14 [&_h1]:text-4xl md:[&_h1]:text-5xl lg:[&_h1]:text-6xl [&_p]:mt-4"
+        backgroundImage={gemImage}
+        backgroundAlt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
         label={isRTL ? 'الحجز' : 'Book'}
         title={isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
         subtitle={
@@ -1179,6 +1187,7 @@ export default function BookPage() {
             tourPrice={tourPrice}
             totalPrice={totalPrice}
             tourType={tourType}
+            tourLabel={summaryTourLabel}
             date={date}
             time={time}
             currentStepLabel={currentStepLabel}
@@ -1219,6 +1228,7 @@ function BookingSummaryPanel({
   tourPrice,
   totalPrice,
   tourType,
+  tourLabel,
   date,
   time,
   currentStepLabel,
@@ -1229,13 +1239,14 @@ function BookingSummaryPanel({
   tourPrice: number;
   totalPrice: number;
   tourType: TourType;
+  tourLabel: string;
   date: string;
   time: string;
   currentStepLabel: string;
 }) {
   return (
     <div className="sticky top-24 space-y-4">
-      <Card className="rounded-[1.75rem] border-primary/15 bg-card/75 p-5 shadow-soft backdrop-blur">
+      <Card className="rounded-[2rem] border-primary/20 bg-card/70 p-5 shadow-soft backdrop-blur">
         <div className="mb-5">
           <div className="section-label mb-2">{isRTL ? '\u0645\u0644\u062e\u0635 \u0627\u0644\u0632\u064a\u0627\u0631\u0629' : 'Visit Summary'}</div>
           <h2 className="font-serif text-2xl">{isRTL ? '\u0632\u064a\u0627\u0631\u062a\u0643 \u0625\u0644\u0649 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Your museum visit'}</h2>
@@ -1246,20 +1257,18 @@ function BookingSummaryPanel({
           </p>
         </div>
         <div className="space-y-3 text-sm">
-          <div className="space-y-2 rounded-2xl border border-primary/10 bg-background/75 p-3">
+          <div className="space-y-2 rounded-2xl bg-background/45 p-3 ring-1 ring-primary/15">
             <SummaryLine label={isRTL ? '\u0627\u0644\u062e\u0637\u0648\u0629 \u0627\u0644\u0622\u0646' : 'Now shaping'} value={currentStepLabel} />
             <SummaryLine label={isRTL ? '\u0627\u0644\u0632\u0648\u0627\u0631' : 'Visitors'} value={String(totalTickets || 0)} />
-            <SummaryLine label={isRTL ? '\u0627\u0644\u0648\u0635\u0648\u0644' : 'Arrival'} value={`${date} • ${time}`} />
-            <SummaryLine
-              label={isRTL ? '\u0627\u0644\u062c\u0648\u0644\u0629 \u0627\u0644\u0645\u0631\u0634\u062f\u0629' : 'Guided tour'}
-              value={tourType === 'personalized'
-                ? (isRTL ? '\u0631\u062d\u0644\u0629 \u0645\u062e\u0635\u0635\u0629' : 'Personalized Journey')
-                : (isRTL ? '\u0623\u0628\u0631\u0632 \u0645\u062d\u0637\u0627\u062a Horus-Bot' : 'Horus-Bot Highlights')}
-            />
+            <SummaryLine label={isRTL ? '\u0627\u0644\u062a\u0627\u0631\u064a\u062e' : 'Visit date'} value={date} />
+            <SummaryLine label={isRTL ? '\u0627\u0644\u0648\u0642\u062a' : 'Time slot'} value={time} />
+            <SummaryLine label={isRTL ? '\u0627\u0644\u062c\u0648\u0644\u0629' : 'Tour'} value={tourLabel} />
+            <SummaryLine label={isRTL ? '\u0646\u0648\u0639 \u0627\u0644\u062c\u0648\u0644\u0629' : 'Tour type'} value={tourType === 'personalized' ? (isRTL ? '\u0645\u062e\u0635\u0635\u0629' : 'Personalized') : (isRTL ? '\u0642\u064a\u0627\u0633\u064a\u0629' : 'Standard')} />
           </div>
           <div className="space-y-1 border-t border-primary/15 pt-3">
             <SummaryLine label={isRTL ? '\u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Museum Entry Ticket'} value={`${museumPrice} ${CURRENCY}`} />
             <SummaryLine label={isRTL ? '\u062c\u0648\u0644\u0629 Horus-Bot \u0627\u0644\u0645\u0631\u0634\u062f\u0629' : 'Horus-Bot Guided Tour'} value={`${tourPrice} ${CURRENCY}`} />
+            <SummaryLine label={isRTL ? '\u0627\u0644\u062f\u0641\u0639' : 'Payment'} value={isRTL ? '\u0639\u0646\u062f \u0627\u0644\u0634\u0628\u0627\u0643' : 'Pay at Counter'} />
           </div>
           <div className="flex items-center justify-between rounded-2xl border border-primary/15 bg-primary/10 p-3 text-base">
             <span>{isRTL ? '\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a' : 'Total'}</span>
@@ -1345,9 +1354,9 @@ function BookingSummaryCard({
 
 function SummaryLine({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="text-right font-medium text-foreground rtl:text-left">{value}</span>
+    <div className="flex items-start justify-between gap-4">
+      <span className="shrink-0 text-muted-foreground">{label}</span>
+      <span className="min-w-0 text-right font-medium text-foreground rtl:text-left">{value}</span>
     </div>
   );
 }
