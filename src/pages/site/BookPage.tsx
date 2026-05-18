@@ -1198,7 +1198,7 @@ export default function BookPage() {
         )}
         </div>
 
-        <aside className="relative z-10 hidden self-start lg:sticky lg:top-24 lg:block">
+        <aside className="hidden self-start lg:block">
           <div className="sticky top-24">
             <BookingSummaryPanel
               isRTL={isRTL}
