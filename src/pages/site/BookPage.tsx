@@ -439,8 +439,8 @@ export default function BookPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-32 after:bg-gradient-to-t after:from-background after:to-transparent">
-        <div className="pointer-events-none absolute inset-0 -z-20">
+      <section className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
           <img
             src={gemImage}
             alt={isRTL ? '\u0642\u0627\u0639\u0629 \u0645\u062a\u062d\u0641 \u0647\u0627\u062f\u0626\u0629' : 'Soft museum hall light'}
@@ -449,14 +449,15 @@ export default function BookPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background/95" />
           <div className="absolute inset-0 bg-background/40" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
         </div>
-        <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="pointer-events-none absolute inset-0">
           <div
             className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
             style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 60%)' }}
           />
         </div>
-        <div className="mx-auto max-w-5xl px-4 py-16 text-center md:px-8 md:py-20">
+        <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 text-center md:px-8 md:py-20">
           <div className="section-label mb-3">{isRTL ? 'Ø§Ù„Ø­Ø¬Ø²' : 'Book'}</div>
           <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
             {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
@@ -1261,7 +1262,7 @@ function BookingSummaryPanel({
   currentStepLabel: string;
 }) {
   return (
-    <div className="sticky top-20 space-y-4">
+    <div className="sticky top-24 space-y-4">
       <Card className="rounded-[2rem] border-primary/30 bg-card/90 p-5 shadow-[0_24px_70px_-34px_hsl(var(--primary)/0.7)] backdrop-blur">
         <div className="mb-5">
           <div className="section-label mb-2">{isRTL ? '\u0645\u0644\u062e\u0635 \u0627\u0644\u0632\u064a\u0627\u0631\u0629' : 'Visit Summary'}</div>
