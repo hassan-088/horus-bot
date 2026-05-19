@@ -79,14 +79,14 @@ export function SiteHeader() {
   }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 w-full bg-transparent pointer-events-none">
-      <div className="mx-auto max-w-7xl px-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-8">
+    <header className="sticky top-0 z-40 w-full bg-transparent">
+      <div className="mx-auto max-w-7xl px-3 pt-3 md:px-8 lg:py-0">
         <div
           className={cn(
-            'pointer-events-auto flex h-12 items-center justify-between rounded-full border px-3 shadow-[0_20px_55px_-32px_hsl(var(--primary)/0.65)] backdrop-blur-md lg:h-14 lg:px-4',
+            'flex h-12 items-center justify-between rounded-full border px-3 shadow-[0_18px_45px_-28px_hsl(var(--primary)/0.55)] backdrop-blur-md lg:h-16 lg:rounded-none lg:border-0 lg:bg-sidebar/55 lg:px-0 lg:shadow-none lg:backdrop-blur-lg',
             scrolled
-              ? 'border-primary/20 bg-card/80 shadow-[0_24px_65px_-34px_hsl(var(--primary)/0.72)] backdrop-blur-2xl'
-              : 'border-primary/10 bg-card/45 backdrop-blur-lg',
+              ? 'border-primary/20 bg-card/85 backdrop-blur-2xl'
+              : 'border-primary/10 bg-card/60',
           )}
         >
           <Link to="/" className="flex min-w-0 items-center gap-2">
@@ -104,7 +104,7 @@ export function SiteHeader() {
                 end={item.to === '/'}
                 className={({ isActive }) =>
                   cn(
-                    'rounded-full px-3 py-2 text-sm font-medium transition-colors',
+                    'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     isActive
                       ? 'text-primary'
                       : 'text-muted-foreground hover:text-foreground',
@@ -174,7 +174,7 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-[100] pointer-events-auto lg:hidden">
+        <div className="fixed inset-0 z-[100] lg:hidden">
           <div
             className="absolute inset-0 bg-foreground/40 backdrop-blur-sm animate-fade-in"
             onClick={() => setOpen(false)}

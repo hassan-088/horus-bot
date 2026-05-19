@@ -48,7 +48,6 @@ export default function AppPage() {
         }
         backgroundImage={gemImage}
         backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
-        bleedBehindNav
         className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 

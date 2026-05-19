@@ -55,7 +55,6 @@ export default function ExperiencePage() {
         }
         backgroundImage={gemImage}
         backgroundAlt={isRTL ? 'قاعة متحف مضاءة بهدوء' : 'Quietly lit museum hall'}
-        bleedBehindNav
         className="min-h-[calc(78vh-4rem)] md:min-h-[calc(88vh-4rem)] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-32 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 

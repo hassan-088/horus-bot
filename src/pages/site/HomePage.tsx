@@ -14,7 +14,6 @@ export default function HomePage() {
       {/* HERO */}
       <SectionHero
         className="min-h-[calc(100vh-4rem)] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-32 after:bg-gradient-to-t after:from-background after:to-transparent"
-        bleedBehindNav
         backgroundImage={gemImage}
         backgroundAlt={isRTL ? 'قاعة المتحف المصري الكبير' : 'Grand Egyptian Museum hall'}
         label={isRTL ? 'حورس-بوت • جولة متحف مستقبلية' : 'Horus-Bot • Future Museum Tour'}
