@@ -41,11 +41,12 @@ import {
 import { productMessage } from '@/lib/productMessages';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import gemImage from '@/assets/gem.jpg';
 
 const ar = {
-  heroLabel: '\u062a\u0630\u0627\u0643\u0631\u064a',
-  heroTitle: '\u062d\u062c\u0648\u0632\u0627\u062a\u0643 \u0648\u062a\u0630\u0627\u0643\u0631\u0643',
-  heroSubtitle: '\u0627\u0639\u0631\u0636 \u062d\u062c\u0648\u0632\u0627\u062a\u0643 \u0627\u0644\u062d\u0627\u0644\u064a\u0629 \u0648\u0627\u0644\u0633\u0627\u0628\u0642\u0629\u060c \u0648\u062a\u0630\u0627\u0643\u0631 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641\u060c \u0648\u062a\u0630\u0627\u0643\u0631 \u062c\u0648\u0644\u0627\u062a Horus-Bot.',
+  heroLabel: '\u0645\u062d\u0641\u0638\u0629 \u0627\u0644\u0632\u064a\u0627\u0631\u0629',
+  heroTitle: '\u062a\u0630\u0627\u0643\u0631\u064a',
+  heroSubtitle: '\u062a\u0628\u0642\u0649 \u062a\u0641\u0627\u0635\u064a\u0644 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641 \u0648\u062c\u0648\u0644\u0629 Horus-Bot \u062c\u0627\u0647\u0632\u0629 \u0644\u0644\u0632\u064a\u0627\u0631\u0629.',
   signInTitle: '\u0633\u062c\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0644\u0639\u0631\u0636 \u062a\u0630\u0627\u0643\u0631\u0643',
   signInBody: '\u0633\u062c\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0628\u062d\u0633\u0627\u0628\u0643 \u0639\u0644\u0649 Horus-Bot \u0644\u0631\u0624\u064a\u0629 \u062d\u062c\u0648\u0632\u0627\u062a\u0643 \u0648\u062a\u0630\u0627\u0643\u0631\u0643 \u0627\u0644\u0645\u062d\u0641\u0648\u0638\u0629.',
   signInCta: '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644',
@@ -62,18 +63,23 @@ const ar = {
   keepBooking: '\u0627\u0644\u0627\u062d\u062a\u0641\u0627\u0638 \u0628\u0627\u0644\u062d\u062c\u0632',
   cancelBooking: '\u0625\u0644\u063a\u0627\u0621 \u0627\u0644\u062d\u062c\u0632',
   cancelledSuccess: '\u062a\u0645 \u0625\u0644\u063a\u0627\u0621 \u0627\u0644\u062d\u062c\u0632.',
-  summary: '\u0645\u0644\u062e\u0635 \u0627\u0644\u062d\u062c\u0632',
+  booking: '\u0627\u0644\u062d\u062c\u0632',
+  summary: '\u0645\u0644\u062e\u0635 \u0627\u0644\u0632\u064a\u0627\u0631\u0629',
   visitors: '\u0627\u0644\u0632\u0648\u0627\u0631',
-  total: '\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a',
+  total: '\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0645\u0633\u062a\u062d\u0642',
+  visitTime: '\u0645\u0648\u0639\u062f \u0627\u0644\u0632\u064a\u0627\u0631\u0629',
   paymentStatus: '\u062d\u0627\u0644\u0629 \u0627\u0644\u062f\u0641\u0639',
   bookingStatus: '\u062d\u0627\u0644\u0629 \u0627\u0644\u062d\u062c\u0632',
   payAtCounter: '\u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0627\u0644\u0634\u0628\u0627\u0643',
-  entryQr: '\u0631\u0645\u0632 \u0627\u0644\u062f\u062e\u0648\u0644',
+  passCode: '\u0631\u0645\u0632 \u0627\u0644\u0645\u0631\u0648\u0631',
+  entryQr: '\u0631\u0645\u0632 \u062f\u062e\u0648\u0644 \u0627\u0644\u0628\u0648\u0627\u0628\u0629',
   museumTicket: '\u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641',
   tickets: '\u0627\u0644\u062a\u0630\u0627\u0643\u0631',
+  categories: '\u0641\u0626\u0627\u062a \u0627\u0644\u0632\u0648\u0627\u0631',
   price: '\u0627\u0644\u0633\u0639\u0631',
   entryQrBody: '\u064a\u0633\u062a\u062e\u062f\u0645 \u0631\u0645\u0632 QR \u0644\u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641 \u0639\u0646\u062f \u0627\u0644\u0628\u0648\u0627\u0628\u0629.',
   robotTicket: '\u062a\u0630\u0643\u0631\u0629 \u062c\u0648\u0644\u0629 Horus-Bot',
+  robotPairing: '\u0627\u0642\u062a\u0631\u0627\u0646 \u0627\u0644\u0631\u0648\u0628\u0648\u062a',
   route: '\u0627\u0644\u0645\u0633\u0627\u0631',
   tourType: '\u0646\u0648\u0639 \u0627\u0644\u062c\u0648\u0644\u0629',
   duration: '\u0627\u0644\u0645\u062f\u0629',
@@ -126,18 +132,21 @@ export default function MyTicketsPage() {
     <>
       <SectionHero
         label={isRTL ? ar.heroLabel : 'My Tickets'}
-        title={isRTL ? ar.heroTitle : 'Your Bookings and Tickets'}
+        title={isRTL ? ar.heroTitle : 'My Tickets'}
         subtitle={
           isRTL
             ? ar.heroSubtitle
-            : 'View your existing bookings, Museum Entry Tickets, and Horus-Bot Tour Tickets.'
+            : 'Your museum entry and Horus-Bot tour details stay ready for the visit.'
         }
+        backgroundImage={gemImage}
+        backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
+        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 
-      <section className="mx-auto max-w-3xl px-4 md:px-8 pb-24 -mt-6 space-y-8">
+      <section className="relative z-10 mx-auto max-w-5xl px-4 pb-24 -mt-10 space-y-8 md:px-8">
         {!user && (
-          <Card className="p-10 text-center">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <Card className="rounded-[2rem] border-primary/20 bg-card/90 p-8 text-center shadow-soft backdrop-blur md:p-10">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
               <LogIn className="h-6 w-6 text-primary" />
             </div>
             <h2 className="font-serif text-2xl mb-2">
@@ -167,8 +176,8 @@ export default function MyTicketsPage() {
         )}
 
         {user && !loading && !error && tickets.length === 0 && (
-          <Card className="p-10 text-center">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <Card className="rounded-[2rem] border-primary/20 bg-card/90 p-8 text-center shadow-soft backdrop-blur md:p-10">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
               <Ticket className="h-6 w-6 text-primary" />
             </div>
             <h2 className="font-serif text-2xl mb-2">
@@ -208,16 +217,16 @@ export default function MyTicketsPage() {
       </section>
 
       <Dialog open={!!confirmTk} onOpenChange={(open) => !open && !cancellingId && setConfirmTk(null)}>
-        <DialogContent className="max-w-sm rounded-2xl">
+        <DialogContent className="max-w-sm rounded-[2rem] border-primary/20 bg-card/95 p-6 shadow-soft backdrop-blur">
           <DialogHeader>
-            <DialogTitle>{isRTL ? ar.cancelTitle : 'Cancel this booking?'}</DialogTitle>
+            <DialogTitle className="font-serif text-2xl">{isRTL ? ar.cancelTitle : 'Cancel this booking?'}</DialogTitle>
             <DialogDescription>
               {isRTL
                 ? ar.cancelBody
                 : 'This will cancel your Museum Entry Ticket and linked Horus-Bot Tour Ticket.'}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:justify-end">
             <Button variant="ghost" onClick={() => setConfirmTk(null)} disabled={!!cancellingId}>
               {isRTL ? ar.keepBooking : 'Keep booking'}
             </Button>
@@ -234,14 +243,14 @@ export default function MyTicketsPage() {
 function TicketsLoadingState({ isRTL }: { isRTL: boolean }) {
   return (
     <div className="space-y-4">
-      <Card className="p-6">
+      <Card className="rounded-[2rem] border-primary/20 bg-card/90 p-5 shadow-soft backdrop-blur">
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
           <span>{isRTL ? ar.loading : 'Loading tickets...'}</span>
         </div>
       </Card>
       {[0, 1].map((item) => (
-        <Card key={item} className="p-6 space-y-4">
+        <Card key={item} className="rounded-[2rem] border-primary/20 bg-card/80 p-5 shadow-soft backdrop-blur md:p-6 space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-2 flex-1">
               <div className="h-3 w-24 rounded bg-muted animate-pulse" />
@@ -255,7 +264,7 @@ function TicketsLoadingState({ isRTL }: { isRTL: boolean }) {
               <div key={box} className="h-16 rounded-xl bg-muted/70 animate-pulse" />
             ))}
           </div>
-          <div className="h-20 rounded-xl border border-dashed border-border bg-muted/40 animate-pulse" />
+          <div className="h-24 rounded-2xl border border-dashed border-primary/20 bg-muted/40 animate-pulse" />
         </Card>
       ))}
     </div>
@@ -264,7 +273,7 @@ function TicketsLoadingState({ isRTL }: { isRTL: boolean }) {
 
 function InlineLoadingNotice({ isRTL }: { isRTL: boolean }) {
   return (
-    <Card className="p-4">
+    <Card className="rounded-2xl border-primary/20 bg-card/90 p-4 shadow-soft backdrop-blur">
       <div className="flex items-center gap-3 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin text-primary" />
         <span>{isRTL ? ar.loading : 'Loading tickets...'}</span>
@@ -276,9 +285,9 @@ function InlineLoadingNotice({ isRTL }: { isRTL: boolean }) {
 function TicketsErrorState({ error, isRTL, onRetry }: { error: string; isRTL: boolean; onRetry: () => void }) {
   const isNetwork = error === productMessage('network');
   return (
-    <Card className="p-6">
+    <Card className="rounded-[2rem] border-primary/20 bg-card/90 p-6 shadow-soft backdrop-blur">
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-destructive/10">
           <AlertCircle className="h-4 w-4 text-destructive" />
         </div>
         <div className="flex-1">
@@ -295,7 +304,7 @@ function TicketsErrorState({ error, isRTL, onRetry }: { error: string; isRTL: bo
 
 function SkippedBookingsNotice({ count, isRTL }: { count: number; isRTL: boolean }) {
   return (
-    <Card className="p-4 border-primary/30 bg-primary/5">
+    <Card className="rounded-2xl border-primary/30 bg-primary/5 p-4 shadow-soft">
       <div className="flex items-start gap-3">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
         <div>
@@ -328,10 +337,10 @@ function TicketSection({
 }) {
   return (
     <div>
-      <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">
+      <h3 className="section-label mb-3">
         {title}
       </h3>
-      <div className="grid gap-4">
+      <div className="grid gap-5">
         {tickets.map((tk) => (
           <TicketCard
             key={tk.id}
@@ -362,6 +371,28 @@ function paymentStatusLabel(isRTL: boolean) {
   return isRTL ? ar.payAtCounter : 'Pay at Counter';
 }
 
+function visitorCategoryLabel(key: string, isRTL: boolean) {
+  const labels: Record<string, { en: string; ar: string }> = {
+    egyptian_adult: { en: 'Egyptian Adult', ar: 'بالغ مصري' },
+    egyptian_student: { en: 'Egyptian Student', ar: 'طالب مصري' },
+    egyptian_child: { en: 'Egyptian Child', ar: 'طفل مصري' },
+    foreigner_adult: { en: 'Foreigner Adult', ar: 'بالغ أجنبي' },
+    foreigner_student: { en: 'Foreigner Student', ar: 'طالب أجنبي' },
+    foreigner_child: { en: 'Foreigner Child', ar: 'طفل أجنبي' },
+  };
+  return isRTL ? labels[key]?.ar ?? key : labels[key]?.en ?? key.replace(/_/g, ' ');
+}
+
+function visitorCategories(ticketTypes: Record<string, number>, isRTL: boolean) {
+  return Object.entries(ticketTypes)
+    .filter(([, count]) => Number(count) > 0)
+    .map(([key, count]) => ({
+      key,
+      label: visitorCategoryLabel(key, isRTL),
+      count,
+    }));
+}
+
 function TicketCard({
   tk,
   isRTL,
@@ -382,98 +413,94 @@ function TicketCard({
   const routeTitle = isRTL
     ? tk.route_title_ar || tk.route_title_en
     : tk.route_title_en || tk.route_title_ar;
+  const categories = visitorCategories(tk.ticket_types, isRTL);
+  const tourTypeLabel = tk.tour_type === 'personalized'
+    ? (isRTL ? 'مخصصة' : 'Personalized')
+    : (isRTL ? 'قياسية' : 'Standard');
+  const visitWhen = [tk.visit_date, tk.visit_time].filter(Boolean).join(' • ');
 
   return (
-    <Card className={'overflow-hidden p-0 ' + (inactive ? 'opacity-75' : '')}>
-      <div className="border-b border-border/60 bg-gradient-to-br from-card via-card to-primary/5 p-6">
-        <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-            {isRTL ? ar.summary : 'Booking summary'}
+    <Card className={cn('overflow-hidden rounded-[2rem] border-primary/20 bg-card/90 p-0 shadow-soft backdrop-blur', inactive && 'opacity-75')}>
+      <div className="border-b border-primary/15 bg-gradient-to-br from-card/95 via-card/85 to-primary/10 p-5 md:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <span className="section-label">{isRTL ? ar.booking : 'Booking'}</span>
+              <span className="max-w-full truncate rounded-full border border-primary/15 bg-background/55 px-3 py-1 font-mono text-xs text-muted-foreground">
+                {tk.booking_id}
+              </span>
+            </div>
+            <h3 className="font-serif text-2xl leading-tight text-foreground md:text-3xl">{tk.museum_name}</h3>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5 text-primary" />{tk.visit_date}</span>
+              {tk.visit_time && <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-primary" />{tk.visit_time}</span>}
+              <span className="flex items-center gap-1.5">
+                {tk.tour_type === 'personalized' ? <Sparkles className="h-3.5 w-3.5 text-primary" /> : <Zap className="h-3.5 w-3.5 text-primary" />}
+                <span>{tourTypeLabel}</span>
+              </span>
+            </div>
           </div>
-          <h3 className="font-serif text-2xl">{tk.museum_name}</h3>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1 flex-wrap">
-            <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" />{tk.visit_date}</span>
-            {tk.visit_time && <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{tk.visit_time}</span>}
-            <span className="flex items-center gap-1.5">
-              {tk.tour_type === 'personalized' ? <Sparkles className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
-              <span className="capitalize">{tk.tour_type ?? 'standard'}</span>
-            </span>
+          <div className="flex flex-wrap items-center gap-2 md:justify-end">
+            <Badge variant="secondary" className={statusBadgeClass(tk.status)}>
+              {statusLabel(tk.status, isRTL)}
+            </Badge>
+            <Badge variant="secondary" className="border-0 bg-primary/15 text-primary">
+              {paymentStatusLabel(isRTL)}
+            </Badge>
           </div>
-        </div>
-        <Badge
-          variant="secondary"
-          className={statusBadgeClass(tk.status)}
-        >
-          {statusLabel(tk.status, isRTL)}
-        </Badge>
         </div>
       </div>
 
-      <div className="space-y-5 p-6">
-        <div className="grid gap-3 sm:grid-cols-4">
-          <InfoBox label={isRTL ? ar.visitors : 'Visitors'} value={`${tk.total_tickets}`} />
+      <div className="space-y-5 p-5 md:p-6">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <InfoBox label={isRTL ? ar.visitTime : 'Visit time'} value={visitWhen} />
           <InfoBox label={isRTL ? ar.total : 'Total'} value={`${tk.total_price} ${tk.currency}`} />
-          <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
-          <InfoBox label={isRTL ? ar.bookingStatus : 'Booking status'} value={statusLabel(tk.status, isRTL)} />
+          <InfoBox label={isRTL ? ar.visitors : 'Visitors'} value={`${tk.total_tickets}`} />
         </div>
 
-      {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
-        <div className="space-y-2">
-          {tk.preferred_language && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Languages className="h-3.5 w-3.5" />
-              <span className="capitalize">{tk.preferred_language.replace('-', ' ')}</span>
-            </div>
-          )}
-          {tk.interests && tk.interests.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              {tk.interests.map((interest) => (
-                <span key={interest} className="rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[11px] capitalize">
-                  {interest.replace('-', ' ')}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
-        <div className="mb-3 flex items-center gap-2">
-          <QrCode className="h-4 w-4 text-primary" />
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-            {isRTL ? ar.entryQr : 'Museum Entry QR'}
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="grid h-20 w-20 shrink-0 grid-cols-3 gap-1 rounded-xl border border-primary/25 bg-background p-2">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <span key={i} className={cn('rounded-sm', i % 2 === 0 ? 'bg-foreground' : 'bg-primary/35')} />
-            ))}
-          </div>
-        <div className="min-w-0">
-          <p className="font-mono text-sm truncate">{tk.qr_value}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {isRTL ? ar.entryQrBody : 'Use this QR at the museum gate.'}
-          </p>
-        </div>
-        </div>
-      </div>
-
-      <div className="grid gap-4">
         <PassCard
           icon={<Ticket className="h-4 w-4 text-primary" />}
           title={isRTL ? ar.museumTicket : 'Museum Entry Ticket'}
           status={statusLabel(tk.museum_status, isRTL)}
         >
-          <div className="grid sm:grid-cols-3 gap-2 text-sm">
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <QrCode className="h-4 w-4 text-primary" />
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                {isRTL ? ar.entryQr : 'Gate Entry Code'}
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-background/75">
+                <QrCode className="h-6 w-6 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="break-all font-mono text-sm font-semibold text-foreground">{tk.qr_value}</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {isRTL ? ar.entryQrBody : 'Show this code at the museum entrance.'}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-2 text-sm sm:grid-cols-3">
             <InfoBox label={isRTL ? ar.tickets : 'Tickets'} value={`${tk.total_tickets}`} />
             <InfoBox label={isRTL ? ar.price : 'Price'} value={`${tk.museum_entry_total} ${tk.currency}`} />
             <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
           </div>
-          <p className="text-xs text-muted-foreground">
-            {isRTL ? ar.entryQrBody : 'Museum Entry QR is used at the museum gate.'}
+          {categories.length > 0 && (
+            <div className="space-y-1.5">
+              <div className="text-[11px] text-muted-foreground">{isRTL ? ar.categories : 'Visitor categories'}</div>
+              <div className="flex flex-wrap gap-1.5">
+                {categories.map((category) => (
+                  <span key={category.key} className="rounded-full bg-background/75 px-2 py-0.5 text-[11px] text-foreground ring-1 ring-primary/15">
+                    {category.label} × {category.count}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {isRTL ? ar.entryQrBody : 'Used at the museum entrance.'}
           </p>
         </PassCard>
 
@@ -482,7 +509,7 @@ function TicketCard({
           title={isRTL ? ar.robotTicket : 'Horus-Bot Tour Ticket'}
           status={statusLabel(tk.robot_status, isRTL)}
         >
-          <div className="grid sm:grid-cols-3 gap-2 text-sm">
+          <div className="grid gap-2 text-sm sm:grid-cols-3">
             {routeTitle && <InfoBox label={isRTL ? ar.route : 'Route'} value={routeTitle} />}
             <InfoBox label={isRTL ? ar.tourType : 'Tour type'} value={tk.tour_type ?? 'standard'} />
             <InfoBox label={isRTL ? ar.duration : 'Duration'} value={`${tk.tour_duration ?? 45} min`} />
@@ -512,33 +539,52 @@ function TicketCard({
               </p>
             </div>
           )}
-          <p className="text-xs text-muted-foreground">
+          {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {tk.preferred_language && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-background/75 px-2 py-0.5 text-[11px] text-muted-foreground ring-1 ring-primary/15">
+                  <Languages className="h-3.5 w-3.5" />
+                  <span className="capitalize">{tk.preferred_language.replace('-', ' ')}</span>
+                </span>
+              )}
+              {tk.interests?.map((interest) => (
+                <span key={interest} className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] capitalize text-primary">
+                  {interest.replace('-', ' ')}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="rounded-2xl border border-primary/15 bg-background/55 p-3">
+            <p className="mb-1 text-xs font-semibold text-foreground">{isRTL ? ar.robotPairing : 'Robot Pairing'}</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">
             {isRTL
               ? ar.pairingBody
               : 'Robot Pairing happens later inside the mobile app by scanning the physical robot QR.'}
-          </p>
+            </p>
+          </div>
         </PassCard>
-      </div>
 
-      {canCancel && onCancel && (
-        <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={onCancel} disabled={isCancelling}>
-          {isCancelling ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XIcon className="h-3.5 w-3.5" />}
-          {isRTL ? ar.cancelBooking : 'Cancel booking'}
-        </Button>
-      )}
-      {!canCancel && cancellationReason && (
-        <p className="text-xs text-muted-foreground">{cancellationReason}</p>
-      )}
+        <div className="border-t border-primary/15 pt-4">
+          {canCancel && onCancel && (
+            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={onCancel} disabled={isCancelling}>
+              {isCancelling ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XIcon className="h-3.5 w-3.5" />}
+              {isRTL ? ar.cancelBooking : 'Cancel booking'}
+            </Button>
+          )}
+          {!canCancel && cancellationReason && (
+            <p className="rounded-2xl border border-primary/15 bg-background/55 p-3 text-xs leading-relaxed text-muted-foreground">{cancellationReason}</p>
+          )}
+        </div>
       </div>
     </Card>
   );
 }
 
 function statusBadgeClass(status: TicketStatus) {
-  if (status === 'active') return 'bg-primary/15 text-primary border-0';
-  if (status === 'cancelled' || status === 'expired') return 'bg-muted text-muted-foreground border-0';
-  if (status === 'completed' || status === 'used') return 'bg-emerald-500/15 text-emerald-700 border-0';
-  return 'bg-amber-500/15 text-amber-700 border-0';
+  if (status === 'active') return 'shrink-0 bg-primary/15 text-primary border-0';
+  if (status === 'cancelled' || status === 'expired') return 'shrink-0 bg-muted text-muted-foreground border-0';
+  if (status === 'completed' || status === 'used') return 'shrink-0 bg-emerald-500/15 text-emerald-700 border-0';
+  return 'shrink-0 bg-amber-500/15 text-amber-700 border-0';
 }
 
 function statusLabel(status: TicketStatus, isRTL: boolean) {
@@ -588,9 +634,9 @@ function cancellationFailureMessage(error: string, isRTL: boolean) {
 
 function InfoBox({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-muted/50 p-3 text-sm">
+    <div className="min-w-0 rounded-xl bg-background/65 p-3 text-sm ring-1 ring-primary/10">
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="font-semibold capitalize">{value}</div>
+      <div className="break-words font-semibold capitalize text-foreground">{value}</div>
     </div>
   );
 }
@@ -607,13 +653,15 @@ function PassCard({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border/60 p-4 space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          {icon}
-          <h4 className="font-semibold">{title}</h4>
+    <div className="space-y-4 rounded-[1.5rem] border border-primary/15 bg-background/45 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/15">
+            {icon}
+          </span>
+          <h4 className="min-w-0 font-serif text-lg leading-tight text-foreground">{title}</h4>
         </div>
-        <Badge variant="secondary" className="bg-muted text-muted-foreground border-0">{status}</Badge>
+        <Badge variant="secondary" className="w-fit shrink-0 border-0 bg-muted text-muted-foreground">{status}</Badge>
       </div>
       {children}
     </div>

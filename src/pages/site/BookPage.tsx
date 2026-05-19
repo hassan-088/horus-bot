@@ -459,7 +459,7 @@ export default function BookPage() {
           />
         </div>
         <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 text-center md:px-8 md:py-20">
-          <div className="section-label mb-3">{isRTL ? 'Ø§Ù„Ø­Ø¬Ø²' : 'Book'}</div>
+          <div className="section-label mb-3">{isRTL ? 'الحجز' : 'Book'}</div>
           <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
             {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
           </h1>
@@ -997,7 +997,7 @@ export default function BookPage() {
                             type="button"
                             onClick={() => setSelectedExhibits((arr) => toggleInArray(arr, exhibit.id))}
                             className={cn(
-                              'min-h-16 rounded-2xl border p-3 text-left transition-colors',
+                              'min-h-16 rounded-2xl border p-3 text-left transition-colors rtl:text-right',
                               active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                             )}
                           >
@@ -1151,7 +1151,7 @@ export default function BookPage() {
                     onClick={() => !opt.disabled && setPay(opt.id)}
                     disabled={opt.disabled}
                     className={cn(
-                      'w-full flex items-start gap-3 p-4 rounded-2xl border text-left transition-colors',
+                      'w-full flex items-start gap-3 p-4 rounded-2xl border text-left transition-colors rtl:text-right',
                       active ? 'border-primary bg-primary/10' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                       opt.disabled && 'cursor-not-allowed opacity-60 hover:border-primary/10',
                     )}
