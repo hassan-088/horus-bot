@@ -48,7 +48,8 @@ export default function AppPage() {
         }
         backgroundImage={gemImage}
         backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
-        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
+        bleedBehindNav
+        atmosphereContinuity
       />
 
       <section className="relative z-10 mx-auto max-w-7xl px-4 pb-8 -mt-8 md:px-8 md:pb-10">

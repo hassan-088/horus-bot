@@ -11,6 +11,8 @@ interface SectionHeroProps {
   children?: ReactNode;
   backgroundImage?: string;
   backgroundAlt?: string;
+  bleedBehindNav?: boolean;
+  atmosphereContinuity?: boolean;
 }
 
 export function SectionHero({
@@ -23,9 +25,11 @@ export function SectionHero({
   children,
   backgroundImage,
   backgroundAlt = '',
+  bleedBehindNav = false,
+  atmosphereContinuity = false,
 }: SectionHeroProps) {
   return (
-    <section className={cn('relative overflow-hidden', className)}>
+    <section className={cn('relative isolate overflow-hidden', className)}>
       {/* Optional museum background image */}
       {backgroundImage && (
         <div className="pointer-events-none absolute inset-0 -z-20">
@@ -49,9 +53,16 @@ export function SectionHero({
         />
       </div>
 
+      {atmosphereContinuity && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-[-1px] z-0 h-44 bg-gradient-to-b from-transparent via-background/70 to-background md:h-64" />
+      )}
+
       <div
         className={cn(
-          'mx-auto max-w-5xl px-4 py-16 md:px-8 md:py-28',
+          'relative z-10 mx-auto max-w-5xl px-4 md:px-8',
+          bleedBehindNav
+            ? 'pb-16 pt-[calc(env(safe-area-inset-top)+6.5rem)] md:pb-28 md:pt-36'
+            : 'py-16 md:py-28',
           align === 'center' ? 'text-center' : 'text-start'
         )}
       >
