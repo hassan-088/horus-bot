@@ -1,152 +1,187 @@
 import { Link } from 'react-router-dom';
-import { MessageSquare, Map, BookOpen, Smartphone, Ticket, QrCode } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Bot, Camera, MessageSquare, Route, Sparkles, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SectionHero } from '@/components/site/SectionHero';
 import { useApp } from '@/contexts/AppContext';
-import gemMapImage from '@/assets/gem-complex-map.png';
+import gemImage from '@/assets/gem.jpg';
+import onboardingImage from '@/assets/onboarding.jpg';
+
+const ar = {
+  heroLabel: 'تجربة التطبيق',
+  heroTitle: 'يبقى المتحف قريبا طوال الزيارة',
+  heroSubtitle: 'احتفظ بالتذاكر والمسارات وإرشاد Horus-Bot والذكريات جاهزة قبل تجربة المتحف وأثناءها وبعدها.',
+  beforeLabel: 'قبل الوصول',
+  beforeTitle: 'تصل وأنت مطمئن',
+  beforeBody: 'تظل تذاكرك وتفاصيل زيارتك قريبة، حتى تبدأ اليوم من لحظة هادئة بدلا من البحث عن كل شيء عند الباب.',
+  beforeOne: 'تذاكر الزيارة جاهزة',
+  beforeTwo: 'المسار واضح قبل الدخول',
+  beforeThree: 'تفاصيل الزيارة في مكان واحد',
+  insideLabel: 'داخل المتحف',
+  insideTitle: 'يتحرك الإرشاد معك',
+  insideBody: 'عند وصولك، يساعدك التطبيق على استخدام تذاكرك، ثم Pair Robot ومتابعة Live Tour وطرح الأسئلة بينما تتقدم في القاعات.',
+  pairRobot: 'Pair Robot',
+  liveTour: 'Live Tour',
+  questions: 'أسئلة أثناء الزيارة',
+  afterLabel: 'بعد الزيارة',
+  afterTitle: 'تبقى الزيارة معك',
+  afterBody: 'بعد الجولة، تبقى الذكريات وتفاصيل الزيارة محفوظة، لتعود إلى ما شاهدته وتشارك لحظات المتحف بهدوء.',
+  memories: 'ذكريات الزيارة',
+  history: 'سجل الزيارات',
+  moments: 'لحظات محفوظة',
+  ctaTitle: 'هل أنت مستعد للمشي عبر التاريخ؟',
+  ctaBody: 'ابدأ بالحجز، ثم دع Horus-Bot يجعل الزيارة أوضح وأكثر هدوءا داخل المتحف.',
+  bookVisit: 'احجز زيارتك',
+};
 
 export default function AppPage() {
   const { isRTL } = useApp();
 
-  const screens = [
-    { icon: Ticket, label: isRTL ? 'تذاكري' : 'My Tickets' },
-    { icon: QrCode, label: isRTL ? 'اقتران الروبوت' : 'Robot Pairing' },
-    { icon: Map, label: isRTL ? 'الملاحة الحية' : 'Live navigation' },
-    { icon: BookOpen, label: isRTL ? 'تفاصيل المعروضات' : 'Exhibit details' },
-    { icon: MessageSquare, label: isRTL ? 'اسأل المرشد' : 'Ask the guide' },
-  ];
-  const appMoments = [
-    {
-      icon: Ticket,
-      labelEn: 'Before the visit',
-      labelAr: 'قبل الزيارة',
-      titleEn: 'Tickets are ready before arrival',
-      titleAr: 'تذاكرك جاهزة قبل الوصول',
-      bodyEn: 'Your Museum Entry Ticket and Horus-Bot Tour Ticket stay linked to the same account used on the website.',
-      bodyAr: 'تذكرة دخول المتحف وتذكرة جولة Horus-Bot تبقيان مرتبطتين بالحساب نفسه المستخدم على الموقع.',
-    },
-    {
-      icon: QrCode,
-      labelEn: 'At the museum',
-      labelAr: 'داخل المتحف',
-      titleEn: 'Pair with the physical robot',
-      titleAr: 'اقترن بالروبوت الفعلي',
-      bodyEn: 'Robot Pairing happens by scanning the physical QR on the robot, after your visit is booked.',
-      bodyAr: 'يتم اقتران الروبوت عبر مسح رمز QR الفعلي على الروبوت بعد إتمام الحجز.',
-    },
-    {
-      icon: Map,
-      labelEn: 'During the tour',
-      labelAr: 'أثناء الجولة',
-      titleEn: 'Follow the Live Tour',
-      titleAr: 'تابع الجولة الحية',
-      bodyEn: 'The app carries the live map, exhibit details, questions, and tour progress while the robot guides the route.',
-      bodyAr: 'يحمل التطبيق الخريطة الحية وتفاصيل المعروضات والأسئلة وتقدم الجولة بينما يقود الروبوت المسار.',
-    },
-  ];
-
-  const actions = (
-    <div className="flex flex-wrap gap-3 justify-center">
-      <Button asChild size="lg">
-        <Link to="/book">
-          <Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Visit'}
-        </Link>
-      </Button>
-      <Button asChild size="lg" variant="outline">
-        <Link to="/tickets-mine">
-          <Smartphone className="h-4 w-4" /> {isRTL ? 'عرض تذاكري' : 'My Tickets'}
-        </Link>
-      </Button>
-    </div>
-  );
-
   return (
     <>
       <SectionHero
-        label={isRTL ? 'التطبيق المرافق' : 'The Companion App'}
-        title={isRTL ? 'تجربة المتحف في يدك أثناء الزيارة' : 'Your Museum Visit, Ready in Your Hand'}
+        label={isRTL ? ar.heroLabel : 'Companion Experience'}
+        title={isRTL ? ar.heroTitle : 'The museum stays close throughout the visit.'}
         subtitle={
           isRTL
-            ? 'احجز من الموقع، ثم استخدم التطبيق داخل المتحف لعرض التذاكر، واقتران الروبوت، ومتابعة الجولة الحية.'
-            : 'Book on the website, then use the mobile app inside the museum for tickets, Robot Pairing, and the Live Tour.'
+            ? ar.heroSubtitle
+            : 'Keep tickets, routes, Horus-Bot guidance, and memories ready before, during, and after the museum experience.'
         }
-        actions={actions}
+        backgroundImage={gemImage}
+        backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
+        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 
-      <div className="mx-auto max-w-3xl px-4 md:px-8 -mt-6 mb-4 text-center space-y-2">
-        <p className="text-sm text-foreground/85">
-          {isRTL ? 'الموقع يجهز الزيارة، والتطبيق يكملها داخل المتحف.' : 'The website prepares the visit; the app carries it through inside the museum.'}
-        </p>
-        <p className="text-sm text-primary/90">
-          {isRTL
-            ? 'تذكرة دخول المتحف تستخدم عند البوابة. اقتران الروبوت يتم لاحقا في التطبيق بمسح رمز QR الفعلي على الروبوت.'
-            : 'The museum entry QR is used at the gate. Robot Pairing happens later in the app by scanning the physical QR on the robot.'}
-        </p>
-      </div>
-
-      <section className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <div className="section-label mb-4">{isRTL ? 'دور التطبيق' : 'App Role'}</div>
-            <h2 className="font-serif text-3xl md:text-5xl mb-5">{isRTL ? 'التطبيق هو رفيق الزيارة داخل المتحف' : 'The app is the in-museum companion'}</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {isRTL
-                ? 'الموقع ينهي الحجز. التطبيق يحمل ما يحدث عند الوصول: التذاكر، اقتران الروبوت، الجولة الحية، والأسئلة.'
-                : 'The website completes the booking. The app carries what happens on arrival: tickets, Robot Pairing, the Live Tour, and questions.'}
-            </p>
+      <section className="relative z-10 mx-auto max-w-7xl px-4 pb-12 -mt-8 md:px-8 md:pb-16">
+        <div className="rounded-[2rem] border border-primary/20 bg-card/80 p-4 shadow-soft backdrop-blur md:p-5">
+          <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">
+            {[
+              { icon: Ticket, en: 'Before arrival', ar: ar.beforeLabel },
+              { icon: Bot, en: 'Inside the museum', ar: ar.insideLabel },
+              { icon: Camera, en: 'After the visit', ar: ar.afterLabel },
+            ].map((item, index) => (
+              <div key={item.en} className="flex items-center gap-3 rounded-2xl bg-background/45 px-4 py-3 ring-1 ring-primary/10">
+                <item.icon className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-sm font-medium text-foreground">{isRTL ? item.ar : item.en}</span>
+              </div>
+            )).flatMap((node, index) => (
+              index < 2
+                ? [node, <div key={`line-${index}`} className="hidden h-px w-8 bg-primary/30 md:block" />]
+                : [node]
+            ))}
           </div>
-          <div className="space-y-5">
-            {appMoments.map((moment) => (
-              <div key={moment.labelEn} className="grid gap-4 rounded-2xl border border-border/60 bg-card/55 p-5 sm:grid-cols-[48px_1fr]">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/25">
-                  <moment.icon className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">{isRTL ? moment.labelAr : moment.labelEn}</p>
-                  <h3 className="mt-1 font-serif text-xl">{isRTL ? moment.titleAr : moment.titleEn}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{isRTL ? moment.bodyAr : moment.bodyEn}</p>
-                </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[0.82fr_1.18fr] md:px-8 md:py-20">
+        <div className="self-center">
+          <div className="section-label mb-4">{isRTL ? ar.beforeLabel : 'Before Arrival'}</div>
+          <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+            {isRTL ? ar.beforeTitle : 'You arrive already settled.'}
+          </h2>
+          <p className="leading-relaxed text-muted-foreground">
+            {isRTL
+              ? ar.beforeBody
+              : 'Your tickets and visit details stay close, so the day begins calmly instead of with searching at the gate.'}
+          </p>
+        </div>
+        <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-card/70 p-5 shadow-soft backdrop-blur md:p-7">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-background/30" />
+          <div className="relative grid gap-3 sm:grid-cols-3">
+            {[
+              { icon: Ticket, en: 'Tickets ready', ar: ar.beforeOne },
+              { icon: Route, en: 'Route prepared', ar: ar.beforeTwo },
+              { icon: Sparkles, en: 'Visit details together', ar: ar.beforeThree },
+            ].map((item) => (
+              <div key={item.en} className="rounded-2xl bg-background/55 p-4 ring-1 ring-primary/15">
+                <item.icon className="mb-4 h-5 w-5 text-primary" />
+                <p className="text-sm font-medium leading-snug text-foreground">{isRTL ? item.ar : item.en}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="relative bg-sidebar/15 overflow-hidden">
-        <img
-          src={gemMapImage}
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.06]"
-        />
-        <div className="relative mx-auto max-w-7xl px-4 md:px-8 py-20">
-          <div className="mb-10 max-w-2xl">
-            <div className="section-label mb-4">{isRTL ? 'شاشات أساسية' : 'Core Screens'}</div>
-            <h2 className="font-serif text-3xl md:text-4xl">{isRTL ? 'شاشات قليلة، كل منها له وظيفة واضحة' : 'A few screens, each with a clear job'}</h2>
+      <section className="bg-sidebar/15">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[1.08fr_0.92fr] md:px-8 md:py-20">
+          <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] shadow-[0_28px_90px_-28px_hsl(var(--primary)/0.45)] ring-1 ring-primary/20">
+            <img
+              src={onboardingImage}
+              alt={isRTL ? 'زوار داخل قاعة متحف' : 'Visitors inside a museum gallery'}
+              loading="lazy"
+              className="h-full min-h-[360px] w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
+              <div className="grid gap-2 sm:grid-cols-3">
+                {[
+                  { icon: Bot, en: 'Pair Robot', ar: ar.pairRobot },
+                  { icon: Route, en: 'Live Tour', ar: ar.liveTour },
+                  { icon: MessageSquare, en: 'Questions during the visit', ar: ar.questions },
+                ].map((item) => (
+                  <div key={item.en} className="rounded-2xl border border-primary/20 bg-card/75 p-3 shadow-soft backdrop-blur">
+                    <item.icon className="mb-2 h-4 w-4 text-primary" />
+                    <p className="text-sm font-medium leading-snug">{isRTL ? item.ar : item.en}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {screens.map((s) => (
-              <Card key={s.label} className="flex items-center gap-3 p-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/25">
-                  <s.icon className="h-5 w-5 text-primary" />
-                </div>
-                <p className="text-sm font-medium text-foreground">{s.label}</p>
-              </Card>
-            ))}
+          <div className="self-center">
+            <div className="section-label mb-4">{isRTL ? ar.insideLabel : 'Inside The Museum'}</div>
+            <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+              {isRTL ? ar.insideTitle : 'Guidance moves with you.'}
+            </h2>
+            <p className="leading-relaxed text-muted-foreground">
+              {isRTL
+                ? ar.insideBody
+                : 'When you arrive, the app helps with your tickets, Pair Robot, the Live Tour, and questions as you move through the galleries.'}
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-4 md:px-8 py-20 text-center">
-        <h2 className="font-serif text-3xl md:text-5xl mb-6">{isRTL ? 'ابدأ من الموقع وأكمل داخل التطبيق' : 'Start on the Website, Continue in the App'}</h2>
-        <p className="text-lg text-muted-foreground mb-10">
-          {isRTL
-            ? 'بعد الحجز، تظهر تذاكرك في حسابك. عند وصولك، استخدم التطبيق للدخول، واقتران الروبوت، ومتابعة الجولة.'
-            : 'After booking, your tickets stay in your account. When you arrive, use the app for entry, Robot Pairing, and the Live Tour.'}
-        </p>
-        {actions}
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[0.9fr_1.1fr] md:px-8 md:py-20">
+        <div className="self-center">
+          <div className="section-label mb-4">{isRTL ? ar.afterLabel : 'After The Visit'}</div>
+          <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+            {isRTL ? ar.afterTitle : 'The visit stays with you.'}
+          </h2>
+          <p className="leading-relaxed text-muted-foreground">
+            {isRTL
+              ? ar.afterBody
+              : 'After the tour, memories and visit details remain close, so the museum does not disappear when the day ends.'}
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            { icon: Sparkles, en: 'Visit memories', ar: ar.memories },
+            { icon: Route, en: 'Visit history', ar: ar.history },
+            { icon: Camera, en: 'Captured moments', ar: ar.moments },
+          ].map((item) => (
+            <div key={item.en} className="rounded-[2rem] border border-primary/15 bg-card/70 p-5 shadow-soft backdrop-blur">
+              <item.icon className="mb-5 h-5 w-5 text-primary" />
+              <p className="font-serif text-lg leading-snug text-foreground">{isRTL ? item.ar : item.en}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-14 text-center md:px-8 md:py-20">
+        <div className="rounded-[2rem] border border-primary/25 bg-gradient-to-br from-card/90 via-card/75 to-primary/10 p-6 shadow-[0_22px_70px_-35px_hsl(var(--primary)/0.55)] backdrop-blur md:p-12">
+          <h2 className="mb-6 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+            {isRTL ? ar.ctaTitle : 'Ready to walk through history?'}
+          </h2>
+          <p className="mx-auto mb-9 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+            {isRTL
+              ? ar.ctaBody
+              : 'Start with a booking, then let Horus-Bot make the museum visit clearer and calmer inside the galleries.'}
+          </p>
+          <Button asChild size="lg">
+            <Link to="/book">
+              <Ticket className="h-4 w-4" /> {isRTL ? ar.bookVisit : 'Book Visit'}
+            </Link>
+          </Button>
+        </div>
       </section>
     </>
   );
