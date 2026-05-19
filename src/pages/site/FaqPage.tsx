@@ -12,23 +12,23 @@ export default function FaqPage() {
     ? [
         {
           q: 'ما هو Horus-Bot؟',
-          a: 'Horus-Bot روبوت إرشاد ذاتي يقود الجولة داخل المتحف، بينما يدعمك تطبيق الهاتف بالتذاكر، والخرائط، ومحتوى المعروضات، والتفاعل أثناء الزيارة.',
+          a: 'Horus-Bot مرشد متحفي ذاتي يساعد الزوار على استكشاف المعروضات من خلال السرد الموجّه والمساعدة التفاعلية داخل القاعات.',
         },
         {
           q: 'هل أحتاج إلى التطبيق؟',
-          a: 'نعم، التطبيق هو المكان الذي تستخدم فيه تذاكرك داخل المتحف وتقرن تذكرة جولة الروبوت بالروبوت الفعلي عند الوصول.',
+          a: 'نعم، التطبيق يرافقك داخل المتحف لاستخدام التذاكر، والاتصال بـ Horus-Bot، ومتابعة الجولة المباشرة أثناء الزيارة.',
         },
         {
           q: 'أين أحجز التذاكر؟',
           a: 'يمكنك حجز تذكرة دخول المتحف وتذكرة جولة Horus-Bot من الموقع. بعد الحجز ستظهر التذاكر في حسابك على الموقع وفي تطبيق الهاتف.',
         },
         {
-          q: 'هل رمز دخول المتحف هو نفسه رمز اقتران الروبوت؟',
-          a: 'لا. رمز تذكرة دخول المتحف يستخدم عند بوابة المتحف. اقتران الروبوت يحدث لاحقا داخل تطبيق الهاتف عن طريق مسح رمز QR الفعلي الموجود على الروبوت.',
+          q: 'هل رمز دخول المتحف هو نفسه رمز الاتصال بـ Horus-Bot؟',
+          a: 'لا. رمز تذكرة دخول المتحف يستخدم عند بوابة المتحف. الاتصال بـ Horus-Bot يتم لاحقا داخل تطبيق الهاتف عن طريق مسح رمز QR الموجود على الروبوت.',
         },
         {
           q: 'ما طرق الدفع المتاحة؟',
-          a: 'الحجز الحالي يستخدم الدفع النقدي عند شباك المتحف. حالة الدفع تظهر كتسديد عند الشباك، ولا يوجد دفع إلكتروني داخل الموقع أو التطبيق حاليا.',
+          a: 'الحجز الحالي يستخدم الدفع النقدي عند شباك المتحف. حالة الدفع تظهر باسم Pay at Counter، ولا يوجد دفع إلكتروني داخل الموقع أو التطبيق حاليا.',
         },
         {
           q: 'هل يمكنني إلغاء الحجز؟',
@@ -40,7 +40,7 @@ export default function FaqPage() {
         },
         {
           q: 'ما اللغات المدعومة؟',
-          a: 'واجهة الموقع والتطبيق تدعم العربية والإنجليزية. لغة سرد جولة الروبوت يتم اختيارها ضمن إعدادات تذكرة جولة Horus-Bot.',
+          a: 'واجهة الموقع والتطبيق تدعم العربية والإنجليزية. لغة سرد جولة Horus-Bot يتم اختيارها ضمن إعدادات تذكرة الجولة.',
         },
         {
           q: 'هل التجربة مناسبة لذوي الاحتياجات الخاصة؟',
@@ -50,23 +50,23 @@ export default function FaqPage() {
     : [
         {
           q: 'What is Horus-Bot?',
-          a: 'Horus-Bot is an autonomous robot guide for the museum visit. The mobile app supports the same account, tickets, maps, exhibit content, and in-visit interaction.',
+          a: 'Horus-Bot is an autonomous museum guide that helps visitors explore exhibits through guided storytelling and interactive assistance.',
         },
         {
           q: 'Do I need the mobile app?',
-          a: 'Yes. The website is for pre-visit booking and account management. Robot Pairing and the Live Tour happen later inside the mobile app.',
+          a: 'Yes. The website prepares your visit. Robot connection and Live Tour continue inside the mobile app during your museum visit.',
         },
         {
           q: 'Where do I book tickets?',
           a: 'You can book the Museum Entry Ticket and Horus-Bot Tour Ticket on the website. The same tickets appear in your account on both website and mobile app.',
         },
         {
-          q: 'Is the Museum Entry QR the same as the Robot Pairing QR?',
-          a: 'No. The Museum Entry QR is used at the museum gate. Robot Pairing happens later in the mobile app by scanning the physical QR code on the robot.',
+          q: 'Is the Museum Entry QR the same as the Horus-Bot connection QR?',
+          a: 'No. The Museum Entry QR is used at the museum gate. Horus-Bot connection happens later in the mobile app by scanning the QR code on the robot.',
         },
         {
           q: 'Which payment methods are supported?',
-          a: 'Bookings currently use cash payment at the museum counter. Payment status is shown as Pay at Counter; there is no online payment gateway in the current product.',
+          a: 'Bookings currently use Pay at Counter. There is no online payment in the current experience.',
         },
         {
           q: 'Can I cancel my booking?',

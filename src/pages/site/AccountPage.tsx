@@ -189,6 +189,11 @@ export default function AccountPage() {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join('') || 'H';
+  const normalizedEmail = (user.email ?? '').toLowerCase();
+  const emptyValue = isRTL ? 'غير مضاف' : 'Not added';
+  const activeBookingLabel = isRTL
+    ? `${activeTickets.length} ${activeTickets.length === 1 ? ar.activeBooking : ar.activeBookings}`
+    : `${activeTickets.length} active booking${activeTickets.length === 1 ? '' : 's'}`;
 
   return (
     <>
@@ -237,11 +242,11 @@ export default function AccountPage() {
               <div className="min-w-0">
                 <div className="section-label mb-1">{isRTL ? ar.visitorProfile : 'Visitor Profile'}</div>
                 <h2 className="truncate font-serif text-2xl leading-tight text-foreground md:text-3xl">{profileName}</h2>
-                <p className="mt-1 break-all text-sm text-muted-foreground">{user.email}</p>
+                <p className="mt-1 break-all text-sm text-muted-foreground">{normalizedEmail || emptyValue}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Badge variant="secondary" className="border-0 bg-primary/15 text-primary">{isRTL ? ar.readyForVisit : 'Ready for the visit'}</Badge>
                   <Badge variant="secondary" className="border-0 bg-background/65 text-muted-foreground">
-                    {isRTL ? ar.preferredLanguage : 'Preferred language'}: {languageLabel(profile?.preferred_language, isRTL)}
+                    {activeBookingLabel}
                   </Badge>
                 </div>
               </div>
@@ -277,11 +282,10 @@ export default function AccountPage() {
 
             {!editing ? (
               <div className="grid gap-3 sm:grid-cols-2">
-                <Field icon={<UserIcon className="h-4 w-4" />} label={isRTL ? ar.fullName : 'Full name'} value={profile?.full_name || profile?.display_name || '-'} />
-                <Field icon={<Mail className="h-4 w-4" />} label={isRTL ? ar.email : 'Email'} value={user.email ?? '-'} />
-                <Field icon={<Phone className="h-4 w-4" />} label={isRTL ? ar.phone : 'Phone'} value={profile?.phone_number || '-'} />
-                <Field icon={<Flag className="h-4 w-4" />} label={isRTL ? ar.nationality : 'Nationality'} value={profile?.nationality || '-'} />
-                <Field icon={<Globe className="h-4 w-4" />} label={isRTL ? ar.preferredLanguage : 'Preferred language'} value={languageLabel(profile?.preferred_language, isRTL)} />
+                <Field icon={<UserIcon className="h-4 w-4" />} label={isRTL ? ar.fullName : 'Full name'} value={profile?.full_name || profile?.display_name || emptyValue} />
+                <Field icon={<Mail className="h-4 w-4" />} label={isRTL ? ar.email : 'Email'} value={normalizedEmail || emptyValue} />
+                <Field icon={<Phone className="h-4 w-4" />} label={isRTL ? ar.phone : 'Phone'} value={profile?.phone_number || emptyValue} />
+                <Field icon={<Flag className="h-4 w-4" />} label={isRTL ? ar.nationality : 'Nationality'} value={profile?.nationality || emptyValue} />
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -410,7 +414,7 @@ function Field({ icon, label, value }: { icon: ReactNode; label: string; value: 
         {icon}
         {label}
       </div>
-      <div className="break-words font-medium text-foreground capitalize">{value}</div>
+      <div className="break-words font-medium text-foreground">{value}</div>
     </div>
   );
 }

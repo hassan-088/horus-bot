@@ -79,14 +79,14 @@ const ar = {
   price: '\u0627\u0644\u0633\u0639\u0631',
   entryQrBody: '\u064a\u0633\u062a\u062e\u062f\u0645 \u0631\u0645\u0632 QR \u0644\u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641 \u0639\u0646\u062f \u0627\u0644\u0628\u0648\u0627\u0628\u0629.',
   robotTicket: '\u062a\u0630\u0643\u0631\u0629 \u062c\u0648\u0644\u0629 Horus-Bot',
-  robotPairing: '\u0627\u0642\u062a\u0631\u0627\u0646 \u0627\u0644\u0631\u0648\u0628\u0648\u062a',
+  robotPairing: '\u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0640 Horus-Bot',
   route: '\u0627\u0644\u0645\u0633\u0627\u0631',
   tourType: '\u0646\u0648\u0639 \u0627\u0644\u062c\u0648\u0644\u0629',
   duration: '\u0627\u0644\u0645\u062f\u0629',
   selectedExhibits: '\u0627\u0644\u0642\u0637\u0639 \u0627\u0644\u0645\u062e\u062a\u0627\u0631\u0629',
   routeUnavailable: '\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0645\u0633\u0627\u0631 \u063a\u064a\u0631 \u0645\u062a\u0627\u062d\u0629 \u0644\u0647\u0630\u0647 \u0627\u0644\u062a\u0630\u0643\u0631\u0629 \u0627\u0644\u0642\u062f\u064a\u0645\u0629.',
-  pairingBody: '\u064a\u062d\u062f\u062b \u0627\u0642\u062a\u0631\u0627\u0646 \u0627\u0644\u0631\u0648\u0628\u0648\u062a \u0644\u0627\u062d\u0642\u0627\u064b \u062f\u0627\u062e\u0644 \u062a\u0637\u0628\u064a\u0642 \u0627\u0644\u0647\u0627\u062a\u0641 \u0639\u0646 \u0637\u0631\u064a\u0642 \u0645\u0633\u062d \u0631\u0645\u0632 QR \u0627\u0644\u0641\u0639\u0644\u064a \u0639\u0644\u0649 \u0627\u0644\u0631\u0648\u0628\u0648\u062a.',
-  unavailableAfterPairing: '\u0644\u0627 \u064a\u062a\u0627\u062d \u0625\u0644\u063a\u0627\u0621 \u0627\u0644\u062d\u062c\u0632 \u0628\u0639\u062f \u0627\u0642\u062a\u0631\u0627\u0646 \u0627\u0644\u0631\u0648\u0628\u0648\u062a.',
+  pairingBody: '\u064a\u062a\u0645 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0640 Horus-Bot \u0644\u0627\u062d\u0642\u0627\u064b \u062f\u0627\u062e\u0644 \u062a\u0637\u0628\u064a\u0642 \u0627\u0644\u0647\u0627\u062a\u0641 \u0639\u0646 \u0637\u0631\u064a\u0642 \u0645\u0633\u062d \u0631\u0645\u0632 QR \u0627\u0644\u0645\u0648\u062c\u0648\u062f \u0639\u0644\u0649 \u0627\u0644\u0631\u0648\u0628\u0648\u062a.',
+  unavailableAfterPairing: '\u0644\u0627 \u064a\u062a\u0627\u062d \u0625\u0644\u063a\u0627\u0621 \u0627\u0644\u062d\u062c\u0632 \u0628\u0639\u062f \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0628\u0640 Horus-Bot.',
   unavailableInProgress: '\u0644\u0627 \u064a\u062a\u0627\u062d \u0625\u0644\u063a\u0627\u0621 \u0627\u0644\u062d\u062c\u0632 \u0628\u0639\u062f \u0628\u062f\u0621 \u0627\u0644\u062c\u0648\u0644\u0629 \u0627\u0644\u0645\u0628\u0627\u0634\u0631\u0629.',
   unavailableCompleted: '\u0627\u0643\u062a\u0645\u0644\u062a \u0647\u0630\u0647 \u0627\u0644\u0632\u064a\u0627\u0631\u0629\u060c \u0648\u0644\u0645 \u064a\u0639\u062f \u0627\u0644\u0625\u0644\u063a\u0627\u0621 \u0645\u062a\u0627\u062d\u0627\u064b.',
   unavailableExpired: '\u0627\u0646\u062a\u0647\u0649 \u0645\u0648\u0639\u062f \u0647\u0630\u0627 \u0627\u0644\u062d\u062c\u0632\u060c \u0648\u0644\u0645 \u064a\u0639\u062f \u0627\u0644\u0625\u0644\u063a\u0627\u0621 \u0645\u062a\u0627\u062d\u0627\u064b.',
@@ -101,6 +101,7 @@ const ar = {
     inProgress: '\u062c\u0627\u0631\u064a \u0627\u0644\u062c\u0648\u0644\u0629',
     preparing: '\u0642\u064a\u062f \u0627\u0644\u062a\u062c\u0647\u064a\u0632',
     used: '\u0645\u0633\u062a\u062e\u062f\u0645',
+    partiallyModified: '\u0645\u0639\u062f\u0644 \u062c\u0632\u0626\u064a\u0627\u064b',
   },
 };
 
@@ -418,6 +419,7 @@ function TicketCard({
     ? (isRTL ? 'مخصصة' : 'Personalized')
     : (isRTL ? 'قياسية' : 'Standard');
   const visitWhen = [tk.visit_date, tk.visit_time].filter(Boolean).join(' • ');
+  const bookingStatus = bookingDisplayStatus(tk, isRTL);
 
   return (
     <Card className={cn('overflow-hidden rounded-[2rem] border-primary/20 bg-card/90 p-0 shadow-soft backdrop-blur', inactive && 'opacity-75')}>
@@ -426,7 +428,7 @@ function TicketCard({
           <div className="min-w-0">
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <span className="section-label">{isRTL ? ar.booking : 'Booking'}</span>
-              <span className="max-w-full truncate rounded-full border border-primary/15 bg-background/55 px-3 py-1 font-mono text-xs text-muted-foreground">
+              <span className="max-w-full truncate rounded-full border border-primary/10 bg-background/35 px-2.5 py-0.5 font-mono text-[11px] text-muted-foreground">
                 {tk.booking_id}
               </span>
             </div>
@@ -441,10 +443,10 @@ function TicketCard({
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 md:justify-end">
-            <Badge variant="secondary" className={statusBadgeClass(tk.status)}>
-              {statusLabel(tk.status, isRTL)}
+            <Badge variant="secondary" className={bookingStatus.className}>
+              {bookingStatus.label}
             </Badge>
-            <Badge variant="secondary" className="border-0 bg-primary/15 text-primary">
+            <Badge variant="secondary" className="border-0 bg-background/65 text-primary">
               {paymentStatusLabel(isRTL)}
             </Badge>
           </div>
@@ -490,10 +492,10 @@ function TicketCard({
           {categories.length > 0 && (
             <div className="space-y-1.5">
               <div className="text-[11px] text-muted-foreground">{isRTL ? ar.categories : 'Visitor categories'}</div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {categories.map((category) => (
-                  <span key={category.key} className="rounded-full bg-background/75 px-2 py-0.5 text-[11px] text-foreground ring-1 ring-primary/15">
-                    {category.label} × {category.count}
+                  <span key={category.key} className="rounded-full bg-background/75 px-2.5 py-1 text-[11px] text-foreground ring-1 ring-primary/15">
+                    {category.label} x {category.count}
                   </span>
                 ))}
               </div>
@@ -511,7 +513,7 @@ function TicketCard({
         >
           <div className="grid gap-2 text-sm sm:grid-cols-3">
             {routeTitle && <InfoBox label={isRTL ? ar.route : 'Route'} value={routeTitle} />}
-            <InfoBox label={isRTL ? ar.tourType : 'Tour type'} value={tk.tour_type ?? 'standard'} />
+            <InfoBox label={isRTL ? ar.tourType : 'Tour type'} value={tourTypeLabel} />
             <InfoBox label={isRTL ? ar.duration : 'Duration'} value={`${tk.tour_duration ?? 45} min`} />
             <InfoBox label={isRTL ? ar.price : 'Price'} value={`${tk.robot_tour_price} ${tk.currency}`} />
             <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
@@ -521,9 +523,9 @@ function TicketCard({
               <div className="text-[11px] text-muted-foreground">
                 {isRTL ? ar.selectedExhibits : 'Selected exhibits'}
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {exhibitNames.map((name) => (
-                  <span key={name} className="rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[11px]">
+                  <span key={name} className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] text-primary">
                     {name}
                   </span>
                 ))}
@@ -540,26 +542,26 @@ function TicketCard({
             </div>
           )}
           {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-2">
               {tk.preferred_language && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-background/75 px-2 py-0.5 text-[11px] text-muted-foreground ring-1 ring-primary/15">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-background/75 px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-primary/15">
                   <Languages className="h-3.5 w-3.5" />
-                  <span className="capitalize">{tk.preferred_language.replace('-', ' ')}</span>
+                  <span>{formatDisplayToken(tk.preferred_language)}</span>
                 </span>
               )}
               {tk.interests?.map((interest) => (
-                <span key={interest} className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] capitalize text-primary">
-                  {interest.replace('-', ' ')}
+                <span key={interest} className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] text-primary">
+                  {formatDisplayToken(interest)}
                 </span>
               ))}
             </div>
           )}
           <div className="rounded-2xl border border-primary/15 bg-background/55 p-3">
-            <p className="mb-1 text-xs font-semibold text-foreground">{isRTL ? ar.robotPairing : 'Robot Pairing'}</p>
+            <p className="mb-1 text-xs font-semibold text-foreground">{isRTL ? ar.robotPairing : 'Horus-Bot connection'}</p>
             <p className="text-xs leading-relaxed text-muted-foreground">
             {isRTL
               ? ar.pairingBody
-              : 'Robot Pairing happens later inside the mobile app by scanning the physical robot QR.'}
+              : 'Robot connection and Live Tour continue inside the mobile app during your museum visit.'}
             </p>
           </div>
         </PassCard>
@@ -581,10 +583,32 @@ function TicketCard({
 }
 
 function statusBadgeClass(status: TicketStatus) {
-  if (status === 'active') return 'shrink-0 bg-primary/15 text-primary border-0';
+  if (status === 'active') return 'shrink-0 bg-primary/10 text-primary border-0';
   if (status === 'cancelled' || status === 'expired') return 'shrink-0 bg-muted text-muted-foreground border-0';
   if (status === 'completed' || status === 'used') return 'shrink-0 bg-emerald-500/15 text-emerald-700 border-0';
   return 'shrink-0 bg-amber-500/15 text-amber-700 border-0';
+}
+
+function bookingDisplayStatus(ticket: UserTicket, isRTL: boolean) {
+  const childStatuses = [ticket.museum_status, ticket.robot_status];
+  const hasMixedStatus = new Set(childStatuses).size > 1;
+  const hasCancelledChild = childStatuses.includes('cancelled');
+
+  if (hasMixedStatus || (ticket.status === 'active' && hasCancelledChild)) {
+    return {
+      label: isRTL ? ar.statuses.partiallyModified : 'Partially Modified',
+      className: 'shrink-0 border-0 bg-amber-500/15 text-amber-700',
+    };
+  }
+
+  const displayStatus = ticket.status === 'cancelled' || childStatuses.every((status) => status === 'cancelled')
+    ? 'cancelled'
+    : ticket.status;
+
+  return {
+    label: statusLabel(displayStatus, isRTL),
+    className: statusBadgeClass(displayStatus),
+  };
 }
 
 function statusLabel(status: TicketStatus, isRTL: boolean) {
@@ -609,7 +633,7 @@ function cancellationDeadlineMessage(isRTL: boolean) {
 
 function cancellationBlockedMessage(ticket: UserTicket, isRTL: boolean): string | null {
   if (ticket.robot_status === 'paired') {
-    return isRTL ? ar.unavailableAfterPairing : 'Cancellation is unavailable after Robot Pairing.';
+    return isRTL ? ar.unavailableAfterPairing : 'Cancellation is unavailable after Horus-Bot connection.';
   }
   if (ticket.robot_status === 'in_progress') {
     return isRTL ? ar.unavailableInProgress : 'Cancellation is unavailable after the Live Tour has started.';
@@ -639,6 +663,12 @@ function InfoBox({ label, value }: { label: string; value: string }) {
       <div className="break-words font-semibold capitalize text-foreground">{value}</div>
     </div>
   );
+}
+
+function formatDisplayToken(value: string) {
+  return value
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function PassCard({

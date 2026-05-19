@@ -17,7 +17,7 @@ export default function TicketsInfoPage() {
       unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
         isRTL ? 'دخول المتحف للمواطنين المصريين' : 'Museum entry for Egyptian citizens',
-        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+        isRTL ? 'Pay at Counter' : 'Pay at Counter',
       ],
     },
     {
@@ -26,7 +26,7 @@ export default function TicketsInfoPage() {
       unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
         isRTL ? 'يلزم إبراز بطاقة طالب' : 'Valid student ID required',
-        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+        isRTL ? 'Pay at Counter' : 'Pay at Counter',
       ],
       featured: true,
     },
@@ -36,7 +36,7 @@ export default function TicketsInfoPage() {
       unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
         isRTL ? 'دخول المتحف للأطفال المصريين' : 'Museum entry for Egyptian children',
-        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+        isRTL ? 'Pay at Counter' : 'Pay at Counter',
       ],
     },
     {
@@ -45,7 +45,7 @@ export default function TicketsInfoPage() {
       unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
         isRTL ? 'دخول المتحف للزوار الأجانب' : 'Museum entry for foreign visitors',
-        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+        isRTL ? 'Pay at Counter' : 'Pay at Counter',
       ],
     },
     {
@@ -54,7 +54,7 @@ export default function TicketsInfoPage() {
       unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
         isRTL ? 'يلزم إبراز بطاقة طالب' : 'Valid student ID required',
-        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+        isRTL ? 'Pay at Counter' : 'Pay at Counter',
       ],
     },
     {
@@ -63,7 +63,7 @@ export default function TicketsInfoPage() {
       unit: isRTL ? 'تذكرة' : 'ticket',
       perks: [
         isRTL ? 'دخول المتحف للأطفال الأجانب' : 'Museum entry for foreign children',
-        isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival',
+        isRTL ? 'Pay at Counter' : 'Pay at Counter',
       ],
     },
     {
@@ -123,7 +123,7 @@ export default function TicketsInfoPage() {
         </div>
       </div>
 
-      <section className="mx-auto max-w-7xl px-4 md:px-8 pb-20">
+      <section className="mx-auto max-w-7xl px-4 pb-14 md:px-8 md:pb-16">
         <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
           <Card className="p-6 md:p-8">
             <div className="mb-6">
@@ -186,7 +186,7 @@ export default function TicketsInfoPage() {
       </section>
 
       <section className="bg-sidebar/15">
-        <div className="mx-auto max-w-4xl px-4 md:px-8 py-20 text-center">
+        <div className="mx-auto max-w-4xl px-4 py-16 text-center md:px-8">
           <div className="section-label mb-4">{isRTL ? 'حجز موثوق' : 'Trusted Booking'}</div>
           <h2 className="font-serif text-3xl md:text-4xl mb-10">{isRTL ? 'تفاصيل تطمئنك قبل الحجز' : 'Details That Put You at Ease Before You Book'}</h2>
           <div className="grid gap-5 sm:grid-cols-3 text-start">
@@ -202,7 +202,7 @@ export default function TicketsInfoPage() {
             </Card>
             <Card className="p-6">
               <ShieldCheck className="h-5 w-5 text-primary mb-3" />
-              <h3 className="font-serif text-base mb-1">{isRTL ? 'الدفع نقدا عند الوصول' : 'Cash payment on arrival'}</h3>
+              <h3 className="font-serif text-base mb-1">Pay at Counter</h3>
               <p className="text-sm text-muted-foreground">{isRTL ? 'أكد حجزك الآن وادفع بالجنيه المصري عند شباك المتحف.' : 'Confirm now and pay in EGP at the museum counter.'}</p>
             </Card>
           </div>

@@ -430,7 +430,7 @@ export default function BookPage() {
     { id: 'card', labelEn: 'Card payment', labelAr: 'بطاقة', icon: CreditCard,
       disabled: true,
       note: {
-        en: 'Card payment is not active for this visit. Please pay at the museum counter.',
+        en: 'Card payment is not active for this visit. Please use Pay at Counter.',
         ar: 'الدفع بالبطاقة غير متاح لهذا الحجز. أتمم الحجز نقداً عند شباك المتحف.',
       },
     },
@@ -517,7 +517,7 @@ export default function BookPage() {
                 onClick={() => { setAuthMode('signup'); setAuthErrors({}); }}
                 className={cn(
                   'flex-1 rounded-xl px-3 py-2 text-sm font-medium transition-colors',
-                  authMode === 'signup' ? 'bg-primary/12 text-foreground shadow-sm shadow-primary/10 ring-1 ring-primary/15' : 'text-muted-foreground hover:text-foreground',
+                  authMode === 'signup' ? 'bg-primary/15 text-foreground shadow-sm shadow-primary/10 ring-1 ring-primary/15' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 {isRTL ? 'إنشاء حساب' : 'Create account'}
@@ -527,7 +527,7 @@ export default function BookPage() {
                 onClick={() => { setAuthMode('login'); setAuthErrors({}); }}
                 className={cn(
                   'flex-1 rounded-xl px-3 py-2 text-sm font-medium transition-colors',
-                  authMode === 'login' ? 'bg-primary/12 text-foreground shadow-sm shadow-primary/10 ring-1 ring-primary/15' : 'text-muted-foreground hover:text-foreground',
+                  authMode === 'login' ? 'bg-primary/15 text-foreground shadow-sm shadow-primary/10 ring-1 ring-primary/15' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 {isRTL ? 'تسجيل الدخول' : 'Log in'}
@@ -1132,7 +1132,7 @@ export default function BookPage() {
         {currentStep === 'payment' && (
           <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? '\u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0627\u0644\u0634\u0628\u0627\u0643' : 'Pay at the museum counter'}</h2>
+              <h2 className="font-serif text-2xl mb-1">Pay at Counter</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
                   ? '\u0627\u0644\u062f\u0641\u0639 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u062d\u0627\u0644\u064a\u0627\u064b. \u0633\u064a\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u062d\u062c\u0632\u0643 \u0648\u062a\u062f\u0641\u0639 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
@@ -1229,7 +1229,7 @@ export default function BookPage() {
             <DialogDescription>
               {isRTL
                 ? '\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u0627\u0644\u062d\u062c\u0632. \u064a\u0631\u062c\u0649 \u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641. \u062a\u0630\u0627\u0643\u0631\u0643 \u0645\u062a\u0627\u062d\u0629 \u0627\u0644\u0622\u0646 \u0641\u064a \u062a\u0630\u0627\u0643\u0631\u064a.'
-                : 'Booking confirmed. Please pay at the museum counter. Your tickets are now available in My Tickets.'}
+                : 'Booking confirmed. Pay at Counter. Your tickets are now available in My Tickets.'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center">
@@ -1290,7 +1290,7 @@ function BookingSummaryPanel({
           <div className="space-y-2 border-t border-primary/15 pt-3">
             <SummaryLine label={isRTL ? '\u062a\u0630\u0643\u0631\u0629 \u062f\u062e\u0648\u0644 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Museum Entry Ticket'} value={`${museumPrice} ${CURRENCY}`} />
             <SummaryLine label={isRTL ? '\u062c\u0648\u0644\u0629 Horus-Bot \u0627\u0644\u0645\u0631\u0634\u062f\u0629' : 'Horus-Bot Guided Tour'} value={`${tourPrice} ${CURRENCY}`} />
-            <SummaryLine label={isRTL ? '\u0627\u0644\u062f\u0641\u0639' : 'Payment'} value={isRTL ? '\u0639\u0646\u062f \u0627\u0644\u0634\u0628\u0627\u0643' : 'Pay at Counter'} />
+            <SummaryLine label={isRTL ? '\u0627\u0644\u062f\u0641\u0639' : 'Payment'} value="Pay at Counter" />
           </div>
           <div className="flex items-center justify-between rounded-2xl border border-primary/20 bg-primary/15 p-4 text-base">
             <span>{isRTL ? '\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0645\u0633\u062a\u062d\u0642' : 'Total due'}</span>

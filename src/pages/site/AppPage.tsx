@@ -18,8 +18,8 @@ const ar = {
   beforeThree: 'تفاصيل الزيارة في مكان واحد',
   insideLabel: 'داخل المتحف',
   insideTitle: 'يتحرك الإرشاد معك',
-  insideBody: 'عند وصولك، يساعدك التطبيق على استخدام تذاكرك، ثم Pair Robot ومتابعة Live Tour وطرح الأسئلة بينما تتقدم في القاعات.',
-  pairRobot: 'Pair Robot',
+  insideBody: 'عند وصولك، يساعدك التطبيق على استخدام تذاكرك، ثم الاتصال بـ Horus-Bot ومتابعة Live Tour وطرح الأسئلة بينما تتقدم في القاعات.',
+  pairRobot: 'الاتصال بـ Horus-Bot',
   liveTour: 'Live Tour',
   questions: 'أسئلة أثناء الزيارة',
   afterLabel: 'بعد الزيارة',
@@ -51,7 +51,7 @@ export default function AppPage() {
         className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 
-      <section className="relative z-10 mx-auto max-w-7xl px-4 pb-12 -mt-8 md:px-8 md:pb-16">
+      <section className="relative z-10 mx-auto max-w-7xl px-4 pb-8 -mt-8 md:px-8 md:pb-10">
         <div className="rounded-[2rem] border border-primary/20 bg-card/80 p-4 shadow-soft backdrop-blur md:p-5">
           <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">
             {[
@@ -72,7 +72,7 @@ export default function AppPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[0.82fr_1.18fr] md:px-8 md:py-20">
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-[0.82fr_1.18fr] md:px-8 md:py-16">
         <div className="self-center">
           <div className="section-label mb-4">{isRTL ? ar.beforeLabel : 'Before Arrival'}</div>
           <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
@@ -114,7 +114,7 @@ export default function AppPage() {
             <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
               <div className="grid gap-2 sm:grid-cols-3">
                 {[
-                  { icon: Bot, en: 'Pair Robot', ar: ar.pairRobot },
+              { icon: Bot, en: 'Connect to Horus-Bot', ar: ar.pairRobot },
                   { icon: Route, en: 'Live Tour', ar: ar.liveTour },
                   { icon: MessageSquare, en: 'Questions during the visit', ar: ar.questions },
                 ].map((item) => (
@@ -134,7 +134,7 @@ export default function AppPage() {
             <p className="leading-relaxed text-muted-foreground">
               {isRTL
                 ? ar.insideBody
-                : 'When you arrive, the app helps with your tickets, Pair Robot, the Live Tour, and questions as you move through the galleries.'}
+                : 'When you arrive, the app helps with your tickets, Horus-Bot connection, the Live Tour, and questions as you move through the galleries.'}
             </p>
           </div>
         </div>

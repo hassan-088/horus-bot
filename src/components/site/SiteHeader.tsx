@@ -24,6 +24,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [logoutBusy, setLogoutBusy] = useState(false);
   const [languageBusy, setLanguageBusy] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const handleLogout = async () => {
     if (logoutBusy) return;
@@ -70,10 +71,24 @@ export function SiteHeader() {
     setOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 18);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-sidebar/80 backdrop-blur-xl lg:bg-sidebar/80">
-      <div className="mx-auto max-w-7xl px-3 py-3 md:px-8 lg:py-0">
-        <div className="flex h-14 items-center justify-between rounded-full border border-primary/15 bg-card/90 px-3 shadow-soft backdrop-blur-xl lg:h-16 lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:shadow-none">
+    <header className="sticky top-0 z-40 w-full bg-transparent">
+      <div className="mx-auto max-w-7xl px-3 pt-3 md:px-8 lg:py-0">
+        <div
+          className={cn(
+            'flex h-12 items-center justify-between rounded-full border px-3 shadow-[0_18px_45px_-28px_hsl(var(--primary)/0.55)] backdrop-blur-md lg:h-16 lg:rounded-none lg:border-0 lg:bg-sidebar/55 lg:px-0 lg:shadow-none lg:backdrop-blur-lg',
+            scrolled
+              ? 'border-primary/20 bg-card/85 backdrop-blur-2xl'
+              : 'border-primary/10 bg-card/60',
+          )}
+        >
           <Link to="/" className="flex min-w-0 items-center gap-2">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
               <span className="font-serif text-lg font-bold text-primary">H</span>
@@ -141,13 +156,13 @@ export function SiteHeader() {
               onClick={handleLanguageToggle}
               disabled={languageBusy}
               aria-label={isRTL ? 'تغيير اللغة' : 'Change language'}
-              className="h-10 w-10"
+              className="h-9 w-9 rounded-full"
             >
               {languageBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
             </Button>
             <button
               type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-foreground"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-foreground"
               onClick={() => setOpen((v) => !v)}
               aria-label={open ? 'Close menu' : 'Open menu'}
               aria-expanded={open}

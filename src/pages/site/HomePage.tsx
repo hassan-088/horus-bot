@@ -27,7 +27,7 @@ export default function HomePage() {
         subtitle={
           isRTL
             ? 'جولة متحف هادئة ومبهرة يقودها روبوت ذاتي الحركة، بينما تبقى تذكرتك ومسارك وذكرياتك قريبة في التطبيق.'
-            : 'A quiet, cinematic museum visit guided by an autonomous robot, with your ticket, route, and memories kept close in the app.'
+            : 'A quiet, cinematic museum visit guided by Horus-Bot, with your ticket, route, and memories kept close in the app.'
         }
         actions={
           <>

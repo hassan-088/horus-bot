@@ -20,7 +20,7 @@ const ar = {
   meetLabel: 'لقاء Horus-Bot',
   meetTitle: 'مرشد يتحرك مع الإيقاع',
   meetBody: 'بدلا من متابعة اللوحات وحدك، يتحرك Horus-Bot معك بين المحطات. يفتح الطريق للقصة، ويترك لك مساحة السؤال والتوقف والنظر.',
-  meetOne: 'Pair Robot عند الوصول',
+  meetOne: 'الاتصال بـ Horus-Bot عند الوصول',
   meetTwo: 'Live Tour داخل القاعات',
   meetThree: 'أسئلة في لحظة الفضول',
   walkLabel: 'المشي عبر التاريخ',
@@ -55,7 +55,7 @@ export default function ExperiencePage() {
         }
         backgroundImage={gemImage}
         backgroundAlt={isRTL ? 'قاعة متحف مضاءة بهدوء' : 'Quietly lit museum hall'}
-        className="min-h-[calc(88vh-4rem)] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-32 after:bg-gradient-to-t after:from-background after:to-transparent"
+        className="min-h-[calc(78vh-4rem)] md:min-h-[calc(88vh-4rem)] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-32 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 
       <section className="relative z-10 mx-auto max-w-7xl px-4 pb-12 -mt-10 md:px-8 md:pb-16">
@@ -80,7 +80,7 @@ export default function ExperiencePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[0.92fr_1.08fr] md:px-8 md:py-20">
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-[0.92fr_1.08fr] md:px-8 md:py-20">
         <div className="self-center">
           <div className="section-label mb-4">{isRTL ? ar.arrivalLabel : 'Arrival'}</div>
           <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
@@ -120,7 +120,7 @@ export default function ExperiencePage() {
               </div>
               <div className="grid gap-3">
                 {[
-                  { icon: Bot, en: 'Pair Robot at arrival', ar: ar.meetOne },
+                  { icon: Bot, en: 'Connect to Horus-Bot at arrival', ar: ar.meetOne },
                   { icon: Route, en: 'Live Tour in the galleries', ar: ar.meetTwo },
                   { icon: MessageSquare, en: 'Questions when curiosity appears', ar: ar.meetThree },
                 ].map((item) => (
@@ -146,7 +146,7 @@ export default function ExperiencePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[0.88fr_1.12fr] md:px-8 md:py-20">
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-[0.88fr_1.12fr] md:px-8 md:py-20">
         <div className="self-center">
           <div className="section-label mb-4">{isRTL ? ar.walkLabel : 'Walking Through History'}</div>
           <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">

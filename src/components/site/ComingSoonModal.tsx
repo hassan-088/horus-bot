@@ -20,7 +20,7 @@ export function ComingSoonModal({ open, onOpenChange }: Props) {
           <DialogDescription>
             {isRTL
               ? 'بعد الحجز، تظهر تذاكرك في حسابك. داخل المتحف، استخدم تطبيق Horus-Bot لعرض التذاكر، واقتران الروبوت، ومتابعة الجولة.'
-              : 'After booking, your tickets appear in your account. At the museum, use the Horus-Bot app for tickets, Robot Pairing, and the Live Tour.'}
+              : 'After booking, your tickets appear in your account. At the museum, use the Horus-Bot app for tickets, Horus-Bot connection, and the Live Tour.'}
           </DialogDescription>
         </DialogHeader>
         <Button onClick={() => onOpenChange(false)}>

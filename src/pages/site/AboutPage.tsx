@@ -31,12 +31,12 @@ const ar = {
   memorable: 'أكثر رسوخا',
   confidenceLabel: 'ثقة للمؤسسات',
   confidenceTitle: 'مصمم ليحترم هدوء المتحف وقيمته التعليمية',
-  confidenceBody: 'Horus-Bot يقدم إحساسا منظما وجادا للمتحف: حركة موجهة، سرد ثقافي، وتجربة تساعد الزوار على الفهم دون أن تطغى على المكان.',
+  confidenceBody: 'Horus-Bot يمنح المتحف تجربة زوار منظمة ومهنية: حركة موجهة، سرد ثقافي، ومساعدة هادئة على الفهم دون أن تطغى على المكان.',
   learning: 'قيمة تعليمية',
   guided: 'حركة موجهة',
   storytelling: 'سرد ثقافي',
   ctaTitle: 'ابدأ زيارة أكثر هدوءا',
-  ctaBody: 'احجز الزيارة ودع Horus-Bot يجعل الطريق داخل المتحف أقرب إلى القصة.',
+  ctaBody: 'احجز الزيارة ودع Horus-Bot يرشد رحلتك داخل المتحف بهدوء.',
   bookVisit: 'احجز زيارتك',
 };
 
@@ -115,7 +115,7 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-sidebar/15">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[1.05fr_0.95fr] md:px-8 md:py-20">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-[1.05fr_0.95fr] md:px-8 md:py-16">
           <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-card/70 p-5 shadow-soft backdrop-blur md:p-7">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-background/30" />
             <div className="relative">
@@ -150,7 +150,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[0.9fr_1.1fr] md:px-8 md:py-20">
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-[0.9fr_1.1fr] md:px-8 md:py-16">
         <div className="self-center">
           <div className="section-label mb-4">{isRTL ? ar.visionLabel : 'Vision'}</div>
           <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
@@ -190,12 +190,12 @@ export default function AboutPage() {
           <div className="self-center">
             <div className="section-label mb-4">{isRTL ? ar.confidenceLabel : 'Institution Confidence'}</div>
             <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
-              {isRTL ? ar.confidenceTitle : 'Made to respect the museum’s calm and educational value.'}
+              {isRTL ? ar.confidenceTitle : "Made to respect the museum's calm and educational value."}
             </h2>
             <p className="leading-relaxed text-muted-foreground">
               {isRTL
                 ? ar.confidenceBody
-                : 'Horus-Bot gives museums an organized, serious feeling: guided movement, cultural storytelling, and a visitor experience that helps people understand without overpowering the place.'}
+                : 'Horus-Bot gives museums an organized and professional visitor experience: guided movement, cultural storytelling, and calm support for understanding the place.'}
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               {[ar.learning, ar.guided, ar.storytelling].map((item, index) => (
@@ -216,7 +216,7 @@ export default function AboutPage() {
           <p className="mx-auto mb-9 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
             {isRTL
               ? ar.ctaBody
-              : 'Book the visit and let Horus-Bot bring the path through the museum closer to the story.'}
+              : 'Book the visit and let Horus-Bot guide your museum journey with calm support.'}
           </p>
           <Button asChild size="lg">
             <Link to="/book">

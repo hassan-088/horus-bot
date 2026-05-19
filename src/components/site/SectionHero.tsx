@@ -51,7 +51,7 @@ export function SectionHero({
 
       <div
         className={cn(
-          'mx-auto max-w-5xl px-4 md:px-8 py-20 md:py-28',
+          'mx-auto max-w-5xl px-4 py-16 md:px-8 md:py-28',
           align === 'center' ? 'text-center' : 'text-start'
         )}
       >
@@ -60,12 +60,12 @@ export function SectionHero({
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-6 text-lg md:text-xl leading-relaxed text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-5 text-lg md:mt-6 md:text-xl leading-relaxed text-muted-foreground max-w-2xl mx-auto">
             {subtitle}
           </p>
         )}
         {actions && (
-          <div className={cn('mt-10 flex flex-wrap gap-3', align === 'center' && 'justify-center')}>
+          <div className={cn('mt-8 flex flex-wrap gap-3 md:mt-10', align === 'center' && 'justify-center')}>
             {actions}
           </div>
         )}

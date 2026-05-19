@@ -38,8 +38,8 @@ export function SiteFooter() {
               <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm leading-relaxed text-muted-foreground">
                 <BookOpen className="mb-3 h-5 w-5 text-primary" />
                 {isRTL
-                  ? 'احجز قبل الوصول، ثم دع Horus-Bot يجعل الطريق داخل المتحف أقرب إلى القصة.'
-                  : 'Book before arrival, then let Horus-Bot bring the museum path closer to the story.'}
+                  ? 'احجز قبل الوصول، ثم دع Horus-Bot يرشد رحلتك داخل المتحف بهدوء.'
+                  : 'Book before arrival, then let Horus-Bot guide your museum journey with calm support.'}
               </div>
             </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, Phone, Globe, Flag, ArrowLeft, Loader2, Check, X as XIcon } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, Globe, Flag, Loader2, Check, X as XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -166,23 +166,15 @@ export default function AuthScreen() {
     switchAction: isSignUp
       ? (isArabic ? 'تسجيل الدخول' : 'Sign In')
       : (isArabic ? 'إنشاء حساب' : 'Sign Up'),
-    back: isArabic ? 'رجوع' : 'Back',
     forgot: isArabic ? 'نسيت كلمة المرور؟' : 'Forgot password?',
     pwRulesIntro: isArabic ? 'يجب أن تتضمن كلمة المرور على الأقل:' : 'Password must contain at least:',
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <div className="p-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="gap-2">
-          <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-          {t.back}
-        </Button>
-      </div>
-
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className="mb-8 animate-fade-in-up">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center shadow-lg">
+          <div className="flex h-16 w-16 items-center justify-center">
             <img src={ankhLogo} alt="Horus-Bot" className="w-12 h-12" />
           </div>
         </div>

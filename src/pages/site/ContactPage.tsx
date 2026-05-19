@@ -62,7 +62,7 @@ export default function ContactPage() {
               <Mail className="h-5 w-5 text-primary mb-3" />
               <h3 className="font-serif text-base mb-1">{isRTL ? 'دعم الزوار' : 'Visitor Support'}</h3>
               <p className="text-sm text-muted-foreground">support@horus-bot.com</p>
-              <p className="text-xs text-primary/80 mt-2">{isRTL ? 'الردود عادةً خلال ساعات قليلة.' : 'Typically replies within a few hours.'}</p>
+              <p className="text-xs text-primary/90 mt-2">{isRTL ? 'الردود عادةً خلال ساعات قليلة.' : 'Typically replies within a few hours.'}</p>
             </Card>
             <Card className="p-6">
               <Briefcase className="h-5 w-5 text-primary mb-3" />
@@ -121,7 +121,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-4 md:px-8 pb-24">
+      <section className="mx-auto max-w-3xl px-4 pb-28 md:px-8">
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-8 text-center">
           <h2 className="font-serif text-2xl md:text-3xl text-foreground mb-3">
             {isRTL ? 'تفضّل بداية أسرع؟' : 'Prefer a Faster Start?'}
