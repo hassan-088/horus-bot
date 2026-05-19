@@ -1,13 +1,25 @@
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  User as UserIcon, Mail, Phone, Globe, Flag, LogOut, Pencil, Loader2, Ticket,
+  Calendar,
+  Flag,
+  Globe,
+  Loader2,
+  LogOut,
+  Mail,
+  Pencil,
+  Phone,
+  ShieldCheck,
+  Ticket,
+  User as UserIcon,
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
@@ -17,6 +29,56 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserTickets } from '@/hooks/useUserTickets';
 import { productMessage } from '@/lib/productMessages';
 import { toast } from 'sonner';
+import gemImage from '@/assets/gem.jpg';
+
+const ar = {
+  account: 'حسابي',
+  signInTitle: 'سجل الدخول للمتابعة',
+  signInSubtitle: 'سجل الدخول للوصول إلى ملفك الشخصي وتذاكرك.',
+  signInCta: 'تسجيل الدخول',
+  heroTitle: 'حسابي',
+  heroSubtitle: 'احتفظ بتفاصيل زيارتك وتفضيلاتك وتذاكر Horus-Bot جاهزة في مكان واحد.',
+  welcome: 'مرحبا',
+  visitorProfile: 'ملف الزائر',
+  readyForVisit: 'جاهز للزيارة',
+  preferredLanguage: 'اللغة المفضلة',
+  quickActions: 'إجراءات سريعة',
+  bookVisit: 'احجز زيارتك',
+  myTickets: 'تذاكري',
+  viewTickets: 'عرض التذاكر',
+  profileDetails: 'تفاصيل الملف الشخصي',
+  profileHelper: 'هذه التفاصيل تساعدنا على تجهيز زيارتك وحفظ تذاكرك بهدوء.',
+  edit: 'تعديل',
+  cancel: 'إلغاء',
+  fullName: 'الاسم الكامل',
+  displayName: 'اسم العرض',
+  email: 'البريد الإلكتروني',
+  phone: 'الهاتف',
+  nationality: 'الجنسية',
+  avatarUrl: 'رابط الصورة الشخصية',
+  preferences: 'تفضيلات الزيارة',
+  preferencesHelper: 'اختر اللغة التي تفضلها لواجهة الموقع وتجربة Horus-Bot.',
+  marketingOptIn: 'أرغب في استقبال أخبار وعروض المتحف',
+  english: 'الإنجليزية',
+  arabic: 'العربية',
+  saveChanges: 'حفظ التغييرات',
+  saving: 'جاري الحفظ...',
+  profileUpdated: 'تم تحديث الملف الشخصي.',
+  loadingProfile: 'جاري تحميل الملف الشخصي...',
+  retry: 'إعادة المحاولة',
+  ticketsSummary: 'ملخص التذاكر',
+  noTickets: 'لا توجد تذاكر بعد. احجز زيارتك للبدء.',
+  activeBooking: 'حجز نشط',
+  activeBookings: 'حجوزات نشطة',
+  pastBooking: 'حجز سابق في سجلك.',
+  pastBookings: 'حجوزات سابقة في سجلك.',
+  accountActions: 'إجراءات الحساب',
+  logoutHelper: 'يمكنك تسجيل الخروج من هذا الجهاز مع بقاء تذاكرك محفوظة في حسابك.',
+  logout: 'تسجيل الخروج',
+  logoutDevice: 'تسجيل الخروج من هذا الجهاز',
+  loggingOut: 'جاري تسجيل الخروج...',
+  loggedOut: 'تم تسجيل الخروج.',
+};
 
 export default function AccountPage() {
   const { isRTL, setLanguage } = useApp();
@@ -59,15 +121,19 @@ export default function AccountPage() {
     return (
       <>
         <SectionHero
-          label={isRTL ? 'حسابي' : 'My Account'}
-          title={isRTL ? 'سجل الدخول للمتابعة' : 'Sign in to continue'}
-          subtitle={isRTL
-            ? 'سجل الدخول للوصول إلى ملفك الشخصي وتذاكرك.'
-            : 'Log in to access your profile and tickets.'}
+          label={isRTL ? ar.account : 'My Account'}
+          title={isRTL ? ar.signInTitle : 'Sign in to continue'}
+          subtitle={isRTL ? ar.signInSubtitle : 'Log in to access your profile and tickets.'}
+          backgroundImage={gemImage}
+          backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
+          className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
         />
-        <section className="mx-auto max-w-3xl px-4 md:px-8 pb-24 -mt-2">
-          <Card className="p-8 text-center">
-            <Button asChild><Link to="/auth">{isRTL ? 'تسجيل الدخول' : 'Log in'}</Link></Button>
+        <section className="relative z-10 mx-auto max-w-3xl px-4 pb-24 -mt-10 md:px-8">
+          <Card className="rounded-[2rem] border-primary/20 bg-card/90 p-8 text-center shadow-soft backdrop-blur">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
+              <UserIcon className="h-6 w-6 text-primary" />
+            </div>
+            <Button asChild><Link to="/auth">{isRTL ? ar.signInCta : 'Log in'}</Link></Button>
           </Card>
         </section>
       </>
@@ -95,11 +161,7 @@ export default function AccountPage() {
       return;
     }
     setLanguage(prefLang === 'arabic' ? 'ar' : 'en');
-    toast.success(
-      isRTL
-        ? '\u062a\u0645 \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a.'
-        : 'Profile updated.',
-    );
+    toast.success(isRTL ? ar.profileUpdated : 'Profile updated.');
     setEditing(false);
   };
 
@@ -108,7 +170,7 @@ export default function AccountPage() {
     setLogoutBusy(true);
     try {
       await signOut();
-      toast.success(isRTL ? 'تم تسجيل الخروج.' : 'You have been logged out.');
+      toast.success(isRTL ? ar.loggedOut : 'You have been logged out.');
       navigate('/');
     } catch (e) {
       console.error('[Horus-Bot] Sign out failed', e);
@@ -120,163 +182,217 @@ export default function AccountPage() {
 
   const activeTickets = tickets.filter((t) => t.status === 'active');
   const pastTickets = tickets.filter((t) => t.status !== 'active');
+  const profileName = profile?.full_name || profile?.display_name || (isRTL ? ar.welcome : 'Welcome');
+  const initials = profileName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('') || 'H';
 
   return (
     <>
       <SectionHero
-        label={isRTL ? 'حسابي' : 'My Account'}
-        title={profile?.full_name || profile?.display_name || (isRTL ? 'مرحبا' : 'Welcome')}
-        subtitle={user.email ?? ''}
+        label={isRTL ? ar.account : 'My Account'}
+        title={isRTL ? ar.heroTitle : 'My Account'}
+        subtitle={isRTL ? ar.heroSubtitle : 'Keep your visit details, preferences, and Horus-Bot tickets ready in one place.'}
+        backgroundImage={gemImage}
+        backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
+        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 
-      <section className="mx-auto max-w-3xl px-4 md:px-8 pb-24 -mt-2 space-y-6">
+      <section className="relative z-10 mx-auto max-w-5xl px-4 pb-24 -mt-10 space-y-6 md:px-8">
         {isLoading && !profile && (
-          <Card className="p-6 md:p-8">
+          <Card className="rounded-[2rem] border-primary/20 bg-card/90 p-6 shadow-soft backdrop-blur md:p-8">
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              {isRTL ? '\u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a...' : 'Loading profile...'}
+              {isRTL ? ar.loadingProfile : 'Loading profile...'}
             </div>
           </Card>
         )}
 
         {profileLoadError && !profile && (
-          <Card className="p-6 md:p-8 space-y-4">
+          <Card className="space-y-4 rounded-[2rem] border-primary/20 bg-card/90 p-6 shadow-soft backdrop-blur md:p-8">
             <div>
               <h2 className="font-serif text-xl">{productMessage('profileLoad', isRTL)}</h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 {isRTL
-                  ? '\u062d\u062f\u062b\u062a \u0645\u0634\u0643\u0644\u0629 \u0641\u064a \u0627\u0644\u0627\u062a\u0635\u0627\u0644. \u064a\u0631\u062c\u0649 \u0627\u0644\u062a\u062d\u0642\u0642 \u0645\u0646 \u0627\u0644\u0625\u0646\u062a\u0631\u0646\u062a \u0648\u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649.'
+                  ? 'حدثت مشكلة في الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.'
                   : 'Connection issue. Please check your internet connection and try again.'}
               </p>
             </div>
             <Button onClick={reloadProfile} disabled={isLoading}>
               {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isRTL ? '\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629' : 'Try again'}
+              {isRTL ? ar.retry : 'Try again'}
             </Button>
           </Card>
         )}
 
-        <Card className="p-6 md:p-8 space-y-5">
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl">{isRTL ? 'الملف الشخصي' : 'Profile'}</h2>
-            {!editing ? (
-              <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
-                <Pencil className="h-4 w-4" /> {isRTL ? 'تعديل' : 'Edit'}
-              </Button>
-            ) : (
-              <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
-                {isRTL ? 'إلغاء' : 'Cancel'}
-              </Button>
-            )}
-          </div>
-
-          {!editing ? (
-            <div className="grid sm:grid-cols-2 gap-4 text-sm">
-              <Field icon={<UserIcon className="h-4 w-4" />} label={isRTL ? 'الاسم الكامل' : 'Full name'} value={profile?.full_name || profile?.display_name || '-'} />
-              <Field icon={<Mail className="h-4 w-4" />} label={isRTL ? 'البريد الإلكتروني' : 'Email'} value={user.email ?? '-'} />
-              <Field icon={<Phone className="h-4 w-4" />} label={isRTL ? 'الهاتف' : 'Phone'} value={profile?.phone_number || '-'} />
-              <Field icon={<Flag className="h-4 w-4" />} label={isRTL ? 'الجنسية' : 'Nationality'} value={profile?.nationality || '-'} />
-              <Field icon={<Globe className="h-4 w-4" />} label={isRTL ? 'لغة الواجهة' : 'UI language'} value={languageLabel(profile?.preferred_language, isRTL)} />
+        <Card className="rounded-[2rem] border-primary/20 bg-card/90 p-5 shadow-soft backdrop-blur md:p-6">
+          <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/15 font-serif text-2xl font-semibold text-primary ring-1 ring-primary/25">
+                {initials}
+              </div>
+              <div className="min-w-0">
+                <div className="section-label mb-1">{isRTL ? ar.visitorProfile : 'Visitor Profile'}</div>
+                <h2 className="truncate font-serif text-2xl leading-tight text-foreground md:text-3xl">{profileName}</h2>
+                <p className="mt-1 break-all text-sm text-muted-foreground">{user.email}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Badge variant="secondary" className="border-0 bg-primary/15 text-primary">{isRTL ? ar.readyForVisit : 'Ready for the visit'}</Badge>
+                  <Badge variant="secondary" className="border-0 bg-background/65 text-muted-foreground">
+                    {isRTL ? ar.preferredLanguage : 'Preferred language'}: {languageLabel(profile?.preferred_language, isRTL)}
+                  </Badge>
+                </div>
+              </div>
             </div>
-          ) : (
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label>{isRTL ? 'الاسم الكامل' : 'Full name'}</Label>
-                <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            <div className="flex flex-wrap gap-2 md:justify-end">
+              <Button asChild variant="outline">
+                <Link to="/tickets-mine"><Ticket className="h-4 w-4" /> {isRTL ? ar.viewTickets : 'My Tickets'}</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/book"><Calendar className="h-4 w-4" /> {isRTL ? ar.bookVisit : 'Book Visit'}</Link>
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_0.86fr]">
+          <Card className="space-y-5 rounded-[2rem] border-primary/20 bg-card/90 p-5 shadow-soft backdrop-blur md:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 className="font-serif text-2xl">{isRTL ? ar.profileDetails : 'Profile details'}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{isRTL ? ar.profileHelper : 'These details help keep your visit and tickets ready.'}</p>
               </div>
-              <div className="space-y-1.5">
-                <Label>{isRTL ? 'اسم العرض' : 'Display name'}</Label>
-                <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+              {!editing ? (
+                <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+                  <Pencil className="h-4 w-4" /> {isRTL ? ar.edit : 'Edit'}
+                </Button>
+              ) : (
+                <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
+                  {isRTL ? ar.cancel : 'Cancel'}
+                </Button>
+              )}
+            </div>
+
+            {!editing ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field icon={<UserIcon className="h-4 w-4" />} label={isRTL ? ar.fullName : 'Full name'} value={profile?.full_name || profile?.display_name || '-'} />
+                <Field icon={<Mail className="h-4 w-4" />} label={isRTL ? ar.email : 'Email'} value={user.email ?? '-'} />
+                <Field icon={<Phone className="h-4 w-4" />} label={isRTL ? ar.phone : 'Phone'} value={profile?.phone_number || '-'} />
+                <Field icon={<Flag className="h-4 w-4" />} label={isRTL ? ar.nationality : 'Nationality'} value={profile?.nationality || '-'} />
+                <Field icon={<Globe className="h-4 w-4" />} label={isRTL ? ar.preferredLanguage : 'Preferred language'} value={languageLabel(profile?.preferred_language, isRTL)} />
               </div>
-              <div className="space-y-1.5">
-                <Label>{isRTL ? 'الهاتف' : 'Phone'}</Label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label>{isRTL ? ar.fullName : 'Full name'}</Label>
+                  <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{isRTL ? ar.displayName : 'Display name'}</Label>
+                  <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{isRTL ? ar.phone : 'Phone'}</Label>
+                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{isRTL ? ar.nationality : 'Nationality'}</Label>
+                  <Input value={nationality} onChange={(e) => setNationality(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{isRTL ? ar.preferredLanguage : 'Preferred language'}</Label>
+                  <Select
+                    value={prefLang}
+                    onValueChange={(value) => setPrefLang(value === 'arabic' ? 'arabic' : 'english')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="english">{isRTL ? ar.english : 'English'}</SelectItem>
+                      <SelectItem value="arabic">{isRTL ? ar.arabic : 'Arabic'}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label>{isRTL ? ar.avatarUrl : 'Avatar URL'}</Label>
+                  <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} />
+                </div>
+                <label className="flex items-center gap-2 rounded-2xl border border-primary/15 bg-background/55 p-3 text-sm sm:col-span-2">
+                  <Checkbox
+                    checked={marketingOptIn}
+                    onCheckedChange={(checked) => setMarketingOptIn(checked === true)}
+                  />
+                  {isRTL ? ar.marketingOptIn : 'Send me museum news and offers'}
+                </label>
+                <div className="flex justify-end sm:col-span-2">
+                  <Button onClick={handleSave} disabled={busy}>
+                    {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {busy ? (isRTL ? ar.saving : 'Saving...') : (isRTL ? ar.saveChanges : 'Save changes')}
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <Label>{isRTL ? 'الجنسية' : 'Nationality'}</Label>
-                <Input value={nationality} onChange={(e) => setNationality(e.target.value)} />
+            )}
+          </Card>
+
+          <div className="space-y-6">
+            <Card className="space-y-4 rounded-[2rem] border-primary/20 bg-card/90 p-5 shadow-soft backdrop-blur md:p-6">
+              <div>
+                <h2 className="font-serif text-2xl">{isRTL ? ar.preferences : 'Visit preferences'}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{isRTL ? ar.preferencesHelper : 'Choose the language you prefer for the website and Horus-Bot experience.'}</p>
               </div>
-              <div className="space-y-1.5">
-                <Label>{isRTL ? 'لغة الواجهة' : 'UI language'}</Label>
-                <Select
-                  value={prefLang}
-                  onValueChange={(value) => setPrefLang(value === 'arabic' ? 'arabic' : 'english')}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="english">{isRTL ? 'الإنجليزية' : 'English'}</SelectItem>
-                    <SelectItem value="arabic">{isRTL ? 'العربية' : 'Arabic'}</SelectItem>
-                  </SelectContent>
-                </Select>
+              <Field icon={<Globe className="h-4 w-4" />} label={isRTL ? ar.preferredLanguage : 'Preferred language'} value={languageLabel(profile?.preferred_language, isRTL)} />
+              <div className="rounded-2xl border border-primary/15 bg-background/55 p-3 text-sm text-muted-foreground">
+                <ShieldCheck className="mb-2 h-4 w-4 text-primary" />
+                {profile?.marketing_opt_in
+                  ? (isRTL ? ar.marketingOptIn : 'Museum news and offers are enabled.')
+                  : (isRTL ? 'أخبار وعروض المتحف غير مفعلة حاليا.' : 'Museum news and offers are currently off.')}
               </div>
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label>{isRTL ? 'رابط الصورة الشخصية' : 'Avatar URL'}</Label>
-                <Input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} />
-              </div>
-              <label className="sm:col-span-2 flex items-center gap-2 text-sm">
-                <Checkbox
-                  checked={marketingOptIn}
-                  onCheckedChange={(checked) => setMarketingOptIn(checked === true)}
-                />
-                {isRTL ? 'أرغب في استقبال أخبار وعروض المتحف' : 'Send me museum news and offers'}
-              </label>
-              <div className="sm:col-span-2 flex justify-end">
-                <Button onClick={handleSave} disabled={busy}>
-                  {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {busy
-                    ? (isRTL ? '\u062c\u0627\u0631\u064a \u0627\u0644\u062d\u0641\u0638...' : 'Saving...')
-                    : (isRTL ? '\u062d\u0641\u0638 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a' : 'Save changes')}
+            </Card>
+
+            <Card className="space-y-3 rounded-[2rem] border-primary/20 bg-card/90 p-5 shadow-soft backdrop-blur md:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-serif text-2xl">{isRTL ? ar.ticketsSummary : 'Ticket summary'}</h2>
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/tickets-mine"><Ticket className="h-4 w-4" /> {isRTL ? ar.viewTickets : 'View tickets'}</Link>
                 </Button>
               </div>
-            </div>
-          )}
-        </Card>
+              <p className="text-sm text-muted-foreground">
+                {activeTickets.length === 0
+                  ? (isRTL ? ar.noTickets : "You haven't booked a Horus-Bot visit yet.")
+                  : (isRTL
+                    ? `${activeTickets.length} ${activeTickets.length === 1 ? ar.activeBooking : ar.activeBookings}.`
+                    : `${activeTickets.length} active booking${activeTickets.length === 1 ? '' : 's'}.`)}
+              </p>
+              {activeTickets.length === 0 && (
+                <Button asChild className="w-fit">
+                  <Link to="/book">{isRTL ? ar.bookVisit : 'Book Visit'}</Link>
+                </Button>
+              )}
+              {pastTickets.length > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {isRTL
+                    ? `${pastTickets.length} ${pastTickets.length === 1 ? ar.pastBooking : ar.pastBookings}`
+                    : `${pastTickets.length} past booking${pastTickets.length === 1 ? '' : 's'} in your history.`}
+                </p>
+              )}
+            </Card>
 
-        <Card className="p-6 md:p-8 space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl">{isRTL ? 'تذاكري' : 'My Tickets'}</h2>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/tickets-mine"><Ticket className="h-4 w-4" /> {isRTL ? 'عرض الكل' : 'View all'}</Link>
-            </Button>
+            <Card className="space-y-3 rounded-[2rem] border-primary/20 bg-card/90 p-5 shadow-soft backdrop-blur md:p-6">
+              <h2 className="font-serif text-2xl">{isRTL ? ar.accountActions : 'Account actions'}</h2>
+              <p className="text-sm text-muted-foreground">{isRTL ? ar.logoutHelper : 'Sign out from this device. Your tickets stay saved in your account.'}</p>
+              <Button variant="outline" onClick={handleLogout} disabled={logoutBusy} className="w-fit">
+                {logoutBusy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="h-4 w-4" />
+                )}
+                {logoutBusy ? (isRTL ? ar.loggingOut : 'Logging out...') : (isRTL ? ar.logoutDevice : 'Sign out from this device')}
+              </Button>
+            </Card>
           </div>
-          <p className="text-sm text-muted-foreground">
-            {activeTickets.length === 0
-              ? (isRTL
-                ? 'لا توجد تذاكر بعد. احجز زيارتك للبدء.'
-                : "You haven't booked a Horus-Bot visit yet.")
-              : (isRTL
-                ? `${activeTickets.length} حجز نشط.`
-                : `${activeTickets.length} active booking${activeTickets.length === 1 ? '' : 's'}.`)}
-          </p>
-          {activeTickets.length === 0 && (
-            <Button asChild className="self-start">
-              <Link to="/book">{isRTL ? 'احجز زيارتك' : 'Book Visit'}</Link>
-            </Button>
-          )}
-          {pastTickets.length > 0 && (
-            <p className="text-xs text-muted-foreground">
-              {isRTL
-                ? `${pastTickets.length} حجز سابق في سجلك.`
-                : `${pastTickets.length} past booking${pastTickets.length === 1 ? '' : 's'} in your history.`}
-            </p>
-          )}
-        </Card>
-
-        <div className="flex justify-end">
-          <Button variant="outline" onClick={handleLogout} disabled={logoutBusy}>
-            {logoutBusy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <LogOut className="h-4 w-4" />
-            )}
-            {logoutBusy
-              ? (isRTL
-                ? '\u062c\u0627\u0631\u064a \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c...'
-                : 'Logging out...')
-              : (isRTL ? '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c' : 'Log out')}
-          </Button>
         </div>
       </section>
     </>
@@ -284,17 +400,17 @@ export default function AccountPage() {
 }
 
 function languageLabel(value: string | null | undefined, isRTL: boolean) {
-  return value === 'arabic' ? (isRTL ? 'العربية' : 'Arabic') : (isRTL ? 'الإنجليزية' : 'English');
+  return value === 'arabic' ? (isRTL ? ar.arabic : 'Arabic') : (isRTL ? ar.english : 'English');
 }
 
-function Field({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function Field({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-border/60 p-3">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+    <div className="min-w-0 rounded-2xl border border-primary/15 bg-background/55 p-3">
+      <div className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
         {icon}
         {label}
       </div>
-      <div className="font-medium text-foreground capitalize">{value}</div>
+      <div className="break-words font-medium text-foreground capitalize">{value}</div>
     </div>
   );
 }
