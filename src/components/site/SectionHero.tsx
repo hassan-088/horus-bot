@@ -11,6 +11,7 @@ interface SectionHeroProps {
   children?: ReactNode;
   backgroundImage?: string;
   backgroundAlt?: string;
+  bleedBehindNav?: boolean;
 }
 
 export function SectionHero({
@@ -23,6 +24,7 @@ export function SectionHero({
   children,
   backgroundImage,
   backgroundAlt = '',
+  bleedBehindNav = false,
 }: SectionHeroProps) {
   return (
     <section className={cn('relative overflow-hidden', className)}>
@@ -51,7 +53,10 @@ export function SectionHero({
 
       <div
         className={cn(
-          'mx-auto max-w-5xl px-4 py-16 md:px-8 md:py-28',
+          'mx-auto max-w-5xl px-4 md:px-8',
+          bleedBehindNav
+            ? 'pb-16 pt-[calc(env(safe-area-inset-top)+6.5rem)] md:pb-28 md:pt-36'
+            : 'py-16 md:py-28',
           align === 'center' ? 'text-center' : 'text-start'
         )}
       >
