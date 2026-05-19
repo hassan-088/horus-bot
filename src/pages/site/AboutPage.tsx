@@ -1,163 +1,228 @@
-import { Target, Eye, Users, Map, BookOpen, Languages, BatteryLow, Compass, Route, Award, Building2, Bot, Smartphone, Accessibility } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { BookOpen, Building2, Compass, Heart, Languages, Route, Sparkles, Ticket, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { SectionHero } from '@/components/site/SectionHero';
 import { useApp } from '@/contexts/AppContext';
+import gemImage from '@/assets/gem.jpg';
+import onboardingImage from '@/assets/onboarding.jpg';
+import maskImage from '@/assets/exhibit-golden-mask.jpg';
+
+const ar = {
+  label: 'من نحن',
+  heroTitle: 'نجعل زيارة المتحف أكثر قربا وشخصية',
+  heroSubtitle: 'تحمل زيارات المتاحف قصصا كثيرة. يساعد Horus-Bot على إبقاء الإرشاد والفضول والحركة أقرب إلى الزائر.',
+  whyLabel: 'لماذا يوجد Horus-Bot',
+  whyTitle: 'المتاحف الكبيرة قد تكون مدهشة ومربكة في الوقت نفسه',
+  whyBody: 'يدخل الزائر إلى مساحة واسعة من التاريخ، لكنه قد لا يعرف من أين يبدأ أو كيف يحافظ على تركيزه. نؤمن أن الزيارة الجيدة يجب أن تكون أوضح، أهدأ، وأكثر إنسانية.',
+  whyOne: 'مساحات كبيرة تحتاج إلى طريق واضح',
+  whyTwo: 'لغات مختلفة واحتياجات مختلفة',
+  whyThree: 'قصص كثيرة تحتاج إلى إيقاع مريح',
+  ideaLabel: 'الفكرة',
+  ideaTitle: 'مرشد يبقى بجانب تجربة الزائر',
+  ideaBody: 'الفكرة بسيطة: بدلا من أن يشعر الزائر أنه يمشي وحده بين القاعات، يجد إرشادا يتحرك معه، يساعده على السؤال والاكتشاف وتذكر ما شاهده.',
+  ideaOne: 'حركة أوضح بين المحطات',
+  ideaTwo: 'أسئلة في لحظة الفضول',
+  ideaThree: 'ذكريات تبقى بعد الزيارة',
+  visionLabel: 'الرؤية',
+  visionTitle: 'زيارات أكثر ترحيبا وخصوصية وذاكرة',
+  visionBody: 'نريد أن يشعر كل زائر أن المتحف يتحدث إليه بإيقاع يناسبه، بلغة يفهمها، وبطريقة تحفظ وقار المكان وتفتح القصة.',
+  welcoming: 'أكثر ترحيبا',
+  personal: 'أكثر شخصية',
+  memorable: 'أكثر رسوخا',
+  confidenceLabel: 'ثقة للمؤسسات',
+  confidenceTitle: 'مصمم ليحترم هدوء المتحف وقيمته التعليمية',
+  confidenceBody: 'Horus-Bot يقدم إحساسا منظما وجادا للمتحف: حركة موجهة، سرد ثقافي، وتجربة تساعد الزوار على الفهم دون أن تطغى على المكان.',
+  learning: 'قيمة تعليمية',
+  guided: 'حركة موجهة',
+  storytelling: 'سرد ثقافي',
+  ctaTitle: 'ابدأ زيارة أكثر هدوءا',
+  ctaBody: 'احجز الزيارة ودع Horus-Bot يجعل الطريق داخل المتحف أقرب إلى القصة.',
+  bookVisit: 'احجز زيارتك',
+};
 
 export default function AboutPage() {
   const { isRTL } = useApp();
 
-  const team = [
-    { name: isRTL ? 'المنتج والتجربة' : 'Product & Experience', role: isRTL ? 'تصميم كيفية تنقّل الزوار وتفاعلهم واستمتاعهم بالرحلة.' : 'Designing how visitors move, interact, and enjoy the journey.' },
-    { name: isRTL ? 'فريق الروبوتات' : 'Robotics Team', role: isRTL ? 'بناء الحركة الذاتية والإرشاد الفيزيائي.' : 'Building autonomous movement and physical guidance.' },
-    { name: isRTL ? 'فريق الذكاء والمحتوى' : 'AI & Content Team', role: isRTL ? 'تشغيل شروحات المعروضات والتفاعل مع الزوار.' : 'Powering exhibit narration and visitor interaction.' },
-    { name: isRTL ? 'تجربة الجوال' : 'Mobile Experience', role: isRTL ? 'إنشاء التطبيق المرافق ورحلة المستخدم بالكامل.' : 'Creating the companion app and full user journey.' },
-  ];
-
-  const problems = [
-    { icon: Map, title: isRTL ? 'الزوار يفقدون الوقت والطاقة في التنقل بين القاعات' : 'Visitors lose time and energy navigating large museum spaces', desc: isRTL ? 'قد تبدو المتاحف الكبيرة مربكة عندما لا يعرف الزوار أين يذهبون أو ماذا يشاهدون بعد ذلك.' : 'Large museums can feel confusing when visitors are unsure where to go or what to see next.' },
-    { icon: BookOpen, title: isRTL ? 'كثرة المعلومات تُصعِّب التركيز' : 'Too much information makes it hard to focus', desc: isRTL ? 'لوحات المعروضات الطويلة قد تُربك الزوار بدلاً من مساعدتهم على فهم القصة وراء كل قطعة.' : 'Long exhibit panels can overwhelm visitors instead of helping them understand the story behind each piece.' },
-    { icon: Languages, title: isRTL ? 'حواجز اللغة تحدّ من التجربة' : 'Language barriers limit the experience', desc: isRTL ? 'يُفوِّت كثير من الزوار سياقاً ثقافياً مهماً عندما لا يتوفّر الإرشاد بلغة يفهمونها.' : 'Many visitors miss important cultural context when guidance is not available in a language they understand.' },
-    { icon: BatteryLow, title: isRTL ? 'الزوار يتنقّلون بسرعة دون تفاعل' : 'Visitors often move quickly without engaging', desc: isRTL ? 'قد تتحوّل الزيارات الذاتية إلى مرور سريع، مع تفاعل قليل وذاكرة محدودة بعد الزيارة.' : 'Self-guided visits can become a fast walk-through, with little interaction or memory afterward.' },
-    { icon: Building2, title: isRTL ? 'المتاحف تواجه ضغطاً في ساعات الذروة' : 'Museums face pressure during peak hours', desc: isRTL ? 'تحتاج المتاحف غالباً إلى استيعاب أعداد كبيرة من الزوار بينما تظل أعداد المرشدين محدودة.' : 'Museums often need to support large visitor numbers while guide availability remains limited.' },
-  ];
-
-  const solutions = [
-    { icon: Compass, title: isRTL ? 'إرشاد حي داخل المتحف' : 'Live Guidance Inside the Museum', desc: isRTL ? 'يحصل الزوار على إرشاد لحظي عبر قاعات المتحف دون الاعتماد فقط على اللافتات أو الخرائط الثابتة.' : 'Visitors receive real-time guidance through museum spaces without relying only on signs or static maps.' },
-    { icon: Route, title: isRTL ? 'جولات مبنيّة حول وقت الزائر' : 'Tours Built Around Visitor Time', desc: isRTL ? 'تتكيّف مسارات الجولة مع وقت الزائر واهتماماته، لتجربة أكثر راحةً وتركيزاً.' : 'Tour routes adapt to visitor time and interests, creating a more comfortable and focused experience.' },
-    { icon: Languages, title: isRTL ? 'دعم لغوي شامل' : 'Full Language Support', desc: isRTL ? 'يمكن للزوار متابعة التجربة بالعربية، العامية المصرية، الإنجليزية، ولغات أخرى مدعومة وفقاً لإعداد المتحف.' : 'Visitors can follow the experience in Arabic, Egyptian Arabic, English, and other supported languages depending on the museum setup.' },
-    { icon: Award, title: isRTL ? 'تفاعل يبقى في الذاكرة' : 'Interaction That Sticks', desc: isRTL ? 'لحظات تفاعلية موزَّعة طوال الجولة تُبقي الزوار منخرطين وتساعدهم على تذكُّر ما عاشوه.' : 'Interactive moments throughout the tour keep visitors engaged and help them remember what they experienced.' },
-  ];
-
-  const scope = [
-    { icon: Bot, en: 'Autonomous robot guidance inside the museum', ar: 'إرشاد روبوتي ذاتي داخل المتحف' },
-    { icon: Smartphone, en: 'Companion app for tickets, pairing, maps, and tour continuity', ar: 'تطبيق مرافق للتذاكر والاقتران والخرائط واستمرارية الجولة' },
-    { icon: Route, en: 'Website booking and route planning before arrival', ar: 'حجز وتخطيط للمسار عبر الموقع قبل الوصول' },
-    { icon: Accessibility, en: 'Accessibility-aware visitor preferences', ar: 'تفضيلات زيارة تراعي احتياجات الوصول' },
-  ];
-
   return (
     <>
       <SectionHero
-        label={isRTL ? 'من نحن' : 'About'}
-        title={isRTL ? 'لماذا يوجد حورس-بوت' : 'Why Horus-Bot Exists'}
-        subtitle={isRTL ? 'مبنيٌّ ليجعل زيارة المتحف أكثر وضوحاً وتفاعلاً، وأسهل في الإدارة داخل بيئات المتاحف الحقيقية.' : 'Built to make museum visits clearer, more engaging, and easier to manage in real museum environments.'}
+        label={isRTL ? ar.label : 'About'}
+        title={isRTL ? ar.heroTitle : 'Helping museum visits feel more personal.'}
+        subtitle={
+          isRTL
+            ? ar.heroSubtitle
+            : 'Museum visits hold stories. Horus-Bot keeps guidance, curiosity, and movement closer to the visitor.'
+        }
+        backgroundImage={gemImage}
+        backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
+        className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 md:px-8 py-20 lg:grid-cols-[0.85fr_1.15fr]">
-        <div>
-          <div className="section-label mb-4 text-destructive/80">{isRTL ? 'المشكلة' : 'The Problem'}</div>
-          <h2 className="font-serif text-3xl md:text-5xl mb-5">{isRTL ? 'المتاحف الكبيرة تحتاج إرشاداً أوضح، وليس ضوضاء أكثر' : 'Large museums need clearer guidance, not more noise'}</h2>
-          <p className="text-muted-foreground leading-relaxed">
+      <section className="relative z-10 mx-auto max-w-7xl px-4 pb-12 -mt-8 md:px-8 md:pb-16">
+        <div className="rounded-[2rem] border border-primary/20 bg-card/75 p-4 shadow-soft backdrop-blur md:p-5">
+          <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center">
+            {[
+              { icon: Heart, en: 'The Why', ar: ar.whyLabel },
+              { icon: Sparkles, en: 'The Idea', ar: ar.ideaLabel },
+              { icon: Building2, en: 'Museum Confidence', ar: ar.confidenceLabel },
+            ].map((item, index) => (
+              <div key={item.en} className="flex items-center gap-3 rounded-2xl bg-background/45 px-4 py-3 ring-1 ring-primary/10">
+                <item.icon className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-sm font-medium text-foreground">{isRTL ? item.ar : item.en}</span>
+              </div>
+            )).flatMap((node, index) => (
+              index < 2
+                ? [node, <div key={`line-${index}`} className="hidden h-px w-8 bg-primary/30 md:block" />]
+                : [node]
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[0.88fr_1.12fr] md:px-8 md:py-20">
+        <div className="self-center">
+          <div className="section-label mb-4">{isRTL ? ar.whyLabel : 'Why Horus-Bot Exists'}</div>
+          <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+            {isRTL ? ar.whyTitle : 'Large museums can feel wondrous and overwhelming at once.'}
+          </h2>
+          <p className="leading-relaxed text-muted-foreground">
             {isRTL
-              ? 'حورس-بوت يبدأ من مشكلة تشغيلية وإنسانية واضحة: الزائر يريد طريقاً مفهوماً وقصة جيدة، والمتحف يحتاج تجربة قابلة للتوسع.'
-              : 'Horus-Bot starts from a clear operational and human problem: visitors need a readable path and a good story; museums need an experience that can scale.'}
+              ? ar.whyBody
+              : 'Visitors step into a wide space of history, but they may not know where to begin or how to keep focus. We believe a good visit should feel clearer, calmer, and more human.'}
           </p>
         </div>
-        <div className="divide-y divide-border/60">
-          {problems.map((p) => (
-            <div key={p.title} className="grid gap-3 py-5 sm:grid-cols-[40px_1fr]">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
-                <p.icon className="h-5 w-5" />
+        <div className="relative overflow-hidden rounded-[2rem] shadow-[0_28px_90px_-28px_hsl(var(--primary)/0.45)] ring-1 ring-primary/20">
+          <img
+            src={onboardingImage}
+            alt={isRTL ? 'زوار في قاعة متحف' : 'Visitors in a museum gallery'}
+            loading="lazy"
+            className="h-[430px] w-full object-cover md:h-[520px]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/45 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 grid gap-3 p-5 sm:grid-cols-3 md:p-7">
+            {[
+              { icon: Compass, en: 'A clear path through large spaces', ar: ar.whyOne },
+              { icon: Languages, en: 'Different languages and needs', ar: ar.whyTwo },
+              { icon: BookOpen, en: 'Many stories, calmer pacing', ar: ar.whyThree },
+            ].map((item) => (
+              <div key={item.en} className="rounded-2xl border border-primary/20 bg-card/75 p-3 shadow-soft backdrop-blur">
+                <item.icon className="mb-2 h-4 w-4 text-primary" />
+                <p className="text-sm font-medium leading-snug">{isRTL ? item.ar : item.en}</p>
               </div>
-              <div>
-                <h3 className="font-serif text-lg text-foreground">{p.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-sidebar/15">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[1.05fr_0.95fr] md:px-8 md:py-20">
+          <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-card/70 p-5 shadow-soft backdrop-blur md:p-7">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-background/30" />
+            <div className="relative">
+              <div className="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/25">
+                <Sparkles className="h-8 w-8 text-primary" />
               </div>
+              <div className="grid gap-3">
+                {[
+                  { icon: Route, en: 'Clearer movement between stops', ar: ar.ideaOne },
+                  { icon: Users, en: 'Questions at the moment of curiosity', ar: ar.ideaTwo },
+                  { icon: Heart, en: 'Memories that stay after the visit', ar: ar.ideaThree },
+                ].map((item) => (
+                  <div key={item.en} className="flex items-center gap-3 rounded-2xl bg-background/55 p-4 ring-1 ring-primary/10">
+                    <item.icon className="h-4 w-4 shrink-0 text-primary" />
+                    <span className="text-sm font-medium text-foreground">{isRTL ? item.ar : item.en}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="self-center">
+            <div className="section-label mb-4">{isRTL ? ar.ideaLabel : 'The Idea'}</div>
+            <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+              {isRTL ? ar.ideaTitle : 'A guide that stays beside the visitor experience.'}
+            </h2>
+            <p className="leading-relaxed text-muted-foreground">
+              {isRTL
+                ? ar.ideaBody
+                : 'The idea is simple: instead of feeling alone between galleries, the visitor finds guidance that moves with them, helps them ask, discover, and remember what they saw.'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[0.9fr_1.1fr] md:px-8 md:py-20">
+        <div className="self-center">
+          <div className="section-label mb-4">{isRTL ? ar.visionLabel : 'Vision'}</div>
+          <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+            {isRTL ? ar.visionTitle : 'Museum visits that feel more welcoming, personal, and memorable.'}
+          </h2>
+          <p className="leading-relaxed text-muted-foreground">
+            {isRTL
+              ? ar.visionBody
+              : 'We want every visitor to feel that the museum can speak to them at their pace, in a language they understand, while preserving the calm dignity of the place.'}
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            { icon: Heart, en: 'More welcoming', ar: ar.welcoming },
+            { icon: Languages, en: 'More personal', ar: ar.personal },
+            { icon: Sparkles, en: 'More memorable', ar: ar.memorable },
+          ].map((item) => (
+            <div key={item.en} className="rounded-[2rem] border border-primary/15 bg-card/70 p-5 shadow-soft backdrop-blur">
+              <item.icon className="mb-5 h-5 w-5 text-primary" />
+              <p className="font-serif text-lg leading-snug text-foreground">{isRTL ? item.ar : item.en}</p>
             </div>
           ))}
         </div>
       </section>
 
       <section className="bg-sidebar/15">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-8 py-20 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-3xl border border-primary/20 bg-card/70 p-6 md:p-8">
-            <div className="section-label mb-4 text-primary">{isRTL ? 'الحل' : 'The Solution'}</div>
-            <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'نظام زيارة متصل، لا مجرد روبوت' : 'A connected visit system, not just a robot'}</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {isRTL
-                ? 'الموقع يجهّز الزيارة، التطبيق يحمل التذاكر والجولة، والروبوت يقود التجربة داخل المتحف. كل جزء له دور واضح.'
-                : 'The website prepares the visit, the app carries tickets and the tour, and the robot guides the in-museum experience. Each part has a clear role.'}
-            </p>
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 md:grid-cols-[1.08fr_0.92fr] md:px-8 md:py-20">
+          <div className="relative overflow-hidden rounded-[2rem] ring-1 ring-primary/20 shadow-[0_28px_90px_-28px_hsl(var(--primary)/0.45)]">
+            <img
+              src={maskImage}
+              alt={isRTL ? 'قطعة أثرية ذهبية' : 'Golden museum artifact'}
+              loading="lazy"
+              className="h-[410px] w-full object-cover md:h-[500px]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/35 to-transparent" />
           </div>
-          <div className="space-y-4">
-            {solutions.map((s) => (
-              <div key={s.title} className="flex gap-4">
-                <s.icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
-                <div>
-                  <h3 className="font-serif text-lg">{s.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+          <div className="self-center">
+            <div className="section-label mb-4">{isRTL ? ar.confidenceLabel : 'Institution Confidence'}</div>
+            <h2 className="mb-5 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+              {isRTL ? ar.confidenceTitle : 'Made to respect the museum’s calm and educational value.'}
+            </h2>
+            <p className="leading-relaxed text-muted-foreground">
+              {isRTL
+                ? ar.confidenceBody
+                : 'Horus-Bot gives museums an organized, serious feeling: guided movement, cultural storytelling, and a visitor experience that helps people understand without overpowering the place.'}
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {[ar.learning, ar.guided, ar.storytelling].map((item, index) => (
+                <div key={item} className="rounded-2xl border border-primary/15 bg-card/65 p-4 text-sm shadow-soft backdrop-blur">
+                  {isRTL ? item : index === 0 ? 'Educational value' : index === 1 ? 'Guided movement' : 'Cultural storytelling'}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-        <div className="grid gap-5 md:grid-cols-2">
-          <Card className="p-7 md:p-8">
-            <Target className="h-6 w-6 text-primary mb-4" />
-            <h3 className="font-serif text-xl mb-3">{isRTL ? 'مهمتنا' : 'Mission'}</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              {isRTL
-                ? 'جعل زيارة المتحف أكثر وضوحاً وتفاعلاً، وفي متناول كل زائر.'
-                : 'Make museum visits clearer, more engaging, and accessible for every visitor.'}
-            </p>
-          </Card>
-          <Card className="p-7 md:p-8">
-            <Eye className="h-6 w-6 text-primary mb-4" />
-            <h3 className="font-serif text-xl mb-3">{isRTL ? 'رؤيتنا' : 'Vision'}</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              {isRTL
-                ? 'تقديم تجارب موجَّهة ذكية وقابلة للتوسّع لمتاحف المنطقة.'
-                : 'Bring smart, scalable guided experiences to museums across the region.'}
-            </p>
-          </Card>
-        </div>
-      </section>
-
-      <section className="bg-sidebar/15">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 md:px-8 py-20 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <div className="section-label mb-4">{isRTL ? 'الموقع' : 'Positioning'}</div>
-            <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'مشروع متحف-تقني بحدود واضحة' : 'A museum-tech product with clear boundaries'}</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {isRTL
-                ? 'حورس-بوت ليس صفحة تسويق فقط ولا تطبيقاً منفصلاً فقط؛ هو تجربة زيارة كاملة موزعة بين الموقع والتطبيق والروبوت.'
-                : 'Horus-Bot is not just a marketing site or a standalone app; it is a complete visit experience distributed across website, app, and robot.'}
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {scope.map((item) => (
-              <div key={item.en} className="rounded-2xl border border-border/60 bg-card/60 p-5">
-                <item.icon className="mb-3 h-5 w-5 text-primary" />
-                <p className="text-sm leading-relaxed text-foreground/90">{isRTL ? item.ar : item.en}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 md:px-8 py-20">
-        <div className="mb-10 max-w-3xl">
-          <div className="section-label mb-4">{isRTL ? 'الفريق' : 'Team'}</div>
-          <h2 className="font-serif text-3xl md:text-4xl mb-4">{isRTL ? 'تخصصات تعمل حول رحلة واحدة' : 'Disciplines working around one visit journey'}</h2>
-          <p className="text-muted-foreground leading-relaxed">
+      <section className="mx-auto max-w-5xl px-4 py-14 text-center md:px-8 md:py-20">
+        <div className="rounded-[2rem] border border-primary/25 bg-gradient-to-br from-card/90 via-card/75 to-primary/10 p-6 shadow-[0_22px_70px_-35px_hsl(var(--primary)/0.55)] backdrop-blur md:p-12">
+          <h2 className="mb-6 font-serif text-3xl leading-tight text-foreground md:text-5xl">
+            {isRTL ? ar.ctaTitle : 'Begin a calmer museum visit.'}
+          </h2>
+          <p className="mx-auto mb-9 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
             {isRTL
-              ? 'يطوّر حورس-بوت فريق يجمع بين تصميم المنتج، الروبوتات، وتجارب الزوار المدعومة بالذكاء.'
-              : 'Horus-Bot is developed by a team combining product design, robotics, and AI-driven visitor experiences.'}
+              ? ar.ctaBody
+              : 'Book the visit and let Horus-Bot bring the path through the museum closer to the story.'}
           </p>
-        </div>
-        <div className="grid gap-5 md:grid-cols-4">
-            {team.map((m) => (
-              <div key={m.name} className="border-s border-primary/30 ps-4">
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
-                  <Users className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="font-serif text-base">{m.name}</h3>
-                <p className="text-sm text-muted-foreground mt-1.5 leading-snug">{m.role}</p>
-              </div>
-            ))}
+          <Button asChild size="lg">
+            <Link to="/book">
+              <Ticket className="h-4 w-4" /> {isRTL ? ar.bookVisit : 'Book Visit'}
+            </Link>
+          </Button>
         </div>
       </section>
     </>
