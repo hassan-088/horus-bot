@@ -17,9 +17,10 @@ import { useApp } from '@/contexts/AppContext';
 import { useAuth, friendlyAuthError } from '@/contexts/AuthContext';
 import { useExhibits } from '@/hooks/useExhibits';
 import { useUserTickets, type TourType } from '@/hooks/useUserTickets';
-import { CURRENCY, museumTicketPrices, robotTourPrices, type MuseumTicketCategory } from '@/lib/pricing';
-import { sharedStandardRouteIds } from '@/lib/exhibitCatalog';
+import { isFutureVisitTime } from '@/lib/bookingContract';
+import { CURRENCY, MAX_VISITORS_PER_BOOKING, museumTicketPrices, robotTourPrices, type MuseumTicketCategory } from '@/lib/pricing';
 import { productMessage } from '@/lib/productMessages';
+import { TOUR_NARRATION_LANGUAGES, isSupportedTourNarrationLanguage } from '@/lib/tourLanguages';
 import {
   loadRecommendedRoutes,
   type RecommendedRoute,
@@ -35,9 +36,15 @@ type PayMethod = 'card' | 'cash';
 
 const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00'];
 const STANDARD_TOUR_DURATION_MIN = 45;
-const STANDARD_ROUTE_IDS = sharedStandardRouteIds;
 const ARTIFACT_ID_PATTERN = /^artifact_\d{3}$/;
 const DURATIONS = [30, 45, 60, 90];
+
+function todayDateInputValue() {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
 
 const emailSchema = z.string().trim().email();
 
@@ -66,7 +73,6 @@ export default function BookPage() {
     loading: exhibitsLoading,
     error: exhibitsError,
     retry: retryExhibits,
-    standardRoute,
   } = useExhibits();
   const navigate = useNavigate();
   const [tourType, setTourType] = useState<TourType>('standard');
@@ -157,7 +163,7 @@ export default function BookPage() {
   });
 
   // Date & time
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayDateInputValue();
   const [date, setDate] = useState(today);
   const [time, setTime] = useState<string>('11:00');
 
@@ -171,7 +177,7 @@ export default function BookPage() {
   const [kidsMode, setKidsMode] = useState(false);
   const [photoSpots, setPhotoSpots] = useState(false);
   const [notes, setNotes] = useState('');
-  const [selectedRouteId, setSelectedRouteId] = useState<string>('horus_highlights');
+  const [selectedRouteId, setSelectedRouteId] = useState<string>('');
   const [languageTouched, setLanguageTouched] = useState(false);
   const [routesLoading, setRoutesLoading] = useState(true);
   const [routeRows, setRouteRows] = useState<RecommendedRoute[]>([]);
@@ -186,10 +192,6 @@ export default function BookPage() {
     .reduce((acc, [k, n]) => acc + n * museumTicketPrices[k], 0);
   const tourPrice = robotTourPrices[tourType];
   const totalPrice = museumPrice + tourPrice;
-  const standardSelectedExhibitIds =
-    standardRoute.length === STANDARD_ROUTE_IDS.length
-      ? standardRoute.map((exhibit) => exhibit.id)
-      : [];
   const activeRecommendedRoutes = routeRows.filter((route) => route.is_active);
   const selectedRecommendedRoute =
     activeRecommendedRoutes.find((route) => route.id === selectedRouteId) ?? null;
@@ -215,9 +217,64 @@ export default function BookPage() {
     retryRecommendedRoutes();
   }, []);
 
+  useEffect(() => {
+    if (time && isFutureVisitTime(date, time)) return;
+    const nextSlot = TIME_SLOTS.find((slot) => isFutureVisitTime(date, slot));
+    if (nextSlot && nextSlot !== time) {
+      setTime(nextSlot);
+    }
+  }, [date, time]);
+
   // ---- Handlers ----
+  const visitorLimitMessage = isRTL
+    ? `يمكن أن يشمل حجز Horus-Bot حتى ${MAX_VISITORS_PER_BOOKING} زوار فقط.`
+    : `Each Horus-Bot booking can include up to ${MAX_VISITORS_PER_BOOKING} visitors.`;
+  const visitorLimitHelper = isRTL
+    ? `الحد الأقصى ${MAX_VISITORS_PER_BOOKING} زوار لكل حجز.`
+    : `Maximum ${MAX_VISITORS_PER_BOOKING} visitors per booking.`;
+  const unsupportedTourLanguageMessage = isRTL
+    ? 'اختر لغة جولة مدعومة.'
+    : 'Choose a supported tour language.';
+  const standardRouteRequiredMessage = isRTL
+    ? 'اختر مساراً مقترحاً للجولة القياسية.'
+    : 'Choose a recommended route for the standard tour.';
+  const personalizedExhibitRequiredMessage = isRTL
+    ? 'اختر معروضاً واحداً على الأقل لجولتك المخصصة.'
+    : 'Choose at least one exhibit for your personalized tour.';
+  const futureVisitTimeMessage = isRTL
+    ? 'يرجى اختيار وقت زيارة قادم.'
+    : 'Please choose a future visit time.';
+  const pastVisitTimeMessage = isRTL
+    ? 'هذا الوقت قد مر بالفعل. يرجى اختيار وقت لاحق.'
+    : 'This time has already passed. Please choose a later time.';
+  const noRemainingVisitTimesMessage = isRTL
+    ? 'لا توجد مواعيد زيارة متاحة اليوم. يرجى اختيار تاريخ آخر.'
+    : 'No remaining visit times are available today. Please choose another date.';
+  const availableTimeSlots = TIME_SLOTS.filter((slot) => isFutureVisitTime(date, slot));
+  const hasNoRemainingSlotsToday = date === today && availableTimeSlots.length === 0;
+  const isSelectedVisitTimeFuture = isFutureVisitTime(date, time);
+  const visitTimeErrorMessage = hasNoRemainingSlotsToday
+    ? noRemainingVisitTimesMessage
+    : date === today
+      ? pastVisitTimeMessage
+      : futureVisitTimeMessage;
+
   const updateQuantity = (k: MuseumTicketCategory, d: number) =>
-    setQuantities((q) => ({ ...q, [k]: Math.max(0, q[k] + d) }));
+    setQuantities((q) => {
+      const currentCategoryQuantity = q[k];
+      const nextCategoryQuantity = Math.max(0, currentCategoryQuantity + d);
+      const nextTotal = Object.entries(q).reduce(
+        (total, [key, value]) => total + (key === k ? nextCategoryQuantity : value),
+        0,
+      );
+
+      if (d > 0 && nextTotal > MAX_VISITORS_PER_BOOKING) {
+        toast.error(visitorLimitMessage);
+        return q;
+      }
+
+      return { ...q, [k]: nextCategoryQuantity };
+    });
 
   const validateAuth = () => {
     const e: typeof authErrors = {};
@@ -284,14 +341,24 @@ export default function BookPage() {
       toast.error(isRTL ? 'اختر تذكرة واحدة على الأقل.' : 'Please select at least one ticket.');
       return;
     }
+    if (totalTickets > MAX_VISITORS_PER_BOOKING) {
+      toast.error(visitorLimitMessage);
+      return;
+    }
     goNext();
   };
 
   const proceedFromDatetime = () => {
-    if (!date || !time || date < today) {
-      toast.error(isRTL
-        ? '\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u062a\u0627\u0631\u064a\u062e \u0648\u0648\u0642\u062a \u0635\u0627\u0644\u062d\u064a\u0646.'
-        : 'Please choose a valid date and time.');
+    if (!date || !time || !isSelectedVisitTimeFuture) {
+      toast.error(visitTimeErrorMessage);
+      return;
+    }
+    goNext();
+  };
+
+  const proceedFromLanguage = () => {
+    if (!isSupportedTourNarrationLanguage(tourLanguage)) {
+      toast.error(unsupportedTourLanguageMessage);
       return;
     }
     goNext();
@@ -303,13 +370,12 @@ export default function BookPage() {
   const applyRecommendedRoute = (route: RecommendedRoute) => {
     const validArtifactIds = route.artifact_ids.filter((id) => ARTIFACT_ID_PATTERN.test(id));
     setSelectedRouteId(route.id);
-    setSelectedExhibits(validArtifactIds);
     setInterests(route.theme ? [route.theme] : route.recommended_for);
     setDuration(route.duration_min || STANDARD_TOUR_DURATION_MIN);
     setPace(route.pace || 'normal');
     setKidsMode(route.kids_friendly);
     setPhotoSpots(route.photo_spots);
-    setTourType(route.id === 'horus_highlights' ? 'standard' : 'personalized');
+    setTourType('standard');
     if (!languageTouched && route.recommended_language) {
       setTourLanguage(route.recommended_language);
     }
@@ -322,50 +388,71 @@ export default function BookPage() {
     }
     setTourType(nextTourType);
     if (nextTourType === 'standard') {
-      const highlights = activeRecommendedRoutes.find((route) => route.id === 'horus_highlights');
-      if (highlights) {
-        applyRecommendedRoute(highlights);
-      }
+      setSelectedExhibits([]);
     } else {
       setSelectedRouteId('');
+      setInterests([]);
+      setDuration(STANDARD_TOUR_DURATION_MIN);
+      setPace('normal');
+      setKidsMode(false);
+      setPhotoSpots(false);
     }
+  };
+
+  const proceedFromTour = () => {
+    if (tourType === 'standard' && !selectedRecommendedRoute) {
+      toast.error(standardRouteRequiredMessage);
+      return;
+    }
+    goNext();
+  };
+
+  const proceedFromPersonalize = () => {
+    if (selectedExhibits.length === 0) {
+      toast.error(personalizedExhibitRequiredMessage);
+      return;
+    }
+    goNext();
   };
 
   const confirmAndPay = async () => {
     if (busy) return;
+    if (totalTickets === 0) {
+      toast.error(isRTL ? 'اختر تذكرة واحدة على الأقل.' : 'Please select at least one ticket.');
+      return;
+    }
+    if (totalTickets > MAX_VISITORS_PER_BOOKING) {
+      toast.error(visitorLimitMessage);
+      return;
+    }
     if (pay !== 'cash') {
       toast.error(isRTL
         ? '\u064a\u0643\u062a\u0645\u0644 \u0647\u0630\u0627 \u0627\u0644\u062d\u062c\u0632 \u0646\u0642\u062f\u0627\u064b \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
         : 'This booking is completed with cash at the museum counter.');
       return;
     }
-    if (!date || !time || date < today) {
-      toast.error(isRTL
-        ? '\u064a\u0631\u062c\u0649 \u0627\u062e\u062a\u064a\u0627\u0631 \u062a\u0627\u0631\u064a\u062e \u0648\u0648\u0642\u062a \u0635\u0627\u0644\u062d\u064a\u0646.'
-        : 'Please choose a valid date and time.');
+    if (!date || !time || !isFutureVisitTime(date, time)) {
+      toast.error(visitTimeErrorMessage);
       return;
     }
-    const routeArtifactIds = selectedRecommendedRoute?.artifact_ids.filter((id) => ARTIFACT_ID_PATTERN.test(id));
-    const effectiveTourType: TourType =
-      selectedRecommendedRoute && selectedRecommendedRoute.id !== 'horus_highlights'
-        ? 'personalized'
-        : tourType;
+    if (!isSupportedTourNarrationLanguage(tourLanguage)) {
+      toast.error(unsupportedTourLanguageMessage);
+      return;
+    }
+    const routeArtifactIds = tourType === 'standard'
+      ? selectedRecommendedRoute?.artifact_ids.filter((id) => ARTIFACT_ID_PATTERN.test(id))
+      : undefined;
+    const effectiveTourType: TourType = tourType;
     const selectedExhibitIds =
       routeArtifactIds && routeArtifactIds.length > 0
         ? routeArtifactIds
-        : effectiveTourType === 'standard'
-          ? standardSelectedExhibitIds
-          : selectedExhibits.filter((id) => ARTIFACT_ID_PATTERN.test(id));
-    if (effectiveTourType === 'standard' && selectedExhibitIds.length === 0) {
-      toast.error(productMessage('routes', isRTL));
+        : selectedExhibits.filter((id) => ARTIFACT_ID_PATTERN.test(id));
+    if (effectiveTourType === 'standard' && (!selectedRecommendedRoute || selectedExhibitIds.length === 0)) {
+      toast.error(standardRouteRequiredMessage);
       return;
     }
     if (effectiveTourType === 'personalized' && selectedExhibitIds.length === 0) {
-      toast.error(exhibits.length === 0
-        ? productMessage('exhibits', isRTL)
-        : (isRTL
-          ? '\u0627\u062e\u062a\u0631 \u0642\u0637\u0639\u0629 \u0648\u0627\u062d\u062f\u0629 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644 \u0644\u062c\u0648\u0644\u062a\u0643.'
-          : 'Please select at least one exhibit for your tour.'));
+      toast.error(personalizedExhibitRequiredMessage);
       return;
     }
     setBusy(true);
@@ -387,9 +474,9 @@ export default function BookPage() {
       kids_mode: effectiveTourType === 'personalized' ? kidsMode : false,
       photo_spots: effectiveTourType === 'personalized' ? photoSpots : false,
       notes: notes || undefined,
-      route_id: selectedRecommendedRoute?.id,
-      route_title_en: selectedRecommendedRoute?.title_en,
-      route_title_ar: selectedRecommendedRoute?.title_ar,
+      route_id: effectiveTourType === 'standard' ? selectedRecommendedRoute?.id : undefined,
+      route_title_en: effectiveTourType === 'standard' ? selectedRecommendedRoute?.title_en : undefined,
+      route_title_ar: effectiveTourType === 'standard' ? selectedRecommendedRoute?.title_ar : undefined,
     });
     setBusy(false);
     if (error || !ticket) {
@@ -421,9 +508,8 @@ export default function BookPage() {
     { id: 'normal', en: 'Normal', ar: 'عادي' },
     { id: 'fast', en: 'Fast', ar: 'سريع' },
   ];
-  const languages = [
+  const accountLanguages = [
     { id: 'arabic', en: 'Arabic', ar: 'العربية' },
-    { id: 'egyptian_arabic', en: 'Egyptian Arabic', ar: 'العامية المصرية' },
     { id: 'english', en: 'English', ar: 'الإنجليزية' },
   ];
   const payOptions: { id: PayMethod; labelEn: string; labelAr: string; icon: typeof CreditCard; disabled?: boolean; note?: { en: string; ar: string } }[] = [
@@ -439,7 +525,7 @@ export default function BookPage() {
 
   return (
     <>
-      <section className="relative bg-background">
+      <section className="relative w-full max-w-full overflow-hidden bg-background">
         <div className="pointer-events-none absolute inset-x-0 top-0 bottom-[-96px] z-0 overflow-hidden">
           <img
             src={gemImage}
@@ -452,13 +538,13 @@ export default function BookPage() {
           <div className="absolute inset-x-0 bottom-0 z-[1] h-80 bg-gradient-to-b from-transparent via-background/90 to-background" />
           <div className="absolute inset-x-0 bottom-[-80px] h-40 bg-background blur-3xl" />
         </div>
-        <div className="pointer-events-none absolute inset-0 z-[2]">
+        <div className="pointer-events-none absolute inset-0 z-[2] overflow-hidden">
           <div
-            className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
+            className="absolute left-1/2 top-0 h-[600px] w-[min(900px,100%)] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
             style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 60%)' }}
           />
         </div>
-        <div className="relative z-10 mx-auto max-w-5xl px-4 py-16 text-center md:px-8 md:py-20">
+        <div className="relative z-10 mx-auto w-full max-w-5xl px-4 py-16 text-center md:px-8 md:py-20">
           <div className="section-label mb-3">{isRTL ? 'الحجز' : 'Book'}</div>
           <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
             {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
@@ -471,10 +557,10 @@ export default function BookPage() {
         </div>
       </section>
 
-      <div className="relative bg-background">
+      <div className="relative w-full max-w-full overflow-x-clip bg-background">
 
-      <section className="relative mx-auto mb-16 max-w-7xl overflow-visible border-b border-primary/10 px-4 pt-6 sm:px-6 md:mb-20 md:pt-8 lg:px-8">
-        <div className="grid items-start gap-8 overflow-visible lg:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="relative mx-auto mb-16 w-full max-w-7xl overflow-visible border-b border-primary/10 px-4 pt-6 sm:px-6 md:mb-20 md:pt-8 lg:px-8">
+        <div className="grid min-w-0 items-start gap-8 overflow-visible lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-6">
         <div className="rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -651,7 +737,7 @@ export default function BookPage() {
                     <Select value={signupLanguage} onValueChange={setSignupLanguage}>
                       <SelectTrigger id="bp-lang"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {languages.map((l) => (
+                        {accountLanguages.map((l) => (
                           <SelectItem key={l.id} value={l.id}>{isRTL ? l.ar : l.en}</SelectItem>
                         ))}
                       </SelectContent>
@@ -681,6 +767,7 @@ export default function BookPage() {
                   ? 'الأسعار وفقاً لسياسة المتحف المصرية. الجنسية تحدّد الفئة.'
                   : 'Select who is visiting. Your Horus-Bot Guided Tour is added once per booking.'}
               </p>
+              <p className="mt-2 text-xs font-medium text-primary">{visitorLimitHelper}</p>
             </div>
 
             {(['eg', 'foreign'] as const).map((group) => (
@@ -699,7 +786,18 @@ export default function BookPage() {
                         <Minus className="w-4 h-4" />
                       </Button>
                       <span className="w-8 text-center font-semibold tabular-nums">{quantities[row.key]}</span>
-                      <Button variant="outline" size="icon" className="h-9 w-9 rounded-full border-primary/15 bg-background/40 hover:bg-primary/10" onClick={() => updateQuantity(row.key, 1)} aria-label="increase">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className={cn(
+                          'h-9 w-9 rounded-full border-primary/15 bg-background/40 hover:bg-primary/10',
+                          totalTickets >= MAX_VISITORS_PER_BOOKING && 'opacity-55',
+                        )}
+                        onClick={() => updateQuantity(row.key, 1)}
+                        aria-label="increase"
+                        aria-disabled={totalTickets >= MAX_VISITORS_PER_BOOKING}
+                        title={totalTickets >= MAX_VISITORS_PER_BOOKING ? visitorLimitMessage : undefined}
+                      >
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
@@ -711,7 +809,7 @@ export default function BookPage() {
             <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span>{isRTL ? 'إجمالي التذاكر' : 'Total tickets'}</span>
-                <span className="font-semibold">{totalTickets}</span>
+                <span className="font-semibold">{totalTickets}/{MAX_VISITORS_PER_BOOKING}</span>
               </div>
               <div className="flex justify-between">
                 <span>{isRTL ? 'إجمالي دخول المتحف' : 'Museum entry total'}</span>
@@ -777,7 +875,7 @@ export default function BookPage() {
               })}
             </div>
 
-            {routesLoading && (
+            {tourType === 'standard' && routesLoading && (
                 <div className="rounded-2xl border border-primary/10 bg-background/75 p-4 text-sm text-muted-foreground flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin text-primary" />
                 {isRTL
@@ -785,14 +883,14 @@ export default function BookPage() {
                   : 'Loading recommended routes...'}
               </div>
             )}
-            {!routesLoading && activeRecommendedRoutes.length > 0 && (
+            {tourType === 'standard' && !routesLoading && activeRecommendedRoutes.length > 0 && (
               <div className="space-y-3">
                 <div>
                   <Label>{isRTL ? 'المسارات المقترحة' : 'Recommended Routes'}</Label>
                   <p className="text-xs text-muted-foreground mt-1">
                     {isRTL
                       ? 'اختر مسارا جاهزا لملء محطات الجولة وتفضيلاتها.'
-                      : 'Choose a suggested museum path, or keep shaping the visit yourself.'}
+                      : 'Choose a ready-made museum route for the Standard Tour.'}
                   </p>
                 </div>
                 <div className="grid gap-2">
@@ -826,7 +924,7 @@ export default function BookPage() {
                 </div>
               </div>
             )}
-            {!routesLoading && activeRecommendedRoutes.length === 0 && (
+            {tourType === 'standard' && !routesLoading && activeRecommendedRoutes.length === 0 && (
               <div className="rounded-2xl border border-dashed border-primary/20 bg-background/75 p-4 text-sm text-muted-foreground space-y-3">
                 <p>{productMessage('routes', isRTL)}</p>
                 <Button type="button" variant="outline" size="sm" onClick={retryRecommendedRoutes}>
@@ -837,7 +935,7 @@ export default function BookPage() {
 
             <div className="flex justify-between gap-2">
               <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
-              <Button onClick={goNext} className="h-12 px-6">
+              <Button onClick={proceedFromTour} className="h-12 px-6">
                 {isRTL ? 'متابعة' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
@@ -861,20 +959,36 @@ export default function BookPage() {
 
             <div className="space-y-2">
               <Label className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {isRTL ? 'الوقت' : 'Time slot'}</Label>
+              {hasNoRemainingSlotsToday && (
+                <p className="text-sm text-muted-foreground">{noRemainingVisitTimesMessage}</p>
+              )}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {TIME_SLOTS.map((slot) => (
-                  <button
-                    key={slot}
-                    type="button"
-                    onClick={() => setTime(slot)}
-                    className={cn(
-                      'h-11 rounded-xl border text-sm font-medium transition-colors',
-                      time === slot ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
-                    )}
-                  >
-                    {slot}
-                  </button>
-                ))}
+                {TIME_SLOTS.map((slot) => {
+                  const isAvailable = isFutureVisitTime(date, slot);
+                  return (
+                    <button
+                      key={slot}
+                      type="button"
+                      onClick={() => {
+                        if (!isAvailable) {
+                          toast.error(date === today ? pastVisitTimeMessage : futureVisitTimeMessage);
+                          return;
+                        }
+                        setTime(slot);
+                      }}
+                      aria-disabled={!isAvailable}
+                      className={cn(
+                        'h-11 rounded-xl border text-sm font-medium transition-colors',
+                        time === slot && isAvailable
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-primary/10 bg-background/75 hover:border-primary/50',
+                        !isAvailable && 'cursor-not-allowed opacity-45 hover:border-primary/10',
+                      )}
+                    >
+                      {slot}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -891,16 +1005,16 @@ export default function BookPage() {
         {currentStep === 'language' && (
           <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر لغة السرد' : 'Choose the story language'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر لغة السرد' : 'Choose the narration language'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
-                  ? 'سيستخدم Horus-Bot هذه اللغة أثناء جولتك.'
-                  : 'Horus-Bot will tell the museum story in this language during your guided tour.'}
+                  ? 'اختر لغة السرد لجولة Horus-Bot داخل المتحف.'
+                  : 'Choose the narration language for your Horus-Bot guided tour.'}
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-3 gap-2">
-              {languages.map((l) => (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              {TOUR_NARRATION_LANGUAGES.map((l) => (
                 <button
                   key={l.id}
                   type="button"
@@ -920,7 +1034,7 @@ export default function BookPage() {
 
             <div className="flex justify-between gap-2">
               <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
-              <Button onClick={goNext} className="h-12 px-6">
+              <Button onClick={proceedFromLanguage} className="h-12 px-6">
                 {tourType === 'personalized'
                   ? (isRTL ? 'متابعة إلى التخصيص' : 'Continue to personalization')
                   : (isRTL ? 'متابعة إلى الدفع' : 'Continue to payment')}
@@ -1121,7 +1235,7 @@ export default function BookPage() {
 
             <div className="flex justify-between gap-2">
               <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
-              <Button onClick={goNext} className="h-12 px-6">
+              <Button onClick={proceedFromPersonalize} className="h-12 px-6">
                 {isRTL ? 'متابعة إلى الدفع' : 'Continue to payment'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>

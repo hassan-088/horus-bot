@@ -79,8 +79,8 @@ export function SiteHeader() {
   }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 w-full bg-transparent pointer-events-none">
-      <div className="mx-auto max-w-7xl px-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-8">
+    <header className="fixed inset-x-0 top-0 z-40 w-full max-w-full overflow-x-clip bg-transparent pointer-events-none">
+      <div className="mx-auto w-full max-w-7xl px-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-8">
         <div
           className={cn(
             'pointer-events-auto flex h-12 items-center justify-between rounded-full border px-3 shadow-[0_20px_55px_-32px_hsl(var(--primary)/0.65)] backdrop-blur-md lg:h-14 lg:px-4',
@@ -180,7 +180,7 @@ export function SiteHeader() {
             onClick={() => setOpen(false)}
             aria-hidden
           />
-          <div className="absolute inset-x-3 top-3 max-h-[calc(100vh-1.5rem)] overflow-y-auto rounded-[2rem] border border-primary/20 bg-card/95 shadow-2xl backdrop-blur-xl animate-slide-in-right">
+          <div className="absolute inset-x-3 top-3 max-h-[calc(100vh-1.5rem)] max-w-full overflow-y-auto rounded-[2rem] border border-primary/20 bg-card/95 shadow-2xl backdrop-blur-xl animate-slide-in-right">
             <div className="flex h-16 items-center justify-between border-b border-primary/15 px-4">
               <Link to="/" onClick={() => setOpen(false)} className="flex min-w-0 items-center gap-2">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">

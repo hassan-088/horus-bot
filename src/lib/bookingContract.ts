@@ -5,6 +5,8 @@ import {
   writeBatch,
   type Firestore,
 } from 'firebase/firestore';
+import { MAX_VISITORS_PER_BOOKING } from '@/lib/pricing';
+import { normalizeTourNarrationLanguage } from '@/lib/tourLanguages';
 
 export type BookingSource = 'website' | 'mobile_app';
 export type TourType = 'standard' | 'personalized';
@@ -47,7 +49,64 @@ export function makeBookingQrValue(bookingId: string) {
   return `HRSB-${bookingId.slice(-6).toUpperCase()}-${rand}`;
 }
 
+export function visitStartsAt(visitDate: string, visitTime?: string | null): Date | null {
+  const dateMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(visitDate.trim());
+  if (!dateMatch) return null;
+  const parsedTime = parseTimeSlot(visitTime ?? '');
+  if (!parsedTime) return null;
+  return new Date(
+    Number(dateMatch[1]),
+    Number(dateMatch[2]) - 1,
+    Number(dateMatch[3]),
+    parsedTime.hour,
+    parsedTime.minute,
+  );
+}
+
+export function isFutureVisitTime(visitDate: string, visitTime?: string | null, now = new Date()): boolean {
+  const startsAt = visitStartsAt(visitDate, visitTime);
+  return startsAt !== null && startsAt.getTime() > now.getTime();
+}
+
+function parseTimeSlot(value: string): { hour: number; minute: number } | null {
+  const start = value.trim().split(' - ')[0]?.trim();
+  if (!start) return null;
+  const amPm = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(start);
+  if (amPm) {
+    let hour = Number(amPm[1]);
+    const minute = Number(amPm[2]);
+    const period = amPm[3].toUpperCase();
+    if (period === 'PM' && hour !== 12) hour += 12;
+    if (period === 'AM' && hour === 12) hour = 0;
+    return { hour, minute };
+  }
+  const match = /^(\d{1,2}):(\d{2})/.exec(start);
+  if (!match) return null;
+  return { hour: Number(match[1]), minute: Number(match[2]) };
+}
+
 export async function createBooking(db: Firestore, input: CreateBookingInput): Promise<CreatedBookingRefs> {
+  if (input.visitor_count < 1 || input.visitor_count > MAX_VISITORS_PER_BOOKING) {
+    throw new Error(`visitor-count-must-be-1-to-${MAX_VISITORS_PER_BOOKING}`);
+  }
+  if (!isFutureVisitTime(input.visit_date, input.visit_time)) {
+    throw new Error('visit-time-must-be-future');
+  }
+  if ((input.tour_type ?? 'standard') === 'standard') {
+    if (!input.route_id?.trim() || !input.selected_exhibits?.length) {
+      throw new Error('standard-route-required');
+    }
+  }
+  if (input.tour_type === 'personalized') {
+    if (!input.selected_exhibits?.length) {
+      throw new Error('personalized-exhibit-required');
+    }
+  }
+  const narrationLanguage = normalizeTourNarrationLanguage(input.preferred_language);
+  if (!narrationLanguage) {
+    throw new Error('unsupported-tour-language');
+  }
+
   const bookingRef = doc(collection(db, 'bookings'));
   const museumRef = doc(collection(db, 'museumTickets'));
   const robotRef = doc(collection(db, 'robotTourTickets'));
@@ -115,7 +174,7 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
     visit_date: input.visit_date,
     visit_time: input.visit_time ?? null,
     tour_duration_min: input.tour_duration_min ?? null,
-    preferred_language: input.preferred_language ?? null,
+    preferred_language: narrationLanguage,
     pace: input.pace ?? null,
     interests: input.interests ?? [],
     selected_exhibits: input.selected_exhibits ?? [],

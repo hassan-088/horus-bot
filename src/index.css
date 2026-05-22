@@ -173,18 +173,50 @@
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
+  }
+
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
   html {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     font-family: 'Inter', system-ui, sans-serif;
     scroll-behavior: smooth;
+    background: hsl(var(--background));
   }
 
   body {
     @apply bg-background text-foreground antialiased;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
     line-height: 1.5;
     font-family: 'Inter', system-ui, sans-serif;
     position: relative;
+  }
+
+  #root {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    overflow-x: clip;
+    background: hsl(var(--background));
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
   }
 
   /* Smooth premium ambient background — one continuous warm wash */

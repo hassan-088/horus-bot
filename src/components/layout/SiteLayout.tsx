@@ -17,11 +17,11 @@ export function SiteLayout() {
   const hasCinematicHero = cinematicRoutes.has(pathname);
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-background">
+    <div className="relative flex min-h-screen w-full max-w-full flex-col overflow-x-clip bg-background">
       <SiteHeader />
       <main
         className={cn(
-          'flex-1 animate-page-enter',
+          'min-w-0 flex-1 animate-page-enter',
           !hasCinematicHero && 'pt-[calc(env(safe-area-inset-top)+4.75rem)] lg:pt-20',
         )}
       >

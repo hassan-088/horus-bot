@@ -29,7 +29,7 @@ export function SectionHero({
   atmosphereContinuity = false,
 }: SectionHeroProps) {
   return (
-    <section className={cn('relative isolate overflow-hidden', className)}>
+    <section className={cn('relative isolate w-full max-w-full overflow-hidden', className)}>
       {/* Optional museum background image */}
       {backgroundImage && (
         <div className="pointer-events-none absolute inset-0 -z-20">
@@ -46,9 +46,9 @@ export function SectionHero({
       )}
 
       {/* Cinematic gold radial wash */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div
-          className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
+          className="absolute left-1/2 top-0 h-[600px] w-[min(900px,100%)] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
           style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 60%)' }}
         />
       </div>
@@ -59,7 +59,7 @@ export function SectionHero({
 
       <div
         className={cn(
-          'relative z-10 mx-auto max-w-5xl px-4 md:px-8',
+          'relative z-10 mx-auto w-full max-w-5xl px-4 md:px-8',
           bleedBehindNav
             ? 'pb-16 pt-[calc(env(safe-area-inset-top)+6.5rem)] md:pb-28 md:pt-36'
             : 'py-16 md:py-28',

@@ -1,5 +1,7 @@
 export const CURRENCY = 'EGP';
 
+export const MAX_VISITORS_PER_BOOKING = 10;
+
 export const museumTicketPrices = {
   egyptian_adult: 200,
   egyptian_student: 100,
