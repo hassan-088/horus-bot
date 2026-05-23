@@ -5,6 +5,8 @@ import {
   AlertCircle,
   Bot,
   Calendar,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Info,
   Languages,
@@ -33,8 +35,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useExhibits, type WebsiteExhibit } from '@/hooks/useExhibits';
 import {
   canCancelUserTicket,
+  deriveTicketDisplayStatus,
   isWithinCancellationDeadline,
   useUserTickets,
+  type TicketDisplayStatus,
   type TicketStatus,
   type UserTicket,
 } from '@/hooks/useUserTickets';
@@ -113,9 +117,22 @@ export default function MyTicketsPage() {
   const { exhibits } = useExhibits();
   const [confirmTk, setConfirmTk] = useState<UserTicket | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [expandedBookingIds, setExpandedBookingIds] = useState<Set<string>>(() => new Set());
 
-  const active = tickets.filter((t) => t.status === 'active');
-  const past = tickets.filter((t) => t.status !== 'active');
+  const active = tickets.filter((t) => ['active', 'paired', 'in_progress'].includes(t.display_status));
+  const past = tickets.filter((t) => !['active', 'paired', 'in_progress'].includes(t.display_status));
+
+  const toggleExpanded = (bookingId: string) => {
+    setExpandedBookingIds((current) => {
+      const next = new Set(current);
+      if (next.has(bookingId)) {
+        next.delete(bookingId);
+      } else {
+        next.add(bookingId);
+      }
+      return next;
+    });
+  };
 
   const handleCancel = async () => {
     if (!confirmTk || cancellingId) return;
@@ -141,7 +158,9 @@ export default function MyTicketsPage() {
             : 'Your museum entry and Horus-Bot tour details stay ready for the visit.'
         }
         backgroundImage={gemImage}
-        backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
+        backgroundAlt={isRTL ? 'Ù‚Ø§Ø¹Ø© Ù…ØªØ­Ù Ù‡Ø§Ø¯Ø¦Ø©' : 'Quiet museum hall'}
+        bleedBehindNav
+        atmosphereContinuity
         className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 
@@ -204,6 +223,8 @@ export default function MyTicketsPage() {
             exhibits={exhibits}
             onCancel={setConfirmTk}
             cancellingId={cancellingId}
+            expandedBookingIds={expandedBookingIds}
+            onToggleExpanded={toggleExpanded}
           />
         )}
 
@@ -214,6 +235,8 @@ export default function MyTicketsPage() {
             isRTL={isRTL}
             exhibits={exhibits}
             cancellingId={cancellingId}
+            expandedBookingIds={expandedBookingIds}
+            onToggleExpanded={toggleExpanded}
           />
         )}
       </section>
@@ -329,6 +352,8 @@ function TicketSection({
   exhibits,
   onCancel,
   cancellingId,
+  expandedBookingIds,
+  onToggleExpanded,
 }: {
   title: string;
   tickets: UserTicket[];
@@ -336,6 +361,8 @@ function TicketSection({
   exhibits: WebsiteExhibit[];
   onCancel?: (ticket: UserTicket) => void;
   cancellingId: string | null;
+  expandedBookingIds: Set<string>;
+  onToggleExpanded: (bookingId: string) => void;
 }) {
   return (
     <div>
@@ -351,6 +378,8 @@ function TicketSection({
             exhibits={exhibits}
             onCancel={onCancel ? () => onCancel(tk) : undefined}
             isCancelling={cancellingId === tk.id}
+            isExpanded={expandedBookingIds.has(tk.id)}
+            onToggleExpanded={() => onToggleExpanded(tk.id)}
           />
         ))}
       </div>
@@ -375,12 +404,12 @@ function paymentStatusLabel(isRTL: boolean) {
 
 function visitorCategoryLabel(key: string, isRTL: boolean) {
   const labels: Record<string, { en: string; ar: string }> = {
-    egyptian_adult: { en: 'Egyptian Adult', ar: 'بالغ مصري' },
-    egyptian_student: { en: 'Egyptian Student', ar: 'طالب مصري' },
-    egyptian_child: { en: 'Egyptian Child', ar: 'طفل مصري' },
-    foreigner_adult: { en: 'Foreigner Adult', ar: 'بالغ أجنبي' },
-    foreigner_student: { en: 'Foreigner Student', ar: 'طالب أجنبي' },
-    foreigner_child: { en: 'Foreigner Child', ar: 'طفل أجنبي' },
+    egyptian_adult: { en: 'Egyptian Adult', ar: 'Ø¨Ø§Ù„Øº Ù…ØµØ±ÙŠ' },
+    egyptian_student: { en: 'Egyptian Student', ar: 'Ø·Ø§Ù„Ø¨ Ù…ØµØ±ÙŠ' },
+    egyptian_child: { en: 'Egyptian Child', ar: 'Ø·ÙÙ„ Ù…ØµØ±ÙŠ' },
+    foreigner_adult: { en: 'Foreigner Adult', ar: 'Ø¨Ø§Ù„Øº Ø£Ø¬Ù†Ø¨ÙŠ' },
+    foreigner_student: { en: 'Foreigner Student', ar: 'Ø·Ø§Ù„Ø¨ Ø£Ø¬Ù†Ø¨ÙŠ' },
+    foreigner_child: { en: 'Foreigner Child', ar: 'Ø·ÙÙ„ Ø£Ø¬Ù†Ø¨ÙŠ' },
   };
   return isRTL ? labels[key]?.ar ?? key : labels[key]?.en ?? key.replace(/_/g, ' ');
 }
@@ -401,14 +430,18 @@ function TicketCard({
   exhibits,
   onCancel,
   isCancelling = false,
+  isExpanded,
+  onToggleExpanded,
 }: {
   tk: UserTicket;
   isRTL: boolean;
   exhibits: WebsiteExhibit[];
   onCancel?: () => void;
   isCancelling?: boolean;
+  isExpanded: boolean;
+  onToggleExpanded: () => void;
 }) {
-  const inactive = tk.status !== 'active';
+  const inactive = !['active', 'paired', 'in_progress'].includes(tk.display_status);
   const canCancel = canCancelUserTicket(tk);
   const cancellationReason = cancellationBlockedMessage(tk, isRTL);
   const exhibitNames = resolveExhibitNames(tk.selected_exhibits ?? [], exhibits, isRTL);
@@ -417,9 +450,9 @@ function TicketCard({
     : tk.route_title_en || tk.route_title_ar;
   const categories = visitorCategories(tk.ticket_types, isRTL);
   const tourTypeLabel = tk.tour_type === 'personalized'
-    ? (isRTL ? 'مخصصة' : 'Personalized')
-    : (isRTL ? 'قياسية' : 'Standard');
-  const visitWhen = [tk.visit_date, tk.visit_time].filter(Boolean).join(' • ');
+    ? (isRTL ? 'Ù…Ø®ØµØµØ©' : 'Personalized')
+    : (isRTL ? 'Ù‚ÙŠØ§Ø³ÙŠØ©' : 'Standard');
+  const visitWhen = [tk.visit_date, tk.visit_time].filter(Boolean).join(' â€¢ ');
   const bookingStatus = bookingDisplayStatus(tk, isRTL);
 
   return (
@@ -429,9 +462,9 @@ function TicketCard({
           <div className="min-w-0">
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <span className="section-label">{isRTL ? ar.booking : 'Booking'}</span>
-              <span className="max-w-full truncate rounded-full border border-primary/10 bg-background/35 px-2.5 py-0.5 font-mono text-[11px] text-muted-foreground">
+              {isExpanded && <span className="max-w-full truncate rounded-full border border-primary/10 bg-background/35 px-2.5 py-0.5 font-mono text-[11px] text-muted-foreground">
                 {tk.booking_id}
-              </span>
+              </span>}
             </div>
             <h3 className="font-serif text-2xl leading-tight text-foreground md:text-3xl">{tk.museum_name}</h3>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
@@ -455,135 +488,157 @@ function TicketCard({
       </div>
 
       <div className="space-y-5 p-5 md:p-6">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <InfoBox label={isRTL ? ar.visitTime : 'Visit time'} value={visitWhen} />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <InfoBox label={isRTL ? ar.tourType : 'Tour type'} value={tourTypeLabel} />
           <InfoBox label={isRTL ? ar.total : 'Total'} value={`${tk.total_price} ${tk.currency}`} />
           <InfoBox label={isRTL ? ar.visitors : 'Visitors'} value={`${tk.total_tickets}`} />
+          <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
         </div>
 
-        <PassCard
-          icon={<Ticket className="h-4 w-4 text-primary" />}
-          title={isRTL ? ar.museumTicket : 'Museum Entry Ticket'}
-          status={statusLabel(tk.museum_status, isRTL)}
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full justify-center rounded-2xl border-primary/25 bg-background/60 text-primary hover:bg-primary/10 sm:w-auto"
+          onClick={onToggleExpanded}
+          aria-expanded={isExpanded}
         >
-          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
-            <div className="mb-3 flex items-center gap-2">
-              <QrCode className="h-4 w-4 text-primary" />
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                {isRTL ? ar.entryQr : 'Gate Entry Code'}
-              </p>
+          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          {isExpanded ? (isRTL ? 'Ø¥Ø®ÙØ§Ø¡ Ø§Ù„ØªÙØ§ØµÙŠÙ„' : 'Hide details') : (isRTL ? 'Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„' : 'View details')}
+        </Button>
+
+        {isExpanded && (
+          <div className="space-y-5 animate-in fade-in-0 slide-in-from-top-1 duration-200">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <InfoBox label={isRTL ? ar.visitTime : 'Visit time'} value={visitWhen} />
+              <InfoBox label={isRTL ? ar.total : 'Total'} value={`${tk.total_price} ${tk.currency}`} />
+              <InfoBox label={isRTL ? ar.visitors : 'Visitors'} value={`${tk.total_tickets}`} />
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-background/75">
-                <QrCode className="h-6 w-6 text-primary" />
+
+            <PassCard
+              icon={<Ticket className="h-4 w-4 text-primary" />}
+              title={isRTL ? ar.museumTicket : 'Museum Entry Ticket'}
+              status={statusLabel(tk.museum_status, isRTL)}
+            >
+              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <QrCode className="h-4 w-4 text-primary" />
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                    {isRTL ? ar.entryQr : 'Gate Entry Code'}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-background/75">
+                    <QrCode className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="break-all font-mono text-sm font-semibold text-foreground">{tk.qr_value}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {isRTL ? ar.entryQrBody : 'Show this code at the museum entrance.'}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="break-all font-mono text-sm font-semibold text-foreground">{tk.qr_value}</p>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  {isRTL ? ar.entryQrBody : 'Show this code at the museum entrance.'}
+              <div className="grid gap-2 text-sm sm:grid-cols-3">
+                <InfoBox label={isRTL ? ar.tickets : 'Tickets'} value={`${tk.total_tickets}`} />
+                <InfoBox label={isRTL ? ar.price : 'Price'} value={`${tk.museum_entry_total} ${tk.currency}`} />
+                <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
+              </div>
+              {categories.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="text-[11px] text-muted-foreground">{isRTL ? ar.categories : 'Visitor categories'}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((category) => (
+                      <span key={category.key} className="rounded-full bg-background/75 px-2.5 py-1 text-[11px] text-foreground ring-1 ring-primary/15">
+                        {category.label} x {category.count}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {isRTL ? ar.entryQrBody : 'Used at the museum entrance.'}
+              </p>
+            </PassCard>
+
+            <PassCard
+              icon={<Bot className="h-4 w-4 text-primary" />}
+              title={isRTL ? ar.robotTicket : 'Horus-Bot Tour Ticket'}
+              status={statusLabel(tk.robot_status, isRTL)}
+            >
+              <div className="grid gap-2 text-sm sm:grid-cols-3">
+                {routeTitle && <InfoBox label={isRTL ? ar.route : 'Route'} value={routeTitle} />}
+                <InfoBox label={isRTL ? ar.tourType : 'Tour type'} value={tourTypeLabel} />
+                <InfoBox label={isRTL ? ar.duration : 'Duration'} value={`${tk.tour_duration ?? 45} min`} />
+                <InfoBox label={isRTL ? ar.price : 'Price'} value={`${tk.robot_tour_price} ${tk.currency}`} />
+                <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
+              </div>
+              {exhibitNames.length > 0 ? (
+                <div className="space-y-1.5">
+                  <div className="text-[11px] text-muted-foreground">
+                    {isRTL ? ar.selectedExhibits : 'Selected exhibits'}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {exhibitNames.map((name) => (
+                      <span key={name} className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] text-primary">
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <div className="text-[11px] text-muted-foreground">
+                    {isRTL ? ar.selectedExhibits : 'Selected exhibits'}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {isRTL ? ar.routeUnavailable : 'Route details unavailable for this older ticket.'}
+                  </p>
+                </div>
+              )}
+              {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
+                <div className="flex flex-wrap items-center gap-2">
+                  {tk.preferred_language && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-background/75 px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-primary/15">
+                      <Languages className="h-3.5 w-3.5" />
+                      <span>{tourNarrationLanguageLabel(tk.preferred_language, isRTL, tk.preferred_language_other)}</span>
+                    </span>
+                  )}
+                  {tk.interests?.map((interest) => (
+                    <span key={interest} className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] text-primary">
+                      {formatDisplayToken(interest)}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="rounded-2xl border border-primary/15 bg-background/55 p-3">
+                <p className="mb-1 text-xs font-semibold text-foreground">{isRTL ? ar.robotPairing : 'Horus-Bot connection'}</p>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                {isRTL
+                  ? ar.pairingBody
+                  : 'Robot connection and Live Tour continue inside the mobile app during your museum visit.'}
                 </p>
               </div>
-            </div>
-          </div>
-          <div className="grid gap-2 text-sm sm:grid-cols-3">
-            <InfoBox label={isRTL ? ar.tickets : 'Tickets'} value={`${tk.total_tickets}`} />
-            <InfoBox label={isRTL ? ar.price : 'Price'} value={`${tk.museum_entry_total} ${tk.currency}`} />
-            <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
-          </div>
-          {categories.length > 0 && (
-            <div className="space-y-1.5">
-              <div className="text-[11px] text-muted-foreground">{isRTL ? ar.categories : 'Visitor categories'}</div>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <span key={category.key} className="rounded-full bg-background/75 px-2.5 py-1 text-[11px] text-foreground ring-1 ring-primary/15">
-                    {category.label} x {category.count}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {isRTL ? ar.entryQrBody : 'Used at the museum entrance.'}
-          </p>
-        </PassCard>
+            </PassCard>
 
-        <PassCard
-          icon={<Bot className="h-4 w-4 text-primary" />}
-          title={isRTL ? ar.robotTicket : 'Horus-Bot Tour Ticket'}
-          status={statusLabel(tk.robot_status, isRTL)}
-        >
-          <div className="grid gap-2 text-sm sm:grid-cols-3">
-            {routeTitle && <InfoBox label={isRTL ? ar.route : 'Route'} value={routeTitle} />}
-            <InfoBox label={isRTL ? ar.tourType : 'Tour type'} value={tourTypeLabel} />
-            <InfoBox label={isRTL ? ar.duration : 'Duration'} value={`${tk.tour_duration ?? 45} min`} />
-            <InfoBox label={isRTL ? ar.price : 'Price'} value={`${tk.robot_tour_price} ${tk.currency}`} />
-            <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
-          </div>
-          {exhibitNames.length > 0 ? (
-            <div className="space-y-1.5">
-              <div className="text-[11px] text-muted-foreground">
-                {isRTL ? ar.selectedExhibits : 'Selected exhibits'}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {exhibitNames.map((name) => (
-                  <span key={name} className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] text-primary">
-                    {name}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-1.5">
-              <div className="text-[11px] text-muted-foreground">
-                {isRTL ? ar.selectedExhibits : 'Selected exhibits'}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {isRTL ? ar.routeUnavailable : 'Route details unavailable for this older ticket.'}
-              </p>
-            </div>
-          )}
-          {(tk.preferred_language || (tk.interests && tk.interests.length > 0)) && (
-            <div className="flex flex-wrap items-center gap-2">
-              {tk.preferred_language && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-background/75 px-2.5 py-1 text-[11px] text-muted-foreground ring-1 ring-primary/15">
-                  <Languages className="h-3.5 w-3.5" />
-                  <span>{tourNarrationLanguageLabel(tk.preferred_language, isRTL)}</span>
-                </span>
+            <div className="border-t border-primary/15 pt-4">
+              {canCancel && onCancel && (
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={onCancel} disabled={isCancelling}>
+                  {isCancelling ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XIcon className="h-3.5 w-3.5" />}
+                  {isRTL ? ar.cancelBooking : 'Cancel booking'}
+                </Button>
               )}
-              {tk.interests?.map((interest) => (
-                <span key={interest} className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] text-primary">
-                  {formatDisplayToken(interest)}
-                </span>
-              ))}
+              {!canCancel && cancellationReason && (
+                <p className="rounded-2xl border border-primary/15 bg-background/55 p-3 text-xs leading-relaxed text-muted-foreground">{cancellationReason}</p>
+              )}
             </div>
-          )}
-          <div className="rounded-2xl border border-primary/15 bg-background/55 p-3">
-            <p className="mb-1 text-xs font-semibold text-foreground">{isRTL ? ar.robotPairing : 'Horus-Bot connection'}</p>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-            {isRTL
-              ? ar.pairingBody
-              : 'Robot connection and Live Tour continue inside the mobile app during your museum visit.'}
-            </p>
           </div>
-        </PassCard>
-
-        <div className="border-t border-primary/15 pt-4">
-          {canCancel && onCancel && (
-            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={onCancel} disabled={isCancelling}>
-              {isCancelling ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XIcon className="h-3.5 w-3.5" />}
-              {isRTL ? ar.cancelBooking : 'Cancel booking'}
-            </Button>
-          )}
-          {!canCancel && cancellationReason && (
-            <p className="rounded-2xl border border-primary/15 bg-background/55 p-3 text-xs leading-relaxed text-muted-foreground">{cancellationReason}</p>
-          )}
-        </div>
+        )}
       </div>
     </Card>
   );
 }
 
-function statusBadgeClass(status: TicketStatus) {
+function statusBadgeClass(status: TicketDisplayStatus) {
   if (status === 'active') return 'shrink-0 bg-primary/10 text-primary border-0';
   if (status === 'cancelled' || status === 'expired') return 'shrink-0 bg-muted text-muted-foreground border-0';
   if (status === 'completed' || status === 'used') return 'shrink-0 bg-emerald-500/15 text-emerald-700 border-0';
@@ -591,20 +646,13 @@ function statusBadgeClass(status: TicketStatus) {
 }
 
 function bookingDisplayStatus(ticket: UserTicket, isRTL: boolean) {
-  const childStatuses = [ticket.museum_status, ticket.robot_status];
-  const hasMixedStatus = new Set(childStatuses).size > 1;
-  const hasCancelledChild = childStatuses.includes('cancelled');
-
-  if (hasMixedStatus || (ticket.status === 'active' && hasCancelledChild)) {
+  const displayStatus = ticket.display_status ?? deriveTicketDisplayStatus(ticket);
+  if (displayStatus === 'partial') {
     return {
-      label: isRTL ? ar.statuses.partiallyModified : 'Partially Modified',
+      label: isRTL ? ar.statuses.partiallyModified : 'Partially updated',
       className: 'shrink-0 border-0 bg-amber-500/15 text-amber-700',
     };
   }
-
-  const displayStatus = ticket.status === 'cancelled' || childStatuses.every((status) => status === 'cancelled')
-    ? 'cancelled'
-    : ticket.status;
 
   return {
     label: statusLabel(displayStatus, isRTL),
@@ -612,17 +660,20 @@ function bookingDisplayStatus(ticket: UserTicket, isRTL: boolean) {
   };
 }
 
-function statusLabel(status: TicketStatus, isRTL: boolean) {
+function statusLabel(status: TicketStatus | TicketDisplayStatus, isRTL: boolean) {
   const labels: Record<TicketStatus, { en: string; ar: string }> = {
     active: { en: 'Active', ar: ar.statuses.active },
     cancelled: { en: 'Cancelled', ar: ar.statuses.cancelled },
     completed: { en: 'Completed', ar: ar.statuses.completed },
     expired: { en: 'Expired', ar: ar.statuses.expired },
-    paired: { en: 'Paired', ar: ar.statuses.paired },
-    in_progress: { en: 'In Progress', ar: ar.statuses.inProgress },
+    paired: { en: 'Ready to start', ar: ar.statuses.paired },
+    in_progress: { en: 'In progress', ar: ar.statuses.inProgress },
     pending: { en: 'Preparing', ar: ar.statuses.preparing },
     used: { en: 'Used', ar: ar.statuses.used },
   };
+  if (status === 'partial') {
+    return isRTL ? ar.statuses.partiallyModified : 'Partially updated';
+  }
   return isRTL ? labels[status].ar : labels[status].en;
 }
 

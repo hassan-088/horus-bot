@@ -70,6 +70,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Map Firebase Auth error codes to friendly messages. Never expose raw codes.
 export function friendlyAuthError(err: unknown, isArabic = false): string {
   const code = (err as { code?: string })?.code ?? '';
+  const message = (err as { message?: string })?.message ?? '';
+  if (message && !message.startsWith('Firebase:')) return message;
   if (code === 'auth/network-request-failed') return productMessage('network', isArabic);
   if (code === 'auth/operation-not-allowed') return productMessage('generic', isArabic);
   const map: Record<string, { en: string; ar: string }> = {
@@ -94,11 +96,11 @@ export function friendlyAuthError(err: unknown, isArabic = false): string {
       ar: 'تعذر الاتصال. تحقق من الإنترنت ثم حاول مرة أخرى.',
     },
     'auth/user-not-found': {
-      en: 'No account found with this email.',
+      en: 'No account was found with this email. Please create an account first.',
       ar: 'لا يوجد حساب بهذا البريد الإلكتروني.',
     },
     'auth/wrong-password': {
-      en: 'Email or password is incorrect.',
+      en: 'The password is incorrect. Please try again.',
       ar: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
     },
     'auth/invalid-credential': {
@@ -276,9 +278,9 @@ export function AuthProvider({
       setProfileLoadError(null);
       return { error: null };
     } catch (e) {
-      console.error('[Horus-Bot] Profile update failed', e);
+      console.error('[Horus-Bot] Sign up failed', e);
       return {
-        error: new Error(isConnectionError(e) ? productMessage('network') : productMessage('profile')),
+        error: new Error(isConnectionError(e) ? productMessage('network') : friendlyAuthError(e)),
       };
     }
   };
@@ -288,9 +290,9 @@ export function AuthProvider({
       await signInWithEmailAndPassword(auth, email, password);
       return { error: null };
     } catch (e) {
-      console.error('[Horus-Bot] Password reset failed', e);
+      console.error('[Horus-Bot] Sign in failed', e);
       return {
-        error: new Error(isConnectionError(e) ? productMessage('network') : productMessage('generic')),
+        error: new Error(isConnectionError(e) ? productMessage('network') : friendlyAuthError(e)),
       };
     }
   };

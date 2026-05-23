@@ -24,6 +24,7 @@ export interface CreateBookingInput {
   tour_type?: TourType;
   tour_duration_min?: number;
   preferred_language?: string;
+  preferred_language_other?: string;
   pace?: string;
   interests?: string[];
   selected_exhibits?: string[];
@@ -34,6 +35,15 @@ export interface CreateBookingInput {
   route_id?: string;
   route_title_en?: string;
   route_title_ar?: string;
+}
+
+export function maxExhibitsForDuration(durationMin: number | null | undefined): number {
+  const duration = Number(durationMin ?? 45);
+  if (duration <= 30) return 4;
+  if (duration <= 45) return 6;
+  if (duration <= 50) return 7;
+  if (duration <= 60) return 8;
+  return 12;
 }
 
 export interface CreatedBookingRefs {
@@ -106,6 +116,14 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
   if (!narrationLanguage) {
     throw new Error('unsupported-tour-language');
   }
+  if (narrationLanguage === 'other' && !input.preferred_language_other?.trim()) {
+    throw new Error('custom-tour-language-required');
+  }
+  const selectedExhibitCount = input.selected_exhibits?.length ?? 0;
+  const maxSelectedExhibits = maxExhibitsForDuration(input.tour_duration_min);
+  if (selectedExhibitCount > maxSelectedExhibits) {
+    throw new Error(`too-many-exhibits-for-duration-${maxSelectedExhibits}`);
+  }
 
   const bookingRef = doc(collection(db, 'bookings'));
   const museumRef = doc(collection(db, 'museumTickets'));
@@ -175,11 +193,12 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
     visit_time: input.visit_time ?? null,
     tour_duration_min: input.tour_duration_min ?? null,
     preferred_language: narrationLanguage,
+    preferred_language_other: narrationLanguage === 'other' ? input.preferred_language_other?.trim() ?? null : null,
     pace: input.pace ?? null,
     interests: input.interests ?? [],
     selected_exhibits: input.selected_exhibits ?? [],
     accessibility: input.accessibility ?? [],
-    kids_mode: input.kids_mode ?? false,
+    kids_mode: false,
     photo_spots: input.photo_spots ?? false,
     notes: input.notes ?? null,
     route_id: input.route_id ?? null,

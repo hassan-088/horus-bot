@@ -32,6 +32,8 @@ export type TicketStatus =
   | 'pending'
   | 'used';
 
+export type TicketDisplayStatus = TicketStatus | 'partial';
+
 export interface UserTicket {
   id: string;
   booking_id: string;
@@ -54,6 +56,7 @@ export interface UserTicket {
   status: TicketStatus;
   museum_status: TicketStatus;
   robot_status: TicketStatus;
+  display_status: TicketDisplayStatus;
   qr_value: string;
   created_at: string;
   tour_type?: TourType | null;
@@ -63,6 +66,7 @@ export interface UserTicket {
   selected_exhibits?: string[] | null;
   accessibility?: string[] | null;
   preferred_language?: string | null;
+  preferred_language_other?: string | null;
   kids_mode?: boolean | null;
   photo_spots?: boolean | null;
   notes?: string | null;
@@ -104,6 +108,54 @@ function normalizeStatus(value: unknown): TicketStatus {
   }
 }
 
+const STATUS_PRIORITY: Record<TicketDisplayStatus, number> = {
+  active: 1,
+  paired: 2,
+  in_progress: 3,
+  completed: 4,
+  used: 4,
+  cancelled: 5,
+  expired: 5,
+  pending: 6,
+  partial: 6,
+};
+
+export function deriveTicketDisplayStatus(ticket: Pick<UserTicket, 'status' | 'museum_status' | 'robot_status'>): TicketDisplayStatus {
+  const { status, museum_status: museumStatus, robot_status: robotStatus } = ticket;
+
+  if (status === 'cancelled' || (museumStatus === 'cancelled' && robotStatus === 'cancelled')) {
+    return 'cancelled';
+  }
+  if (museumStatus === 'expired' || robotStatus === 'expired' || status === 'expired') {
+    return 'expired';
+  }
+  if (robotStatus === 'in_progress') return 'in_progress';
+  if (robotStatus === 'paired') return 'paired';
+  if (robotStatus === 'completed' || status === 'completed') return 'completed';
+  if (museumStatus === 'used' || status === 'used') return 'used';
+  if (status === 'active' && museumStatus === 'active' && robotStatus === 'active') {
+    return 'active';
+  }
+  if (status === 'pending' || museumStatus === 'pending' || robotStatus === 'pending') {
+    return 'pending';
+  }
+
+  return 'partial';
+}
+
+function createdAtValue(ticket: UserTicket): number {
+  const value = Date.parse(ticket.created_at);
+  if (Number.isFinite(value)) return value;
+  const visitValue = Date.parse(`${ticket.visit_date}T${ticket.visit_time ?? '00:00'}`);
+  return Number.isFinite(visitValue) ? visitValue : 0;
+}
+
+function compareUserTickets(a: UserTicket, b: UserTicket): number {
+  const priorityDiff = STATUS_PRIORITY[a.display_status] - STATUS_PRIORITY[b.display_status];
+  if (priorityDiff !== 0) return priorityDiff;
+  return createdAtValue(b) - createdAtValue(a);
+}
+
 function isLegacyBookingId(value: unknown): boolean {
   return String(value ?? '').trim().toUpperCase().startsWith('ORD-');
 }
@@ -119,7 +171,10 @@ function toUserTicket(
   const museumTotal = (booking.museum_entry_total as number) ?? (museumTicket?.total_price as number) ?? 0;
   const robotTotal = (booking.robot_tour_price as number) ?? (robotTourTicket?.total_price as number) ?? 0;
 
-  return {
+  const status = normalizeStatus(booking.status);
+  const museumStatus = normalizeStatus(museumTicket.status);
+  const robotStatus = normalizeStatus(robotTourTicket.status);
+  const baseTicket = {
     id: bookingId,
     booking_id: (booking.booking_id as string) ?? bookingId,
     booking_source: ((booking.booking_source as BookingSource) ?? 'website'),
@@ -138,9 +193,9 @@ function toUserTicket(
     currency: (booking.currency as string) ?? 'EGP',
     payment_method: (booking.payment_method as string) ?? 'cash',
     payment_status: (booking.payment_status as string) ?? 'pay_at_counter',
-    status: normalizeStatus(booking.status),
-    museum_status: normalizeStatus(museumTicket.status),
-    robot_status: normalizeStatus(robotTourTicket.status),
+    status,
+    museum_status: museumStatus,
+    robot_status: robotStatus,
     qr_value: (museumTicket?.qr_value as string) ?? '',
     created_at: tsToIso(booking.created_at ?? museumTicket?.created_at),
     tour_type: (robotTourTicket?.tour_type as TourType) ?? null,
@@ -150,6 +205,7 @@ function toUserTicket(
     selected_exhibits: asStringArray(robotTourTicket?.selected_exhibits),
     accessibility: asStringArray(robotTourTicket?.accessibility),
     preferred_language: (robotTourTicket?.preferred_language as string) ?? null,
+    preferred_language_other: (robotTourTicket?.preferred_language_other as string) ?? null,
     kids_mode: (robotTourTicket?.kids_mode as boolean) ?? null,
     photo_spots: (robotTourTicket?.photo_spots as boolean) ?? null,
     notes: (robotTourTicket?.notes as string) ?? null,
@@ -158,6 +214,10 @@ function toUserTicket(
     route_title_ar: (robotTourTicket?.route_title_ar as string) ?? null,
     paired_robot_id: (robotTourTicket?.paired_robot_id as string | null) ?? null,
     session_id: (robotTourTicket?.session_id as string | null) ?? null,
+  };
+  return {
+    ...baseTicket,
+    display_status: deriveTicketDisplayStatus(baseTicket),
   };
 }
 
@@ -200,7 +260,7 @@ export function useUserTickets() {
       }));
       const completeRows = rows.filter((row): row is UserTicket => row !== null);
       setSkippedBookingCount(rows.length - completeRows.length);
-      completeRows.sort((a, b) => (a.visit_date || '').localeCompare(b.visit_date || ''));
+      completeRows.sort(compareUserTickets);
       setTickets(completeRows);
     } catch (e) {
       console.error('[Horus-Bot] Ticket load failed', e);
@@ -269,6 +329,7 @@ export function useUserTickets() {
             tour_type: input.tour_type ?? 'standard',
             tour_duration_min: input.tour_duration_min ?? null,
             preferred_language: input.preferred_language ?? null,
+            preferred_language_other: input.preferred_language_other ?? null,
             pace: input.pace ?? null,
             interests: input.interests ?? [],
             selected_exhibits: input.selected_exhibits ?? [],
@@ -285,7 +346,7 @@ export function useUserTickets() {
             status: 'active',
           },
         );
-        setTickets((prev) => [...prev, created]);
+        setTickets((prev) => [...prev, created].sort(compareUserTickets));
         return { ticket: created, error: null };
       } catch (e) {
         console.error('[Horus-Bot] Booking creation failed', e);
@@ -323,8 +384,14 @@ export function useUserTickets() {
         await batch.commit();
         setTickets((prev) =>
           prev.map((t) => (t.booking_id === tk.booking_id
-            ? { ...t, status: 'cancelled', museum_status: 'cancelled', robot_status: 'cancelled' }
-            : t)),
+            ? {
+              ...t,
+              status: 'cancelled',
+              museum_status: 'cancelled',
+              robot_status: 'cancelled',
+              display_status: 'cancelled',
+            }
+            : t)).sort(compareUserTickets),
         );
         return { error: null };
       } catch (e) {

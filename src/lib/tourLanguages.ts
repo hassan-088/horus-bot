@@ -1,7 +1,6 @@
 export const TOUR_NARRATION_LANGUAGES = [
   { id: 'english', en: 'English', ar: 'الإنجليزية' },
   { id: 'arabic', en: 'Arabic', ar: 'العربية' },
-  { id: 'egyptian_arabic', en: 'Egyptian Arabic', ar: 'العربية المصرية' },
   { id: 'french', en: 'French', ar: 'الفرنسية' },
   { id: 'german', en: 'German', ar: 'الألمانية' },
   { id: 'spanish', en: 'Spanish', ar: 'الإسبانية' },
@@ -27,8 +26,13 @@ export function normalizeTourNarrationLanguage(value: string | null | undefined)
   return isSupportedTourNarrationLanguage(normalized) ? normalized : null;
 }
 
-export function tourNarrationLanguageLabel(value: string | null | undefined, isArabic: boolean) {
+export function tourNarrationLanguageLabel(
+  value: string | null | undefined,
+  isArabic: boolean,
+  otherValue?: string | null,
+) {
   const normalized = normalizeTourNarrationLanguage(value);
+  if (normalized === 'other' && otherValue?.trim()) return otherValue.trim();
   const language = TOUR_NARRATION_LANGUAGES.find((item) => item.id === normalized);
   if (!language) return isArabic ? 'اللغة المختارة' : 'Selected language';
   return isArabic ? language.ar : language.en;

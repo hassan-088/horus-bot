@@ -8,6 +8,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     /* Cinematic Museum — Light (warm museum) */
     --background: 39 41% 94%;
     --foreground: 30 9% 15%;
@@ -189,6 +190,7 @@
     font-family: 'Inter', system-ui, sans-serif;
     scroll-behavior: smooth;
     background: hsl(var(--background));
+    color-scheme: light;
   }
 
   body {
@@ -210,6 +212,13 @@
     min-height: 100vh;
     overflow-x: clip;
     background: hsl(var(--background));
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    color-scheme: light;
   }
 
   img,
