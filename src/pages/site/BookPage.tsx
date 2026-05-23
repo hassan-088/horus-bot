@@ -20,6 +20,7 @@ import { useUserTickets, type TourType } from '@/hooks/useUserTickets';
 import { isFutureVisitTime, maxExhibitsForDuration } from '@/lib/bookingContract';
 import { CURRENCY, MAX_VISITORS_PER_BOOKING, museumTicketPrices, robotTourPrices, type MuseumTicketCategory } from '@/lib/pricing';
 import { productMessage } from '@/lib/productMessages';
+import { bookingErrorMessage } from '@/lib/errorMessages';
 import { TOUR_NARRATION_LANGUAGES, isSupportedTourNarrationLanguage, normalizeTourNarrationLanguage } from '@/lib/tourLanguages';
 import {
   loadRecommendedRoutes,
@@ -346,7 +347,7 @@ export default function BookPage() {
 
   const proceedFromTickets = () => {
     if (totalTickets === 0) {
-      toast.error(isRTL ? 'اختر تذكرة واحدة على الأقل.' : 'Please select at least one ticket.');
+      toast.error(isRTL ? 'يرجى اختيار تذكرة زائر واحدة على الأقل.' : 'Please choose at least one visitor ticket.');
       return;
     }
     if (totalTickets > MAX_VISITORS_PER_BOOKING) {
@@ -433,7 +434,7 @@ export default function BookPage() {
   const confirmAndPay = async () => {
     if (busy) return;
     if (totalTickets === 0) {
-      toast.error(isRTL ? 'اختر تذكرة واحدة على الأقل.' : 'Please select at least one ticket.');
+      toast.error(isRTL ? 'يرجى اختيار تذكرة زائر واحدة على الأقل.' : 'Please choose at least one visitor ticket.');
       return;
     }
     if (totalTickets > MAX_VISITORS_PER_BOOKING) {
@@ -508,8 +509,7 @@ export default function BookPage() {
     });
     setBusy(false);
     if (error || !ticket) {
-      const key = error === productMessage('network') ? 'network' : 'booking';
-      toast.error(productMessage(key, isRTL));
+      toast.error(bookingErrorMessage(error, isRTL));
       return;
     }
     setShowSuccess(true);

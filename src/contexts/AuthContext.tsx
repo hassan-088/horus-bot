@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { auth, db } from '@/integrations/firebase/client';
 import type { Language } from '@/lib/i18n';
 import { isConnectionError, productMessage } from '@/lib/productMessages';
+import { authErrorMessage } from '@/lib/errorMessages';
 
 // Public app-level user shape. We keep `id` as the field name (mapped from
 // Firebase `uid`) so the rest of the codebase doesn't need to change.
@@ -69,52 +70,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Map Firebase Auth error codes to friendly messages. Never expose raw codes.
 export function friendlyAuthError(err: unknown, isArabic = false): string {
-  const code = (err as { code?: string })?.code ?? '';
-  const message = (err as { message?: string })?.message ?? '';
-  if (message && !message.startsWith('Firebase:')) return message;
-  if (code === 'auth/network-request-failed') return productMessage('network', isArabic);
-  if (code === 'auth/operation-not-allowed') return productMessage('generic', isArabic);
-  const map: Record<string, { en: string; ar: string }> = {
-    'auth/email-already-in-use': {
-      en: 'This email is already registered. Please log in instead.',
-      ar: 'هذا البريد مسجل بالفعل. سجل الدخول بدلا من ذلك.',
-    },
-    'auth/invalid-email': {
-      en: 'Please enter a valid email address.',
-      ar: 'يرجى إدخال بريد إلكتروني صحيح.',
-    },
-    'auth/weak-password': {
-      en: 'Password is too weak. Use at least 8 characters with uppercase, lowercase, number, and special character.',
-      ar: 'كلمة المرور ضعيفة. استخدم 8 أحرف على الأقل مع حرف كبير وصغير ورقم ورمز.',
-    },
-    'auth/operation-not-allowed': {
-      en: 'Something went wrong. Please try again.',
-      ar: 'إنشاء الحساب بالبريد وكلمة المرور غير مفعل حاليا. يرجى التواصل مع الدعم.',
-    },
-    'auth/network-request-failed': {
-      en: 'Connection issue. Please check your internet connection and try again.',
-      ar: 'تعذر الاتصال. تحقق من الإنترنت ثم حاول مرة أخرى.',
-    },
-    'auth/user-not-found': {
-      en: 'No account was found with this email. Please create an account first.',
-      ar: 'لا يوجد حساب بهذا البريد الإلكتروني.',
-    },
-    'auth/wrong-password': {
-      en: 'The password is incorrect. Please try again.',
-      ar: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
-    },
-    'auth/invalid-credential': {
-      en: 'Email or password is incorrect.',
-      ar: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
-    },
-    'auth/too-many-requests': {
-      en: 'Too many attempts. Please wait a moment and try again.',
-      ar: 'محاولات كثيرة جدا. انتظر قليلا ثم حاول مرة أخرى.',
-    },
-  };
-  const entry = map[code];
-  if (entry) return isArabic ? entry.ar : entry.en;
-  return isArabic ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.';
+  return authErrorMessage(err, isArabic);
+}
+
+function friendlyAuthResultError(err: unknown): Error {
+  const safeError = new Error(friendlyAuthError(err));
+  const code = (err as { code?: unknown })?.code;
+  if (code) (safeError as Error & { code?: unknown }).code = code;
+  return safeError;
 }
 
 function toAppUser(fu: FirebaseUser | null): AppUser | null {
@@ -280,7 +243,7 @@ export function AuthProvider({
     } catch (e) {
       console.error('[Horus-Bot] Sign up failed', e);
       return {
-        error: new Error(isConnectionError(e) ? productMessage('network') : friendlyAuthError(e)),
+        error: friendlyAuthResultError(e),
       };
     }
   };
@@ -292,7 +255,7 @@ export function AuthProvider({
     } catch (e) {
       console.error('[Horus-Bot] Sign in failed', e);
       return {
-        error: new Error(isConnectionError(e) ? productMessage('network') : friendlyAuthError(e)),
+        error: friendlyAuthResultError(e),
       };
     }
   };
@@ -350,7 +313,7 @@ export function AuthProvider({
       await sendPasswordResetEmail(auth, email);
       return { error: null };
     } catch (e) {
-      return { error: e as Error };
+      return { error: friendlyAuthResultError(e) };
     }
   };
 

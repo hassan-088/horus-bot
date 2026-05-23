@@ -15,7 +15,6 @@ import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { PASSWORD_RULES, firstPasswordError, isValidPhone } from '@/lib/passwordRules';
-import { productMessage } from '@/lib/productMessages';
 import { cn } from '@/lib/utils';
 import ankhLogo from '@/assets/ankh.png';
 
@@ -134,8 +133,7 @@ export default function AuthScreen() {
     const { error } = await resetPassword(forgotEmail.trim());
     setForgotBusy(false);
     if (error) {
-      const key = error.message === productMessage('network') ? 'network' : 'generic';
-      toast.error(productMessage(key, isArabic));
+      toast.error(friendlyAuthError(error, isArabic));
       return;
     }
     toast.success(isArabic ? 'تم إرسال رابط إعادة تعيين كلمة المرور. تحقق من بريدك.' : 'Password reset link sent. Please check your email.');

@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
+import { friendlyAuthError, useAuth } from '@/contexts/AuthContext';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -35,11 +35,17 @@ export function AccountGateModal({ open, onOpenChange, onAuthSuccess }: Props) {
     ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.'
     : 'Email or password is incorrect. Please try again.';
   const ERR_MATCH = isRTL ? 'كلمتا المرور غير متطابقتين.' : 'Passwords do not match.';
+  const ERR_EMAIL = isRTL ? 'يرجى إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.';
+  const ERR_PASSWORD = isRTL ? 'يرجى إدخال كلمة المرور.' : 'Please enter your password.';
 
   const handle = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailSchema.safeParse(email).success || !passwordSchema.safeParse(password).success) {
-      toast.error(mode === 'signup' ? ERR_SIGNUP : ERR_LOGIN);
+    if (!emailSchema.safeParse(email).success) {
+      toast.error(ERR_EMAIL);
+      return;
+    }
+    if (!passwordSchema.safeParse(password).success) {
+      toast.error(ERR_PASSWORD);
       return;
     }
     if (mode === 'signup' && password !== confirm) {
@@ -51,13 +57,13 @@ export function AccountGateModal({ open, onOpenChange, onAuthSuccess }: Props) {
       if (mode === 'signup') {
         const { error } = await signUp(email, password, fullName || undefined);
         if (error) {
-          toast.error(ERR_SIGNUP);
+          toast.error(friendlyAuthError(error, isRTL));
           return;
         }
       } else {
         const { error } = await signIn(email, password);
         if (error) {
-          toast.error(ERR_LOGIN);
+          toast.error(friendlyAuthError(error, isRTL));
           return;
         }
       }

@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SectionHero } from '@/components/site/SectionHero';
 import { useApp } from '@/contexts/AppContext';
+import { contactSendErrorMessage, contactValidationMessage } from '@/lib/errorMessages';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -37,21 +38,27 @@ export default function ContactPage() {
     e.preventDefault();
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
-      toast.error(isRTL ? '???? ?????? ?????? ??????? ??? ???????.' : 'Please review the form before sending.');
+      const field = parsed.error.issues[0]?.path[0]?.toString();
+      toast.error(contactValidationMessage(field, isRTL));
       return;
     }
     setSubmitting(true);
-    const subject = encodeURIComponent(`[Horus-Bot] ${form.subject}`);
-    const body = encodeURIComponent([
-      `Name: ${form.name}`,
-      `Email: ${form.email}`,
-      `Subject: ${form.subject}`,
-      '',
-      form.message,
-    ].join('\n'));
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-    toast.success(isRTL ? '???? ??? ????? ?????? ?????? ??????.' : 'Your email app will open to send the message.');
-    setSubmitting(false);
+    try {
+      const subject = encodeURIComponent(`[Horus-Bot] ${form.subject}`);
+      const body = encodeURIComponent([
+        `Name: ${form.name}`,
+        `Email: ${form.email}`,
+        `Subject: ${form.subject}`,
+        '',
+        form.message,
+      ].join('\n'));
+      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+      toast.success(isRTL ? 'سيفتح تطبيق البريد لإرسال الرسالة.' : 'Your email app will open to send the message.');
+    } catch {
+      toast.error(contactSendErrorMessage(isRTL));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
