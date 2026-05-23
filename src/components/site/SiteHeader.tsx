@@ -91,7 +91,7 @@ export function SiteHeader() {
         >
           <Link to="/" className="flex min-w-0 items-center gap-2">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
-              <img src="/horus-eye.png" alt="" className="h-6 w-6 object-contain" aria-hidden="true" />
+              <span className="font-serif text-lg font-bold text-primary">H</span>
             </div>
             <span className="truncate font-serif text-lg tracking-wide text-foreground">Horus-Bot</span>
           </Link>
@@ -184,7 +184,7 @@ export function SiteHeader() {
             <div className="flex h-16 items-center justify-between border-b border-primary/15 px-4">
               <Link to="/" onClick={() => setOpen(false)} className="flex min-w-0 items-center gap-2">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
-                  <img src="/horus-eye.png" alt="" className="h-6 w-6 object-contain" aria-hidden="true" />
+                  <span className="font-serif text-lg font-bold text-primary">H</span>
                 </div>
                 <span className="truncate font-serif text-lg tracking-wide text-foreground">Horus-Bot</span>
               </Link>

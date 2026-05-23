@@ -53,7 +53,7 @@ export default function ContactPage() {
         form.message,
       ].join('\n'));
       window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-      toast.success(isRTL ? 'تم تجهيز رسالة البريد الإلكتروني في تطبيق البريد لديك.' : 'Your email app is ready with the message.');
+      toast.success(isRTL ? 'سيفتح تطبيق البريد لإرسال الرسالة.' : 'Your email app will open to send the message.');
     } catch {
       toast.error(contactSendErrorMessage(isRTL));
     } finally {

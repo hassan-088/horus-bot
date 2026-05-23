@@ -59,12 +59,8 @@ const bookingMessages: Record<string, LocalizedMessage> = {
     ar: 'اختر لغة جولة مدعومة.',
   },
   'custom-tour-language-required': {
-    en: 'Please type your preferred language.',
-    ar: 'يرجى كتابة اللغة التي تفضلها.',
-  },
-  'standard-route-duration-mismatch': {
-    en: 'This route needs a longer tour duration.',
-    ar: 'يحتاج هذا المسار إلى مدة جولة أطول.',
+    en: 'Enter preferred language.',
+    ar: 'أدخل اللغة المفضلة.',
   },
 };
 

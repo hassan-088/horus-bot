@@ -3,7 +3,7 @@ import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { cn } from '@/lib/utils';
 
-const cinematicRoutes = new Set(['/', '/experience', '/app', '/about', '/book', '/tickets-mine']);
+const cinematicRoutes = new Set(['/', '/experience', '/app', '/about']);
 
 /**
  * Public marketing + booking layout.

@@ -8,7 +8,7 @@ export const TOUR_NARRATION_LANGUAGES = [
   { id: 'korean', en: 'Korean', ar: 'الكورية' },
   { id: 'chinese', en: 'Chinese', ar: 'الصينية' },
   { id: 'japanese', en: 'Japanese', ar: 'اليابانية' },
-  { id: 'other', en: 'Other', ar: 'لغة أخرى' },
+  { id: 'other', en: 'Other', ar: 'أخرى' },
 ] as const;
 
 export type TourNarrationLanguage = (typeof TOUR_NARRATION_LANGUAGES)[number]['id'];
@@ -32,9 +32,7 @@ export function tourNarrationLanguageLabel(
   otherValue?: string | null,
 ) {
   const normalized = normalizeTourNarrationLanguage(value);
-  if (normalized === 'other' && otherValue?.trim()) {
-    return isArabic ? `لغة أخرى: ${otherValue.trim()}` : `Other: ${otherValue.trim()}`;
-  }
+  if (normalized === 'other' && otherValue?.trim()) return otherValue.trim();
   const language = TOUR_NARRATION_LANGUAGES.find((item) => item.id === normalized);
   if (!language) return isArabic ? 'اللغة المختارة' : 'Selected language';
   return isArabic ? language.ar : language.en;

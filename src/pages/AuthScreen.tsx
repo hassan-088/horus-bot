@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { PASSWORD_RULES, firstPasswordError, isValidPhone } from '@/lib/passwordRules';
 import { cn } from '@/lib/utils';
+import ankhLogo from '@/assets/ankh.png';
 
 const emailSchema = z.string().trim().email();
 
@@ -171,8 +172,8 @@ export default function AuthScreen() {
     <div className="min-h-screen flex flex-col bg-background">
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className="mb-8 animate-fade-in-up">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
-            <img src="/horus-eye.png" alt="Horus-Bot" className="h-11 w-11 object-contain" />
+          <div className="flex h-16 w-16 items-center justify-center">
+            <img src={ankhLogo} alt="Horus-Bot" className="w-12 h-12" />
           </div>
         </div>
 
