@@ -20,7 +20,7 @@ import { useUserTickets, type TourType } from '@/hooks/useUserTickets';
 import { isFutureVisitTime, maxExhibitsForDuration } from '@/lib/bookingContract';
 import { CURRENCY, MAX_VISITORS_PER_BOOKING, museumTicketPrices, robotTourPrices, type MuseumTicketCategory } from '@/lib/pricing';
 import { productMessage } from '@/lib/productMessages';
-import { TOUR_NARRATION_LANGUAGES, isSupportedTourNarrationLanguage } from '@/lib/tourLanguages';
+import { TOUR_NARRATION_LANGUAGES, isSupportedTourNarrationLanguage, normalizeTourNarrationLanguage } from '@/lib/tourLanguages';
 import {
   loadRecommendedRoutes,
   type RecommendedRoute,
@@ -56,12 +56,12 @@ interface CategoryRow {
 }
 
 const CATEGORY_ROWS: CategoryRow[] = [
-  { key: 'egyptian_adult',   en: 'Egyptian Adult',    ar: 'Ø¨Ø§Ù„Øº Ù…ØµØ±ÙŠ',    group: 'eg' },
-  { key: 'egyptian_student', en: 'Egyptian Student',  ar: 'Ø·Ø§Ù„Ø¨ Ù…ØµØ±ÙŠ',    group: 'eg' },
-  { key: 'egyptian_child',   en: 'Egyptian Child',    ar: 'Ø·ÙÙ„ Ù…ØµØ±ÙŠ',     group: 'eg' },
-  { key: 'foreigner_adult',   en: 'Foreigner Adult',   ar: 'Ø¨Ø§Ù„Øº Ø£Ø¬Ù†Ø¨ÙŠ',   group: 'foreign' },
-  { key: 'foreigner_student', en: 'Foreigner Student', ar: 'Ø·Ø§Ù„Ø¨ Ø£Ø¬Ù†Ø¨ÙŠ',   group: 'foreign' },
-  { key: 'foreigner_child',   en: 'Foreigner Child',   ar: 'Ø·ÙÙ„ Ø£Ø¬Ù†Ø¨ÙŠ',    group: 'foreign' },
+  { key: 'egyptian_adult',   en: 'Egyptian Adult',    ar: 'بالغ مصري',    group: 'eg' },
+  { key: 'egyptian_student', en: 'Egyptian Student',  ar: 'طالب مصري',    group: 'eg' },
+  { key: 'egyptian_child',   en: 'Egyptian Child',    ar: 'طفل مصري',     group: 'eg' },
+  { key: 'foreigner_adult',   en: 'Foreigner Adult',   ar: 'بالغ أجنبي',   group: 'foreign' },
+  { key: 'foreigner_student', en: 'Foreigner Student', ar: 'طالب أجنبي',   group: 'foreign' },
+  { key: 'foreigner_child',   en: 'Foreigner Child',   ar: 'طفل أجنبي',    group: 'foreign' },
 ];
 
 export default function BookPage() {
@@ -95,13 +95,13 @@ export default function BookPage() {
   const currentStep = allSteps[stepIdx];
 
   const stepLabels = allSteps.map((s) => {
-    if (s === 'account') return isRTL ? 'Ø§Ù„Ø­Ø³Ø§Ø¨' : 'Account';
-    if (s === 'tickets') return isRTL ? 'Ø§Ù„ØªØ°Ø§ÙƒØ±' : 'Tickets';
-    if (s === 'tour') return isRTL ? 'Ø§Ù„Ø¬ÙˆÙ„Ø©' : 'Tour';
-    if (s === 'datetime') return isRTL ? 'Ø§Ù„Ù…ÙˆØ¹Ø¯' : 'Date & Time';
-    if (s === 'language') return isRTL ? 'Ø§Ù„Ù„ØºØ©' : 'Language';
-    if (s === 'personalize') return isRTL ? 'Ø§Ù„ØªÙØ¶ÙŠÙ„Ø§Øª' : 'Preferences';
-    return isRTL ? 'Ø§Ù„Ø¯ÙØ¹' : 'Payment';
+    if (s === 'account') return isRTL ? 'الحساب' : 'Account';
+    if (s === 'tickets') return isRTL ? 'التذاكر' : 'Tickets';
+    if (s === 'tour') return isRTL ? 'الجولة' : 'Tour';
+    if (s === 'datetime') return isRTL ? 'الموعد' : 'Date & Time';
+    if (s === 'language') return isRTL ? 'اللغة' : 'Language';
+    if (s === 'personalize') return isRTL ? 'التفضيلات' : 'Preferences';
+    return isRTL ? 'الدفع' : 'Payment';
   });
   const currentStepLabel = stepLabels[stepIdx] ?? '';
   const stepHelp: Record<StepKey, string> = {
@@ -156,7 +156,7 @@ export default function BookPage() {
     fullName?: string; email?: string; password?: string; confirm?: string; phone?: string;
   }>({});
 
-  // Tickets â€” categories
+  // Tickets — categories
   const [quantities, setQuantities] = useState<Record<MuseumTicketCategory, number>>({
     egyptian_adult: 0, egyptian_student: 0, egyptian_child: 0,
     foreigner_adult: 0, foreigner_student: 0, foreigner_child: 0,
@@ -194,7 +194,7 @@ export default function BookPage() {
   const totalPrice = museumPrice + tourPrice;
   const maxSelectedExhibits = maxExhibitsForDuration(duration);
   const exhibitLimitMessage = isRTL
-    ? `ØªØ¯Ø¹Ù… Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø¯Ø© Ø­ØªÙ‰ ${maxSelectedExhibits} Ù‚Ø·Ø¹. Ø§Ø®ØªØ± Ù…Ø¯Ø© Ø£Ø·ÙˆÙ„ Ù„Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø²ÙŠØ¯.`
+    ? `تدعم هذه المدة حتى ${maxSelectedExhibits} قطع. اختر مدة أطول لإضافة المزيد.`
     : `This duration supports up to ${maxSelectedExhibits} exhibits. Choose a longer duration to add more.`;
   const activeRecommendedRoutes = routeRows.filter((route) => route.is_active);
   const selectedRecommendedRoute =
@@ -235,28 +235,28 @@ export default function BookPage() {
 
   // ---- Handlers ----
   const visitorLimitMessage = isRTL
-    ? `ÙŠÙ…ÙƒÙ† Ø£Ù† ÙŠØ´Ù…Ù„ Ø­Ø¬Ø² Horus-Bot Ø­ØªÙ‰ ${MAX_VISITORS_PER_BOOKING} Ø²ÙˆØ§Ø± ÙÙ‚Ø·.`
+    ? `يمكن أن يشمل حجز Horus-Bot حتى ${MAX_VISITORS_PER_BOOKING} زوار فقط.`
     : `Each Horus-Bot booking can include up to ${MAX_VISITORS_PER_BOOKING} visitors.`;
   const visitorLimitHelper = isRTL
-    ? `Ø§Ù„Ø­Ø¯ Ø§Ù„Ø£Ù‚ØµÙ‰ ${MAX_VISITORS_PER_BOOKING} Ø²ÙˆØ§Ø± Ù„ÙƒÙ„ Ø­Ø¬Ø².`
+    ? `الحد الأقصى ${MAX_VISITORS_PER_BOOKING} زوار لكل حجز.`
     : `Maximum ${MAX_VISITORS_PER_BOOKING} visitors per booking.`;
   const unsupportedTourLanguageMessage = isRTL
-    ? 'Ø§Ø®ØªØ± Ù„ØºØ© Ø¬ÙˆÙ„Ø© Ù…Ø¯Ø¹ÙˆÙ…Ø©.'
+    ? 'اختر لغة جولة مدعومة.'
     : 'Choose a supported tour language.';
   const standardRouteRequiredMessage = isRTL
-    ? 'Ø§Ø®ØªØ± Ù…Ø³Ø§Ø±Ø§Ù‹ Ù…Ù‚ØªØ±Ø­Ø§Ù‹ Ù„Ù„Ø¬ÙˆÙ„Ø© Ø§Ù„Ù‚ÙŠØ§Ø³ÙŠØ©.'
+    ? 'اختر مساراً مقترحاً للجولة القياسية.'
     : 'Choose a recommended route for the standard tour.';
   const personalizedExhibitRequiredMessage = isRTL
-    ? 'Ø§Ø®ØªØ± Ù…Ø¹Ø±ÙˆØ¶Ø§Ù‹ ÙˆØ§Ø­Ø¯Ø§Ù‹ Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„ Ù„Ø¬ÙˆÙ„ØªÙƒ Ø§Ù„Ù…Ø®ØµØµØ©.'
+    ? 'اختر معروضاً واحداً على الأقل لجولتك المخصصة.'
     : 'Choose at least one exhibit for your personalized tour.';
   const futureVisitTimeMessage = isRTL
-    ? 'ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± ÙˆÙ‚Øª Ø²ÙŠØ§Ø±Ø© Ù‚Ø§Ø¯Ù….'
+    ? 'يرجى اختيار وقت زيارة قادم.'
     : 'Please choose a future visit time.';
   const pastVisitTimeMessage = isRTL
-    ? 'Ù‡Ø°Ø§ Ø§Ù„ÙˆÙ‚Øª Ù‚Ø¯ Ù…Ø± Ø¨Ø§Ù„ÙØ¹Ù„. ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± ÙˆÙ‚Øª Ù„Ø§Ø­Ù‚.'
+    ? 'هذا الوقت قد مر بالفعل. يرجى اختيار وقت لاحق.'
     : 'This time has already passed. Please choose a later time.';
   const noRemainingVisitTimesMessage = isRTL
-    ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…ÙˆØ§Ø¹ÙŠØ¯ Ø²ÙŠØ§Ø±Ø© Ù…ØªØ§Ø­Ø© Ø§Ù„ÙŠÙˆÙ…. ÙŠØ±Ø¬Ù‰ Ø§Ø®ØªÙŠØ§Ø± ØªØ§Ø±ÙŠØ® Ø¢Ø®Ø±.'
+    ? 'لا توجد مواعيد زيارة متاحة اليوم. يرجى اختيار تاريخ آخر.'
     : 'No remaining visit times are available today. Please choose another date.';
   const availableTimeSlots = TIME_SLOTS.filter((slot) => isFutureVisitTime(date, slot));
   const hasNoRemainingSlotsToday = date === today && availableTimeSlots.length === 0;
@@ -288,26 +288,26 @@ export default function BookPage() {
     const e: typeof authErrors = {};
     if (authMode === 'signup') {
       if (!fullName.trim() || fullName.trim().length < 2) {
-        e.fullName = isRTL ? 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø§Ø³Ù…Ùƒ Ø§Ù„ÙƒØ§Ù…Ù„.' : 'Please enter your full name.';
+        e.fullName = isRTL ? 'الرجاء إدخال اسمك الكامل.' : 'Please enter your full name.';
       }
     }
     if (!email.trim()) {
-      e.email = isRTL ? 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø¨Ø±ÙŠØ¯Ùƒ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ.' : 'Please enter your email.';
+      e.email = isRTL ? 'الرجاء إدخال بريدك الإلكتروني.' : 'Please enter your email.';
     } else if (!emailSchema.safeParse(email).success) {
-      e.email = isRTL ? 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø¨Ø±ÙŠØ¯ Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ ØµØ­ÙŠØ­.' : 'Please enter a valid email address.';
+      e.email = isRTL ? 'الرجاء إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.';
     }
     if (!password) {
-      e.password = isRTL ? 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±.' : 'Please enter your password.';
+      e.password = isRTL ? 'الرجاء إدخال كلمة المرور.' : 'Please enter your password.';
     } else if (authMode === 'signup' && !isStrongPassword(password)) {
       e.password = isRTL
-        ? 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ù„Ø§ ØªØ³ØªÙˆÙÙŠ Ø§Ù„Ù…ØªØ·Ù„Ø¨Ø§Øª.'
+        ? 'كلمة المرور لا تستوفي المتطلبات.'
         : 'Password does not meet the requirements below.';
     }
     if (authMode === 'signup') {
-      if (!confirm) e.confirm = isRTL ? 'Ø§Ù„Ø±Ø¬Ø§Ø¡ ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±.' : 'Please confirm your password.';
-      else if (confirm !== password) e.confirm = isRTL ? 'ÙƒÙ„Ù…ØªØ§ Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± Ù…ØªØ·Ø§Ø¨Ù‚ØªÙŠÙ†.' : 'Passwords do not match.';
+      if (!confirm) e.confirm = isRTL ? 'الرجاء تأكيد كلمة المرور.' : 'Please confirm your password.';
+      else if (confirm !== password) e.confirm = isRTL ? 'كلمتا المرور غير متطابقتين.' : 'Passwords do not match.';
       if (phone.trim() && !isValidPhone(phone)) {
-        e.phone = isRTL ? 'Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø¥Ø¯Ø®Ø§Ù„ Ø±Ù‚Ù… Ù‡Ø§ØªÙ ØµØ­ÙŠØ­.' : 'Please enter a valid phone number.';
+        e.phone = isRTL ? 'الرجاء إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
       }
     }
     setAuthErrors(e);
@@ -346,7 +346,7 @@ export default function BookPage() {
 
   const proceedFromTickets = () => {
     if (totalTickets === 0) {
-      toast.error(isRTL ? 'Ø§Ø®ØªØ± ØªØ°ÙƒØ±Ø© ÙˆØ§Ø­Ø¯Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„.' : 'Please select at least one ticket.');
+      toast.error(isRTL ? 'اختر تذكرة واحدة على الأقل.' : 'Please select at least one ticket.');
       return;
     }
     if (totalTickets > MAX_VISITORS_PER_BOOKING) {
@@ -370,7 +370,7 @@ export default function BookPage() {
       return;
     }
     if (tourLanguage === 'other' && !tourLanguageOther.trim()) {
-      toast.error(isRTL ? 'Ø£Ø¯Ø®Ù„ Ø§Ù„Ù„ØºØ© Ø§Ù„Ù…ÙØ¶Ù„Ø© Ù„Ù„Ø¬ÙˆÙ„Ø©.' : 'Enter preferred language.');
+      toast.error(isRTL ? 'أدخل اللغة المفضلة للجولة.' : 'Enter preferred language.');
       return;
     }
     goNext();
@@ -387,8 +387,9 @@ export default function BookPage() {
     setPace(route.pace || 'normal');
     setPhotoSpots(route.photo_spots);
     setTourType('standard');
-    if (!languageTouched && route.recommended_language) {
-      setTourLanguage(route.recommended_language);
+    const recommendedLanguage = normalizeTourNarrationLanguage(route.recommended_language);
+    if (!languageTouched && recommendedLanguage) {
+      setTourLanguage(recommendedLanguage);
     }
   };
 
@@ -432,7 +433,7 @@ export default function BookPage() {
   const confirmAndPay = async () => {
     if (busy) return;
     if (totalTickets === 0) {
-      toast.error(isRTL ? 'Ø§Ø®ØªØ± ØªØ°ÙƒØ±Ø© ÙˆØ§Ø­Ø¯Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø£Ù‚Ù„.' : 'Please select at least one ticket.');
+      toast.error(isRTL ? 'اختر تذكرة واحدة على الأقل.' : 'Please select at least one ticket.');
       return;
     }
     if (totalTickets > MAX_VISITORS_PER_BOOKING) {
@@ -454,7 +455,7 @@ export default function BookPage() {
       return;
     }
     if (tourLanguage === 'other' && !tourLanguageOther.trim()) {
-      toast.error(isRTL ? 'Ø£Ø¯Ø®Ù„ Ø§Ù„Ù„ØºØ© Ø§Ù„Ù…ÙØ¶Ù„Ø© Ù„Ù„Ø¬ÙˆÙ„Ø©.' : 'Enter preferred language.');
+      toast.error(isRTL ? 'أدخل اللغة المفضلة للجولة.' : 'Enter preferred language.');
       return;
     }
     const routeArtifactIds = tourType === 'standard'
@@ -477,7 +478,7 @@ export default function BookPage() {
     const maxForDuration = maxExhibitsForDuration(effectiveDuration);
     if (selectedExhibitIds.length > maxForDuration) {
       toast.error(isRTL
-        ? `ØªØ¯Ø¹Ù… Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø¯Ø© Ø­ØªÙ‰ ${maxForDuration} Ù‚Ø·Ø¹. Ø§Ø®ØªØ± Ù…Ø¯Ø© Ø£Ø·ÙˆÙ„ Ù„Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø²ÙŠØ¯.`
+        ? `تدعم هذه المدة حتى ${maxForDuration} قطع. اختر مدة أطول لإضافة المزيد.`
         : `This duration supports up to ${maxForDuration} exhibits. Choose a longer duration to add more.`);
       return;
     }
@@ -516,38 +517,38 @@ export default function BookPage() {
 
   // ---- Option lists ----
   const interestOptions = [
-    { id: 'ancient-egypt', en: 'Ancient Egypt', ar: 'Ù…ØµØ± Ø§Ù„Ù‚Ø¯ÙŠÙ…Ø©' },
-    { id: 'royal-artifacts', en: 'Royal artifacts', ar: 'Ø§Ù„Ù‚Ø·Ø¹ Ø§Ù„Ù…Ù„ÙƒÙŠØ©' },
-    { id: 'statues', en: 'Statues', ar: 'Ø§Ù„ØªÙ…Ø§Ø«ÙŠÙ„' },
-    { id: 'mummies', en: 'Mummies', ar: 'Ø§Ù„Ù…ÙˆÙ…ÙŠØ§ÙˆØ§Øª' },
-    { id: 'daily-life', en: 'Daily life', ar: 'Ø§Ù„Ø­ÙŠØ§Ø© Ø§Ù„ÙŠÙˆÙ…ÙŠØ©' },
-    { id: 'architecture', en: 'Architecture', ar: 'Ø§Ù„Ø¹Ù…Ø§Ø±Ø©' },
-    { id: 'highlights-only', en: 'Highlights only', ar: 'Ø£Ø¨Ø±Ø² Ø§Ù„Ù…Ø¹Ø±ÙˆØ¶Ø§Øª ÙÙ‚Ø·' },
+    { id: 'ancient-egypt', en: 'Ancient Egypt', ar: 'مصر القديمة' },
+    { id: 'royal-artifacts', en: 'Royal artifacts', ar: 'القطع الملكية' },
+    { id: 'statues', en: 'Statues', ar: 'التماثيل' },
+    { id: 'mummies', en: 'Mummies', ar: 'المومياوات' },
+    { id: 'daily-life', en: 'Daily life', ar: 'الحياة اليومية' },
+    { id: 'architecture', en: 'Architecture', ar: 'العمارة' },
+    { id: 'highlights-only', en: 'Highlights only', ar: 'أبرز المعروضات فقط' },
   ];
   const accessibilityOptions = [
-    { id: 'step-free', en: 'Step-free route', ar: 'Ù…Ø³Ø§Ø± Ø¨Ø¯ÙˆÙ† Ø¯Ø±Ø¬' },
-    { id: 'larger-text', en: 'Larger text in app', ar: 'Ø­Ø¬Ù… Ù†Øµ Ø£ÙƒØ¨Ø± ÙÙŠ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚' },
-    { id: 'extended-audio', en: 'Extended audio description', ar: 'ÙˆØµÙ ØµÙˆØªÙŠ Ù…ÙˆØ³ÙŽÙ‘Ø¹' },
-    { id: 'slower-pace', en: 'Slower tour pace', ar: 'Ø¥ÙŠÙ‚Ø§Ø¹ Ø¬ÙˆÙ„Ø© Ø£Ø¨Ø·Ø£' },
+    { id: 'step-free', en: 'Step-free route', ar: 'مسار بدون درج' },
+    { id: 'larger-text', en: 'Larger text in app', ar: 'حجم نص أكبر في التطبيق' },
+    { id: 'extended-audio', en: 'Extended audio description', ar: 'وصف صوتي موسَّع' },
+    { id: 'slower-pace', en: 'Slower tour pace', ar: 'إيقاع جولة أبطأ' },
   ];
   const paces = [
-    { id: 'relaxed', en: 'Relaxed', ar: 'Ù…Ø±ÙŠØ­' },
-    { id: 'normal', en: 'Normal', ar: 'Ø¹Ø§Ø¯ÙŠ' },
-    { id: 'fast', en: 'Fast', ar: 'Ø³Ø±ÙŠØ¹' },
+    { id: 'relaxed', en: 'Relaxed', ar: 'مريح' },
+    { id: 'normal', en: 'Normal', ar: 'عادي' },
+    { id: 'fast', en: 'Fast', ar: 'سريع' },
   ];
   const accountLanguages = [
-    { id: 'arabic', en: 'Arabic', ar: 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©' },
-    { id: 'english', en: 'English', ar: 'Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©' },
+    { id: 'arabic', en: 'Arabic', ar: 'العربية' },
+    { id: 'english', en: 'English', ar: 'الإنجليزية' },
   ];
   const payOptions: { id: PayMethod; labelEn: string; labelAr: string; icon: typeof CreditCard; disabled?: boolean; note?: { en: string; ar: string } }[] = [
-    { id: 'card', labelEn: 'Card payment', labelAr: 'Ø¨Ø·Ø§Ù‚Ø©', icon: CreditCard,
+    { id: 'card', labelEn: 'Card payment', labelAr: 'بطاقة', icon: CreditCard,
       disabled: true,
       note: {
         en: 'Card payment is not active for this visit. Please use Pay at Counter.',
-        ar: 'Ø§Ù„Ø¯ÙØ¹ Ø¨Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© ØºÙŠØ± Ù…ØªØ§Ø­ Ù„Ù‡Ø°Ø§ Ø§Ù„Ø­Ø¬Ø². Ø£ØªÙ…Ù… Ø§Ù„Ø­Ø¬Ø² Ù†Ù‚Ø¯Ø§Ù‹ Ø¹Ù†Ø¯ Ø´Ø¨Ø§Ùƒ Ø§Ù„Ù…ØªØ­Ù.',
+        ar: 'الدفع بالبطاقة غير متاح لهذا الحجز. أتمم الحجز نقداً عند شباك المتحف.',
       },
     },
-    { id: 'cash', labelEn: 'Pay at Counter', labelAr: 'Ù†Ù‚Ø¯Ø§Ù‹ Ø¹Ù†Ø¯ Ø´Ø¨Ù‘Ø§Ùƒ Ø§Ù„Ù…ØªØ­Ù', icon: Wallet },
+    { id: 'cash', labelEn: 'Pay at Counter', labelAr: 'نقداً عند شبّاك المتحف', icon: Wallet },
   ];
 
   return (
@@ -572,7 +573,7 @@ export default function BookPage() {
           />
         </div>
         <div className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-16 pt-[calc(env(safe-area-inset-top)+6.5rem)] text-center md:px-8 md:pb-20 md:pt-36">
-          <div className="section-label mb-3">{isRTL ? 'Ø§Ù„Ø­Ø¬Ø²' : 'Book'}</div>
+          <div className="section-label mb-3">{isRTL ? 'الحجز' : 'Book'}</div>
           <h1 className="mx-auto max-w-3xl font-serif text-4xl font-semibold leading-tight text-foreground md:text-5xl lg:text-6xl">
             {isRTL ? '\u062c\u0647\u0632 \u0632\u064a\u0627\u0631\u062a\u0643 \u0645\u0639 Horus-Bot' : 'Prepare Your Horus-Bot Visit'}
           </h1>
@@ -593,15 +594,15 @@ export default function BookPage() {
           <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                {isRTL ? `Ø§Ù„Ø®Ø·ÙˆØ© ${stepIdx + 1} Ù…Ù† ${allSteps.length}` : `Step ${stepIdx + 1} of ${allSteps.length}`}
+                {isRTL ? `الخطوة ${stepIdx + 1} من ${allSteps.length}` : `Step ${stepIdx + 1} of ${allSteps.length}`}
               </p>
               <h2 className="font-serif text-xl text-foreground">{currentStepLabel}</h2>
               <p className="mt-1 max-w-xl text-sm text-muted-foreground">{stepHelp[currentStep]}</p>
             </div>
             <span className="w-fit rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
               {totalTickets > 0
-                ? (isRTL ? `${totalTickets} Ø²Ø§Ø¦Ø±` : `${totalTickets} visitor${totalTickets === 1 ? '' : 's'}`)
-                : (isRTL ? 'Ø§Ø®ØªØ± Ø§Ù„ØªØ°Ø§ÙƒØ±' : 'Select tickets')}
+                ? (isRTL ? `${totalTickets} زائر` : `${totalTickets} visitor${totalTickets === 1 ? '' : 's'}`)
+                : (isRTL ? 'اختر التذاكر' : 'Select tickets')}
             </span>
           </div>
           <BookingStepper
@@ -615,11 +616,11 @@ export default function BookPage() {
           <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
               <h2 className="font-serif text-2xl mb-2">
-                {isRTL ? 'Ø£Ù†Ø´Ø¦ Ø­Ø³Ø§Ø¨Ùƒ Ø¹Ù„Ù‰ Horus-Bot' : 'Create your Horus-Bot account'}
+                {isRTL ? 'أنشئ حسابك على Horus-Bot' : 'Create your Horus-Bot account'}
               </h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
-                  ? 'Ø­Ø³Ø§Ø¨Ùƒ ÙŠØ­ÙØ¸ ØªØ°Ø§ÙƒØ±Ùƒ ÙˆÙŠØ±Ø¨Ø·Ù‡Ø§ Ø¨ØªØ·Ø¨ÙŠÙ‚ Horus-Bot ÙˆØ±ÙˆØ¨ÙˆØª Ø§Ù„Ø¬ÙˆÙ„Ø© ÙÙŠ Ø§Ù„Ù…ØªØ­Ù.'
+                  ? 'حسابك يحفظ تذاكرك ويربطها بتطبيق Horus-Bot وروبوت الجولة في المتحف.'
                   : 'Create or enter your Horus-Bot account so your tickets are ready when you arrive.'}
               </p>
             </div>
@@ -633,7 +634,7 @@ export default function BookPage() {
                   authMode === 'signup' ? 'bg-primary/15 text-foreground shadow-sm shadow-primary/10 ring-1 ring-primary/15' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {isRTL ? 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨' : 'Create account'}
+                {isRTL ? 'إنشاء حساب' : 'Create account'}
               </button>
               <button
                 type="button"
@@ -643,21 +644,21 @@ export default function BookPage() {
                   authMode === 'login' ? 'bg-primary/15 text-foreground shadow-sm shadow-primary/10 ring-1 ring-primary/15' : 'text-muted-foreground hover:text-foreground',
                 )}
               >
-                {isRTL ? 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„' : 'Log in'}
+                {isRTL ? 'تسجيل الدخول' : 'Log in'}
               </button>
             </div>
 
             <form onSubmit={handleAuthSubmit} className="space-y-4 md:space-y-5" noValidate>
               {authMode === 'signup' && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="bp-name">{isRTL ? 'Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„' : 'Full name'}</Label>
+                  <Label htmlFor="bp-name">{isRTL ? 'الاسم الكامل' : 'Full name'}</Label>
                   <div className="relative">
                     <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                     <Input
                       id="bp-name" value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       className={cn('pl-9 rtl:pl-3 rtl:pr-9', authErrors.fullName && 'border-destructive')}
-                      placeholder={isRTL ? 'Ø§Ø³Ù…Ùƒ' : 'Your name'}
+                      placeholder={isRTL ? 'اسمك' : 'Your name'}
                     />
                   </div>
                   {authErrors.fullName && <p className="text-xs text-destructive">{authErrors.fullName}</p>}
@@ -665,7 +666,7 @@ export default function BookPage() {
               )}
 
               <div className="space-y-1.5">
-                <Label htmlFor="bp-email">{isRTL ? 'Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ' : 'Email'}</Label>
+                <Label htmlFor="bp-email">{isRTL ? 'البريد الإلكتروني' : 'Email'}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                   <Input
@@ -679,14 +680,14 @@ export default function BookPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="bp-pw">{isRTL ? 'ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±' : 'Password'}</Label>
+                <Label htmlFor="bp-pw">{isRTL ? 'كلمة المرور' : 'Password'}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                   <Input
                     id="bp-pw" type={showPw ? 'text' : 'password'} value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className={cn('pl-9 pr-10 rtl:pl-10 rtl:pr-9', authErrors.password && 'border-destructive')}
-                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                    placeholder="••••••••"
                   />
                   <button type="button" onClick={() => setShowPw((v) => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground rtl:right-auto rtl:left-3"
@@ -713,14 +714,14 @@ export default function BookPage() {
               {authMode === 'signup' && (
                 <>
                   <div className="space-y-1.5">
-                    <Label htmlFor="bp-pw2">{isRTL ? 'ØªØ£ÙƒÙŠØ¯ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±' : 'Confirm password'}</Label>
+                    <Label htmlFor="bp-pw2">{isRTL ? 'تأكيد كلمة المرور' : 'Confirm password'}</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                       <Input
                         id="bp-pw2" type={showPw2 ? 'text' : 'password'} value={confirm}
                         onChange={(e) => setConfirm(e.target.value)}
                         className={cn('pl-9 pr-10 rtl:pl-10 rtl:pr-9', authErrors.confirm && 'border-destructive')}
-                        placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                        placeholder="••••••••"
                       />
                       <button type="button" onClick={() => setShowPw2((v) => !v)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground rtl:right-auto rtl:left-3"
@@ -733,7 +734,7 @@ export default function BookPage() {
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="bp-phone">{isRTL ? 'Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)' : 'Phone number (optional)'}</Label>
+                      <Label htmlFor="bp-phone">{isRTL ? 'رقم الهاتف (اختياري)' : 'Phone number (optional)'}</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                         <Input
@@ -746,21 +747,21 @@ export default function BookPage() {
                       {authErrors.phone && <p className="text-xs text-destructive">{authErrors.phone}</p>}
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="bp-nat">{isRTL ? 'Ø§Ù„Ø¬Ù†Ø³ÙŠØ© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)' : 'Nationality (optional)'}</Label>
+                      <Label htmlFor="bp-nat">{isRTL ? 'الجنسية (اختياري)' : 'Nationality (optional)'}</Label>
                       <div className="relative">
                         <Flag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                         <Input
                           id="bp-nat" value={nationality}
                           onChange={(e) => setNationality(e.target.value)}
                           className="pl-9 rtl:pl-3 rtl:pr-9"
-                          placeholder={isRTL ? 'Ù…Ø«Ø§Ù„: Ù…ØµØ±ÙŠ' : 'e.g. Egyptian'}
+                          placeholder={isRTL ? 'مثال: مصري' : 'e.g. Egyptian'}
                         />
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="bp-lang">{isRTL ? 'Ø§Ù„Ù„ØºØ© Ø§Ù„Ù…ÙØ¶Ù‘Ù„Ø© (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)' : 'Preferred language (optional)'}</Label>
+                    <Label htmlFor="bp-lang">{isRTL ? 'اللغة المفضّلة (اختياري)' : 'Preferred language (optional)'}</Label>
                     <Select value={signupLanguage} onValueChange={setSignupLanguage}>
                       <SelectTrigger id="bp-lang"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -776,8 +777,8 @@ export default function BookPage() {
               <Button type="submit" className="w-full h-12" disabled={authBusy}>
                 {authBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
                   authMode === 'signup'
-                    ? (isRTL ? 'Ø¥Ù†Ø´Ø§Ø¡ Ø­Ø³Ø§Ø¨ ÙˆÙ…ØªØ§Ø¨Ø¹Ø©' : 'Create account & continue')
-                    : (isRTL ? 'ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ ÙˆÙ…ØªØ§Ø¨Ø¹Ø©' : 'Log in & continue')
+                    ? (isRTL ? 'إنشاء حساب ومتابعة' : 'Create account & continue')
+                    : (isRTL ? 'تسجيل الدخول ومتابعة' : 'Log in & continue')
                 )}
               </Button>
             </form>
@@ -788,10 +789,10 @@ export default function BookPage() {
         {currentStep === 'tickets' && (
           <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'ØªØ°Ø§ÙƒØ± Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…ØªØ­Ù' : 'Choose Museum Entry Tickets'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'تذاكر دخول المتحف' : 'Choose Museum Entry Tickets'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
-                  ? 'Ø§Ù„Ø£Ø³Ø¹Ø§Ø± ÙˆÙÙ‚Ø§Ù‹ Ù„Ø³ÙŠØ§Ø³Ø© Ø§Ù„Ù…ØªØ­Ù Ø§Ù„Ù…ØµØ±ÙŠØ©. Ø§Ù„Ø¬Ù†Ø³ÙŠØ© ØªØ­Ø¯Ù‘Ø¯ Ø§Ù„ÙØ¦Ø©.'
+                  ? 'الأسعار وفقاً لسياسة المتحف المصرية. الجنسية تحدّد الفئة.'
                   : 'Select who is visiting. Your Horus-Bot Guided Tour is added once per booking.'}
               </p>
               <p className="mt-2 text-xs font-medium text-primary">{visitorLimitHelper}</p>
@@ -800,7 +801,7 @@ export default function BookPage() {
             {(['eg', 'foreign'] as const).map((group) => (
               <div key={group} className="space-y-3">
                 <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                  {group === 'eg' ? (isRTL ? 'Ø§Ù„Ù…ØµØ±ÙŠÙˆÙ†' : 'Egyptians') : (isRTL ? 'Ø§Ù„Ø£Ø¬Ø§Ù†Ø¨' : 'Foreigners')}
+                  {group === 'eg' ? (isRTL ? 'المصريون' : 'Egyptians') : (isRTL ? 'الأجانب' : 'Foreigners')}
                 </h3>
                 {CATEGORY_ROWS.filter((r) => r.group === group).map((row) => (
                   <div key={row.key} className="flex items-center justify-between gap-3 p-3 md:p-4 rounded-2xl border border-primary/10 bg-background/75">
@@ -835,18 +836,18 @@ export default function BookPage() {
 
             <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 space-y-2">
               <div className="flex justify-between text-sm">
-                <span>{isRTL ? 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„ØªØ°Ø§ÙƒØ±' : 'Total tickets'}</span>
+                <span>{isRTL ? 'إجمالي التذاكر' : 'Total tickets'}</span>
                 <span className="font-semibold">{totalTickets}/{MAX_VISITORS_PER_BOOKING}</span>
               </div>
               <div className="flex justify-between">
-                <span>{isRTL ? 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…ØªØ­Ù' : 'Museum entry total'}</span>
+                <span>{isRTL ? 'إجمالي دخول المتحف' : 'Museum entry total'}</span>
                 <span className="font-bold text-lg">{museumPrice} {CURRENCY}</span>
               </div>
             </div>
 
             <div className="flex justify-end gap-2">
               <Button onClick={proceedFromTickets} className="h-12 px-6">
-                {isRTL ? 'Ù…ØªØ§Ø¨Ø¹Ø©' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                {isRTL ? 'متابعة' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
           </Card>
@@ -856,10 +857,10 @@ export default function BookPage() {
         {currentStep === 'tour' && (
           <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'Ø§Ø®ØªØ± Ø¬ÙˆÙ„Ø© Horus-Bot' : 'Choose how the tour should feel'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر جولة Horus-Bot' : 'Choose how the tour should feel'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
-                  ? 'Ø§Ù„Ø±ÙˆØ¨ÙˆØª ÙŠÙ‚ÙˆØ¯ Ø¬ÙˆÙ„ØªÙƒ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…ØªØ­Ù ÙˆÙŠØ±ÙˆÙŠÙƒ Ù‚ØµØµ Ø§Ù„Ù‚Ø·Ø¹.'
+                  ? 'الروبوت يقود جولتك داخل المتحف ويرويك قصص القطع.'
                   : 'Horus-Bot will guide the route inside the museum and bring each stop into the story.'}
               </p>
             </div>
@@ -867,13 +868,13 @@ export default function BookPage() {
             <div className="grid md:grid-cols-2 gap-3">
               {([
                 { id: 'standard' as TourType, icon: Zap,
-                  titleEn: 'Horus-Bot Highlights', titleAr: 'Ø¬ÙˆÙ„Ø© Ù‚ÙŠØ§Ø³ÙŠØ©',
+                  titleEn: 'Horus-Bot Highlights', titleAr: 'جولة قياسية',
                   descEn: 'A calm highlights route through the museum favorites.',
-                  descAr: 'Ù…Ø³Ø§Ø± Ø¬Ø§Ù‡Ø² ÙˆÙ…Ø­Ø·Ø§Øª Ù…Ø®ØªØ§Ø±Ø© â€” Ø¨Ø¯ÙˆÙ† Ø£ÙŠ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©.' },
+                  descAr: 'مسار جاهز ومحطات مختارة — بدون أي إعدادات إضافية.' },
                 { id: 'personalized' as TourType, icon: Sparkles,
-                  titleEn: 'Personalized Journey', titleAr: 'Ø¬ÙˆÙ„Ø© Ù…Ø®ØµÙŽÙ‘ØµØ©',
+                  titleEn: 'Personalized Journey', titleAr: 'جولة مخصَّصة',
                   descEn: 'Shape the route around your time, interests, language, and pace.',
-                  descAr: 'Ø§Ø®ØªØ± Ø§Ù„Ù…Ø¯Ø©ØŒ Ø§Ù„Ù…ÙˆØ§Ø¶ÙŠØ¹ØŒ Ø§Ù„Ù„ØºØ©ØŒ Ø§Ù„Ø¥ÙŠÙ‚Ø§Ø¹ØŒ ÙˆØ§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„ÙˆØµÙˆÙ„.' },
+                  descAr: 'اختر المدة، المواضيع، اللغة، الإيقاع، واحتياجات الوصول.' },
               ]).map((t) => {
                 const active = tourType === t.id;
                 const Icon = t.icon;
@@ -895,7 +896,7 @@ export default function BookPage() {
                     </div>
                     <p className="text-sm text-muted-foreground">{isRTL ? t.descAr : t.descEn}</p>
                     <p className="mt-3 text-sm font-semibold text-primary">
-                      {robotTourPrices[t.id]} {CURRENCY} / {isRTL ? 'Ø­Ø¬Ø²' : 'visit'}
+                      {robotTourPrices[t.id]} {CURRENCY} / {isRTL ? 'حجز' : 'visit'}
                     </p>
                   </button>
                 );
@@ -913,10 +914,10 @@ export default function BookPage() {
             {tourType === 'standard' && !routesLoading && activeRecommendedRoutes.length > 0 && (
               <div className="space-y-3">
                 <div>
-                  <Label>{isRTL ? 'Ø§Ù„Ù…Ø³Ø§Ø±Ø§Øª Ø§Ù„Ù…Ù‚ØªØ±Ø­Ø©' : 'Recommended Routes'}</Label>
+                  <Label>{isRTL ? 'المسارات المقترحة' : 'Recommended Routes'}</Label>
                   <p className="text-xs text-muted-foreground mt-1">
                     {isRTL
-                      ? 'Ø§Ø®ØªØ± Ù…Ø³Ø§Ø±Ø§ Ø¬Ø§Ù‡Ø²Ø§ Ù„Ù…Ù„Ø¡ Ù…Ø­Ø·Ø§Øª Ø§Ù„Ø¬ÙˆÙ„Ø© ÙˆØªÙØ¶ÙŠÙ„Ø§ØªÙ‡Ø§.'
+                      ? 'اختر مسارا جاهزا لملء محطات الجولة وتفضيلاتها.'
                       : 'Choose a ready-made museum route for the Standard Tour.'}
                   </p>
                 </div>
@@ -943,7 +944,7 @@ export default function BookPage() {
                           {active && <Check className="h-4 w-4 shrink-0" />}
                         </div>
                         <p className="mt-2 text-xs font-medium">
-                          {route.duration_min} {isRTL ? 'Ø¯Ù‚ÙŠÙ‚Ø©' : 'min'} â€¢ {route.artifact_ids.length} {isRTL ? 'Ù…Ø­Ø·Ø§Øª' : 'stops'}
+                          {route.duration_min} {isRTL ? 'دقيقة' : 'min'} • {route.artifact_ids.length} {isRTL ? 'محطات' : 'stops'}
                         </p>
                       </button>
                     );
@@ -961,9 +962,9 @@ export default function BookPage() {
             )}
 
             <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'Ø±Ø¬ÙˆØ¹' : 'Back'}</Button>
+              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
               <Button onClick={proceedFromTour} className="h-12 px-6">
-                {isRTL ? 'Ù…ØªØ§Ø¨Ø¹Ø©' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                {isRTL ? 'متابعة' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
           </Card>
@@ -973,19 +974,19 @@ export default function BookPage() {
         {currentStep === 'datetime' && (
           <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'Ø§Ø®ØªØ± Ø§Ù„ØªØ§Ø±ÙŠØ® ÙˆØ§Ù„ÙˆÙ‚Øª' : 'Choose when you would like to visit'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر التاريخ والوقت' : 'Choose when you would like to visit'}</h2>
               <p className="text-sm text-muted-foreground">
-                {isRTL ? 'Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ù…Ø­Ø¯ÙˆØ¯Ø© Ù„ÙƒÙ„ ÙØªØ±Ø©.' : 'Select a calm arrival time for your museum visit.'}
+                {isRTL ? 'الأماكن محدودة لكل فترة.' : 'Select a calm arrival time for your museum visit.'}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label className="flex items-center gap-2"><CalendarIcon className="h-4 w-4 text-primary" /> {isRTL ? 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ø²ÙŠØ§Ø±Ø©' : 'Visit date'}</Label>
+              <Label className="flex items-center gap-2"><CalendarIcon className="h-4 w-4 text-primary" /> {isRTL ? 'تاريخ الزيارة' : 'Visit date'}</Label>
               <Input type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
 
             <div className="space-y-2">
-              <Label className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {isRTL ? 'Ø§Ù„ÙˆÙ‚Øª' : 'Time slot'}</Label>
+              <Label className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {isRTL ? 'الوقت' : 'Time slot'}</Label>
               {hasNoRemainingSlotsToday && (
                 <p className="text-sm text-muted-foreground">{noRemainingVisitTimesMessage}</p>
               )}
@@ -1020,9 +1021,9 @@ export default function BookPage() {
             </div>
 
             <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'Ø±Ø¬ÙˆØ¹' : 'Back'}</Button>
+              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
               <Button onClick={proceedFromDatetime} className="h-12 px-6">
-                {isRTL ? 'Ù…ØªØ§Ø¨Ø¹Ø©' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                {isRTL ? 'متابعة' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
           </Card>
@@ -1032,10 +1033,10 @@ export default function BookPage() {
         {currentStep === 'language' && (
           <Card className={cn(panelClass, 'p-5 md:p-8 space-y-5')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'Ø§Ø®ØªØ± Ù„ØºØ© Ø§Ù„Ø³Ø±Ø¯' : 'Choose the narration language'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'اختر لغة السرد' : 'Choose the narration language'}</h2>
               <p className="text-sm text-muted-foreground">
                 {isRTL
-                  ? 'Ø§Ø®ØªØ± Ù„ØºØ© Ø§Ù„Ø³Ø±Ø¯ Ù„Ø¬ÙˆÙ„Ø© Horus-Bot Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…ØªØ­Ù.'
+                  ? 'اختر لغة السرد لجولة Horus-Bot داخل المتحف.'
                   : 'Choose the narration language for your Horus-Bot guided tour.'}
               </p>
             </div>
@@ -1061,23 +1062,23 @@ export default function BookPage() {
             {tourLanguage === 'other' && (
               <div className="space-y-2">
                 <Label htmlFor="tour-language-other">
-                  {isRTL ? 'Ø£Ø¯Ø®Ù„ Ø§Ù„Ù„ØºØ© Ø§Ù„Ù…ÙØ¶Ù„Ø©' : 'Enter preferred language'}
+                  {isRTL ? 'أدخل اللغة المفضلة' : 'Enter preferred language'}
                 </Label>
                 <Input
                   id="tour-language-other"
                   value={tourLanguageOther}
                   onChange={(e) => setTourLanguageOther(e.target.value)}
-                  placeholder={isRTL ? 'Ù…Ø«Ø§Ù„: Ø§Ù„Ø¨Ø±ØªØºØ§Ù„ÙŠØ©' : 'e.g. Portuguese'}
+                  placeholder={isRTL ? 'مثال: البرتغالية' : 'e.g. Portuguese'}
                 />
               </div>
             )}
 
             <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'Ø±Ø¬ÙˆØ¹' : 'Back'}</Button>
+              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
               <Button onClick={proceedFromLanguage} className="h-12 px-6">
                 {tourType === 'personalized'
-                  ? (isRTL ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø¥Ù„Ù‰ Ø§Ù„ØªØ®ØµÙŠØµ' : 'Continue')
-                  : (isRTL ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø¯ÙØ¹' : 'Continue')}
+                  ? (isRTL ? 'متابعة إلى التخصيص' : 'Continue')
+                  : (isRTL ? 'متابعة إلى الدفع' : 'Continue')}
                 <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
@@ -1088,14 +1089,14 @@ export default function BookPage() {
         {currentStep === 'personalize' && (
           <Card className={cn(panelClass, 'p-5 md:p-8 space-y-6')}>
             <div>
-              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'ØªÙØ¶ÙŠÙ„Ø§ØªÙƒ' : 'Shape the visit around you'}</h2>
+              <h2 className="font-serif text-2xl mb-1">{isRTL ? 'تفضيلاتك' : 'Shape the visit around you'}</h2>
               <p className="text-sm text-muted-foreground">
                 {tourType === 'personalized'
                   ? (isRTL
-                    ? 'Ø®ØµÙ‘Øµ Ø¬ÙˆÙ„Ø© Horus-Bot ÙˆÙÙ‚ ÙˆÙ‚ØªÙƒ ÙˆØ§Ù‡ØªÙ…Ø§Ù…Ø§ØªÙƒ.'
+                    ? 'خصّص جولة Horus-Bot وفق وقتك واهتماماتك.'
                     : 'Let Horus-Bot adapt the route to the stories, pace, and support you prefer.')
                   : (isRTL
-                    ? 'Ø¨Ø¶Ø¹ ØªÙØ¶ÙŠÙ„Ø§Øª Ø£Ø³Ø§Ø³ÙŠØ© â€” Ø¬ÙˆÙ„ØªÙƒ Ø§Ù„Ù‚ÙŠØ§Ø³ÙŠØ© Ø¬Ø§Ù‡Ø²Ø© Ø¨Ø§Ù„ÙØ¹Ù„.'
+                    ? 'بضع تفضيلات أساسية — جولتك القياسية جاهزة بالفعل.'
                     : 'A few gentle preferences. Your highlights tour is otherwise ready.')}
               </p>
             </div>
@@ -1103,7 +1104,7 @@ export default function BookPage() {
             {tourType === 'personalized' && (
               <>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'Ù…Ø¯Ø© Ø§Ù„Ø¬ÙˆÙ„Ø©' : 'Tour duration'}</Label>
+                  <Label>{isRTL ? 'مدة الجولة' : 'Tour duration'}</Label>
                   <div className="grid grid-cols-4 gap-2">
                     {DURATIONS.map((d) => (
                       <button
@@ -1115,7 +1116,7 @@ export default function BookPage() {
                           duration === d ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                         )}
                       >
-                        {d} {isRTL ? 'Ø¯' : 'min'}
+                        {d} {isRTL ? 'د' : 'min'}
                       </button>
                     ))}
                   </div>
@@ -1125,11 +1126,11 @@ export default function BookPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'Ø§Ù„Ù‚Ø·Ø¹ Ø§Ù„Ù…Ø®ØªØ§Ø±Ø©' : 'Selected exhibits'}</Label>
+                  <Label>{isRTL ? 'القطع المختارة' : 'Selected exhibits'}</Label>
                   {exhibitsLoading && exhibits.length === 0 ? (
                     <div className="flex items-center gap-2 rounded-2xl border border-primary/10 bg-background/75 p-3 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      {isRTL ? 'Ø¬Ø§Ø±ÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù‚Ø·Ø¹...' : 'Loading exhibits...'}
+                      {isRTL ? 'جاري تحميل القطع...' : 'Loading exhibits...'}
                     </div>
                   ) : exhibits.length === 0 ? (
                     <div className="rounded-2xl border border-dashed border-primary/20 bg-background/75 p-4 text-sm text-muted-foreground space-y-3">
@@ -1194,7 +1195,7 @@ export default function BookPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'Ø§Ù‡ØªÙ…Ø§Ù…Ø§ØªÙƒ' : 'Interests / themes'}</Label>
+                  <Label>{isRTL ? 'اهتماماتك' : 'Interests / themes'}</Label>
                   <div className="flex flex-wrap gap-2">
                     {interestOptions.map((opt) => {
                       const active = interests.includes(opt.id);
@@ -1217,7 +1218,7 @@ export default function BookPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'Ø§Ø­ØªÙŠØ§Ø¬Ø§Øª Ø§Ù„ÙˆØµÙˆÙ„' : 'Accessibility'}</Label>
+                  <Label>{isRTL ? 'احتياجات الوصول' : 'Accessibility'}</Label>
                   <div className="flex flex-wrap gap-2">
                     {accessibilityOptions.map((opt) => {
                       const active = accessibility.includes(opt.id);
@@ -1241,7 +1242,7 @@ export default function BookPage() {
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>{isRTL ? 'Ø§Ù„Ø¥ÙŠÙ‚Ø§Ø¹' : 'Pace'}</Label>
+                    <Label>{isRTL ? 'الإيقاع' : 'Pace'}</Label>
                     <Select value={pace} onValueChange={setPace}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -1250,7 +1251,7 @@ export default function BookPage() {
                     </Select>
                   </div>
                   <div className="flex items-center justify-between rounded-xl border border-primary/10 bg-background/75 p-3">
-                    <span className="text-sm">{isRTL ? 'Ù…Ø­Ø·Ø§Øª ØªØµÙˆÙŠØ±' : 'Photo spots'}</span>
+                    <span className="text-sm">{isRTL ? 'محطات تصوير' : 'Photo spots'}</span>
                     <button
                       type="button"
                       onClick={() => setPhotoSpots((v) => !v)}
@@ -1265,20 +1266,20 @@ export default function BookPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="bp-notes">{isRTL ? 'Ù…Ù„Ø§Ø­Ø¸Ø§Øª (Ø§Ø®ØªÙŠØ§Ø±ÙŠ)' : 'Optional notes'}</Label>
+              <Label htmlFor="bp-notes">{isRTL ? 'ملاحظات (اختياري)' : 'Optional notes'}</Label>
               <Textarea
                 id="bp-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder={isRTL ? 'Ø£Ø®Ø¨Ø±Ù†Ø§ Ø¨Ø£ÙŠ Ø´ÙŠØ¡ ÙŠØ³Ø§Ø¹Ø¯ Ø¹Ù„Ù‰ ØªØ®ØµÙŠØµ Ø²ÙŠØ§Ø±ØªÙƒ.' : 'Share anything that would make the visit feel smoother.'}
+                placeholder={isRTL ? 'أخبرنا بأي شيء يساعد على تخصيص زيارتك.' : 'Share anything that would make the visit feel smoother.'}
                 className="min-h-24"
               />
             </div>
 
             <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'Ø±Ø¬ÙˆØ¹' : 'Back'}</Button>
+              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
               <Button onClick={proceedFromPersonalize} className="h-12 px-6">
-                {isRTL ? 'Ù…ØªØ§Ø¨Ø¹Ø© Ø¥Ù„Ù‰ Ø§Ù„Ø¯ÙØ¹' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+                {isRTL ? 'متابعة إلى الدفع' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
           </Card>
@@ -1328,21 +1329,21 @@ export default function BookPage() {
             </div>
 
             <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 space-y-1.5 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„ØªØ°Ø§ÙƒØ±' : 'Total visitors'}</span><span>{totalTickets}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'Ø§Ù„Ù…ÙˆØ¹Ø¯' : 'When'}</span><span>{date} â€¢ {time}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'Ù†ÙˆØ¹ Ø§Ù„Ø¬ÙˆÙ„Ø©' : 'Tour'}</span><span className="capitalize">{tourType}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…ØªØ­Ù' : 'Museum entry'}</span><span>{museumPrice} {CURRENCY}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'Ø¬ÙˆÙ„Ø© Ø§Ù„Ø±ÙˆØ¨ÙˆØª' : 'Robot tour'}</span><span>{tourPrice} {CURRENCY}</span></div>
-              <div className="flex justify-between border-t border-primary/15 pt-2 mt-2"><span>{isRTL ? 'Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ' : 'Total'}</span><span className="font-bold">{totalPrice} {CURRENCY}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'إجمالي التذاكر' : 'Total visitors'}</span><span>{totalTickets}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'الموعد' : 'When'}</span><span>{date} • {time}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'نوع الجولة' : 'Tour'}</span><span className="capitalize">{tourType}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'دخول المتحف' : 'Museum entry'}</span><span>{museumPrice} {CURRENCY}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{isRTL ? 'جولة الروبوت' : 'Robot tour'}</span><span>{tourPrice} {CURRENCY}</span></div>
+              <div className="flex justify-between border-t border-primary/15 pt-2 mt-2"><span>{isRTL ? 'الإجمالي' : 'Total'}</span><span className="font-bold">{totalPrice} {CURRENCY}</span></div>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <ShieldCheck className="h-4 w-4 text-primary" />
-              {isRTL ? 'Ø³ØªÙØ­ÙØ¸ ØªØ°ÙƒØ±ØªÙƒ ÙÙŠ Ø­Ø³Ø§Ø¨Ùƒ ÙˆØªØ¸Ù‡Ø± ÙÙŠ ØªØ·Ø¨ÙŠÙ‚ Horus-Bot.' : 'Your ticket will be saved to your account and appear in the Horus-Bot app.'}
+              {isRTL ? 'ستُحفظ تذكرتك في حسابك وتظهر في تطبيق Horus-Bot.' : 'Your ticket will be saved to your account and appear in the Horus-Bot app.'}
             </div>
 
             <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'Ø±Ø¬ÙˆØ¹' : 'Back'}</Button>
+              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
               <Button onClick={confirmAndPay} disabled={busy} className="h-12 px-6">
                 {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                 {busy
@@ -1494,23 +1495,23 @@ function BookingSummaryCard({
     <div className="space-y-4">
       <Card className="p-6 shadow-soft">
         <div className="mb-5">
-          <div className="section-label mb-2">{isRTL ? 'Ù…Ù„Ø®Øµ Ø§Ù„Ø­Ø¬Ø²' : 'Booking Summary'}</div>
-          <h2 className="font-serif text-2xl">{isRTL ? 'Ø²ÙŠØ§Ø±ØªÙƒ Ø¥Ù„Ù‰ Ø§Ù„Ù…ØªØ­Ù' : 'Your museum visit'}</h2>
+          <div className="section-label mb-2">{isRTL ? 'ملخص الحجز' : 'Booking Summary'}</div>
+          <h2 className="font-serif text-2xl">{isRTL ? 'زيارتك إلى المتحف' : 'Your museum visit'}</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            {isRTL ? 'Ø±Ø§Ø¬Ø¹ Ø§Ù„ØªÙØ§ØµÙŠÙ„ Ø£Ø«Ù†Ø§Ø¡ Ø¥ÙƒÙ…Ø§Ù„ Ø§Ù„Ø®Ø·ÙˆØ§Øª.' : 'Review details as you complete each step.'}
+            {isRTL ? 'راجع التفاصيل أثناء إكمال الخطوات.' : 'Review details as you complete each step.'}
           </p>
         </div>
         <div className="space-y-3 text-sm">
-          <SummaryLine label={isRTL ? 'Ø§Ù„Ø®Ø·ÙˆØ© Ø§Ù„Ø­Ø§Ù„ÙŠØ©' : 'Current step'} value={currentStepLabel} />
-          <SummaryLine label={isRTL ? 'Ø§Ù„Ø²ÙˆØ§Ø±' : 'Visitors'} value={String(totalTickets || 0)} />
-          <SummaryLine label={isRTL ? 'Ø§Ù„Ù…ÙˆØ¹Ø¯' : 'When'} value={`${date} â€¢ ${time}`} />
-          <SummaryLine label={isRTL ? 'Ø§Ù„Ø¬ÙˆÙ„Ø©' : 'Tour'} value={tourType === 'personalized' ? (isRTL ? 'Ù…Ø®ØµÙŽÙ‘ØµØ©' : 'Personalized') : (isRTL ? 'Ù‚ÙŠØ§Ø³ÙŠØ©' : 'Standard')} />
+          <SummaryLine label={isRTL ? 'الخطوة الحالية' : 'Current step'} value={currentStepLabel} />
+          <SummaryLine label={isRTL ? 'الزوار' : 'Visitors'} value={String(totalTickets || 0)} />
+          <SummaryLine label={isRTL ? 'الموعد' : 'When'} value={`${date} • ${time}`} />
+          <SummaryLine label={isRTL ? 'الجولة' : 'Tour'} value={tourType === 'personalized' ? (isRTL ? 'مخصَّصة' : 'Personalized') : (isRTL ? 'قياسية' : 'Standard')} />
           <div className="border-t border-border/60 pt-3">
-            <SummaryLine label={isRTL ? 'Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…ØªØ­Ù' : 'Museum entry'} value={`${museumPrice} ${CURRENCY}`} />
-            <SummaryLine label={isRTL ? 'Ø¬ÙˆÙ„Ø© Horus-Bot' : 'Horus-Bot tour'} value={`${tourPrice} ${CURRENCY}`} />
+            <SummaryLine label={isRTL ? 'دخول المتحف' : 'Museum entry'} value={`${museumPrice} ${CURRENCY}`} />
+            <SummaryLine label={isRTL ? 'جولة Horus-Bot' : 'Horus-Bot tour'} value={`${tourPrice} ${CURRENCY}`} />
           </div>
           <div className="flex items-center justify-between rounded-xl bg-primary/10 p-3 text-base">
-            <span>{isRTL ? 'Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ' : 'Total'}</span>
+            <span>{isRTL ? 'الإجمالي' : 'Total'}</span>
             <span className="font-bold text-primary">{totalPrice} {CURRENCY}</span>
           </div>
         </div>
@@ -1518,11 +1519,11 @@ function BookingSummaryCard({
       <div className="rounded-2xl border border-primary/25 bg-primary/5 p-4 text-sm text-muted-foreground">
         <ShieldCheck className="mb-3 h-5 w-5 text-primary" />
         <p className="font-medium text-foreground">
-          {isRTL ? 'Ù…Ø§ Ø³ØªØ­ØµÙ„ Ø¹Ù„ÙŠÙ‡' : 'What you receive'}
+          {isRTL ? 'ما ستحصل عليه' : 'What you receive'}
         </p>
         <p className="mt-2 leading-relaxed">
           {isRTL
-            ? 'ØªØ°ÙƒØ±Ø© Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…ØªØ­Ù ÙˆØªØ°ÙƒØ±Ø© Ø¬ÙˆÙ„Ø© Horus-Bot Ù…Ø­ÙÙˆØ¸ØªØ§Ù† ÙÙŠ ØªØ°Ø§ÙƒØ±ÙŠ. ÙŠØªÙ… Ø§Ù„Ø¯ÙØ¹ Ø¹Ù†Ø¯ Ø´Ø¨Ø§Ùƒ Ø§Ù„Ù…ØªØ­Ù.'
+            ? 'تذكرة دخول المتحف وتذكرة جولة Horus-Bot محفوظتان في تذاكري. يتم الدفع عند شباك المتحف.'
             : 'A Museum Entry Ticket and Horus-Bot Tour Ticket saved in My Tickets. Payment happens at the museum counter.'}
         </p>
       </div>

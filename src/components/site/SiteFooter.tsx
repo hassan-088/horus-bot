@@ -1,15 +1,15 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { BookOpen, Briefcase, Building2, Mail, MapPin, Smartphone, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 
 const exploreLinks = [
-  { to: '/about', en: 'About', ar: 'Ù…Ù† Ù†Ø­Ù†' },
-  { to: '/experience', en: 'Experience', ar: 'Ø§Ù„ØªØ¬Ø±Ø¨Ø©' },
-  { to: '/tickets-info', en: 'Tickets', ar: 'Ø§Ù„ØªØ°Ø§ÙƒØ±' },
-  { to: '/app', en: 'App', ar: 'Ø§Ù„ØªØ·Ø¨ÙŠÙ‚' },
-  { to: '/faq', en: 'FAQ', ar: 'Ø§Ù„Ø£Ø³Ø¦Ù„Ø©' },
-  { to: '/contact', en: 'Contact', ar: 'ØªÙˆØ§ØµÙ„' },
+  { to: '/about', en: 'About', ar: 'من نحن' },
+  { to: '/experience', en: 'Experience', ar: 'التجربة' },
+  { to: '/tickets-info', en: 'Tickets', ar: 'التذاكر' },
+  { to: '/app', en: 'App', ar: 'التطبيق' },
+  { to: '/faq', en: 'FAQ', ar: 'الأسئلة' },
+  { to: '/contact', en: 'Contact', ar: 'تواصل' },
 ];
 
 export function SiteFooter() {
@@ -27,24 +27,24 @@ export function SiteFooter() {
                 </div>
                 <div>
                   <p className="font-serif text-2xl leading-tight text-foreground">Horus-Bot</p>
-                  <p className="text-xs text-muted-foreground">{isRTL ? 'Ø±ÙÙŠÙ‚ Ø²ÙŠØ§Ø±Ø© Ø§Ù„Ù…ØªØ­Ù' : 'Museum visit companion'}</p>
+                  <p className="text-xs text-muted-foreground">{isRTL ? 'رفيق زيارة المتحف' : 'Museum visit companion'}</p>
                 </div>
               </div>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
                 {isRTL
-                  ? 'ÙŠØ³Ø§Ø¹Ø¯ Horus-Bot Ø§Ù„Ø²ÙˆØ§Ø± Ø¹Ù„Ù‰ ØªØ¬Ù‡ÙŠØ² Ø²ÙŠØ§Ø±Ø© Ø§Ù„Ù…ØªØ­ÙØŒ Ø¥Ø¨Ù‚Ø§Ø¡ Ø§Ù„ØªØ°Ø§ÙƒØ± Ù‚Ø±ÙŠØ¨Ø©ØŒ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© Ø§Ù„Ø¬ÙˆÙ„Ø© Ø§Ù„Ù…ÙˆØ¬Ù‡Ø© Ø¯Ø§Ø®Ù„ Ø§Ù„ØªØ·Ø¨ÙŠÙ‚.'
+                  ? 'يساعد Horus-Bot الزوار على تجهيز زيارة المتحف، إبقاء التذاكر قريبة، ومتابعة الجولة الموجهة داخل التطبيق.'
                   : 'Horus-Bot helps visitors prepare their museum visit, keep tickets close, and continue the guided journey in the app.'}
               </p>
               <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm leading-relaxed text-muted-foreground">
                 <BookOpen className="mb-3 h-5 w-5 text-primary" />
                 {isRTL
-                  ? 'Ø§Ø­Ø¬Ø² Ù‚Ø¨Ù„ Ø§Ù„ÙˆØµÙˆÙ„ØŒ Ø«Ù… Ø¯Ø¹ Horus-Bot ÙŠØ±Ø´Ø¯ Ø±Ø­Ù„ØªÙƒ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù…ØªØ­Ù Ø¨Ù‡Ø¯ÙˆØ¡.'
+                  ? 'احجز قبل الوصول، ثم دع Horus-Bot يرشد رحلتك داخل المتحف بهدوء.'
                   : 'Book before arrival, then let Horus-Bot guide your museum journey with calm support.'}
               </div>
             </div>
 
             <div>
-              <h4 className="section-label mb-4">{isRTL ? 'Ø§Ø³ØªÙƒØ´Ù' : 'Explore'}</h4>
+              <h4 className="section-label mb-4">{isRTL ? 'استكشف' : 'Explore'}</h4>
               <nav className="grid grid-cols-2 gap-2 text-sm sm:max-w-sm lg:grid-cols-1">
                 {exploreLinks.map((link) => (
                   <Link
@@ -60,13 +60,13 @@ export function SiteFooter() {
 
             <div className="space-y-5">
               <div>
-                <h4 className="section-label mb-4">{isRTL ? 'Ù„Ù„Ù…ØªØ§Ø­Ù' : 'For Museums'}</h4>
+                <h4 className="section-label mb-4">{isRTL ? 'للمتاحف' : 'For Museums'}</h4>
                 <div className="space-y-3 rounded-2xl border border-primary/15 bg-background/45 p-4 text-sm text-muted-foreground">
                   <div className="flex items-start gap-2">
                     <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                     <span>
                       {isRTL
-                        ? 'Ù„Ù„Ù…ØªØ§Ø­Ù ÙˆØ§Ù„Ù…Ø³Ø§Ø­Ø§Øª Ø§Ù„Ø«Ù‚Ø§ÙÙŠØ© Ø§Ù„ØªÙŠ ØªØ±ÙŠØ¯ ØªØ¬Ø±Ø¨Ø© Ø¬ÙˆÙ„Ø§Øª Ø£ÙƒØ«Ø± ØªÙ†Ø¸ÙŠÙ…Ø§.'
+                        ? 'للمتاحف والمساحات الثقافية التي تريد تجربة جولات أكثر تنظيما.'
                         : 'For museums and cultural spaces building a more guided visitor experience.'}
                     </span>
                   </div>
@@ -86,16 +86,16 @@ export function SiteFooter() {
               </div>
 
               <div>
-                <h4 className="section-label mb-4">{isRTL ? 'Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø²ÙŠØ§Ø±Ø©' : 'Start the Visit'}</h4>
+                <h4 className="section-label mb-4">{isRTL ? 'ابدأ الزيارة' : 'Start the Visit'}</h4>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                   <Button asChild>
                     <Link to="/book">
-                      <Ticket className="h-4 w-4" /> {isRTL ? 'Ø§Ø­Ø¬Ø² Ø²ÙŠØ§Ø±ØªÙƒ' : 'Book Visit'}
+                      <Ticket className="h-4 w-4" /> {isRTL ? 'احجز زيارتك' : 'Book Visit'}
                     </Link>
                   </Button>
                   <Button asChild variant="outline">
                     <Link to="/app">
-                      <Smartphone className="h-4 w-4" /> {isRTL ? 'Ø§Ù„ØªØ·Ø¨ÙŠÙ‚ Ø§Ù„Ù…Ø±Ø§ÙÙ‚' : 'Companion App'}
+                      <Smartphone className="h-4 w-4" /> {isRTL ? 'التطبيق المرافق' : 'Companion App'}
                     </Link>
                   </Button>
                 </div>
@@ -104,10 +104,10 @@ export function SiteFooter() {
           </div>
 
           <div className="mt-10 flex flex-col gap-4 border-t border-primary/15 pt-5 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
-            <p>Â© {new Date().getFullYear()} Horus-Bot. {isRTL ? 'Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­Ù‚ÙˆÙ‚ Ù…Ø­ÙÙˆØ¸Ø©.' : 'All rights reserved.'}</p>
+            <p>© {new Date().getFullYear()} Horus-Bot. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
             <div className="flex flex-wrap gap-4">
-              <Link to="/privacy" className="hover:text-primary transition-colors">{isRTL ? 'Ø§Ù„Ø®ØµÙˆØµÙŠØ©' : 'Privacy'}</Link>
-              <Link to="/terms" className="hover:text-primary transition-colors">{isRTL ? 'Ø§Ù„Ø´Ø±ÙˆØ·' : 'Terms'}</Link>
+              <Link to="/privacy" className="hover:text-primary transition-colors">{isRTL ? 'الخصوصية' : 'Privacy'}</Link>
+              <Link to="/terms" className="hover:text-primary transition-colors">{isRTL ? 'الشروط' : 'Terms'}</Link>
             </div>
           </div>
         </div>

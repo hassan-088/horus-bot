@@ -158,7 +158,7 @@ export default function MyTicketsPage() {
             : 'Your museum entry and Horus-Bot tour details stay ready for the visit.'
         }
         backgroundImage={gemImage}
-        backgroundAlt={isRTL ? 'Ù‚Ø§Ø¹Ø© Ù…ØªØ­Ù Ù‡Ø§Ø¯Ø¦Ø©' : 'Quiet museum hall'}
+        backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
         bleedBehindNav
         atmosphereContinuity
         className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
@@ -404,12 +404,12 @@ function paymentStatusLabel(isRTL: boolean) {
 
 function visitorCategoryLabel(key: string, isRTL: boolean) {
   const labels: Record<string, { en: string; ar: string }> = {
-    egyptian_adult: { en: 'Egyptian Adult', ar: 'Ø¨Ø§Ù„Øº Ù…ØµØ±ÙŠ' },
-    egyptian_student: { en: 'Egyptian Student', ar: 'Ø·Ø§Ù„Ø¨ Ù…ØµØ±ÙŠ' },
-    egyptian_child: { en: 'Egyptian Child', ar: 'Ø·ÙÙ„ Ù…ØµØ±ÙŠ' },
-    foreigner_adult: { en: 'Foreigner Adult', ar: 'Ø¨Ø§Ù„Øº Ø£Ø¬Ù†Ø¨ÙŠ' },
-    foreigner_student: { en: 'Foreigner Student', ar: 'Ø·Ø§Ù„Ø¨ Ø£Ø¬Ù†Ø¨ÙŠ' },
-    foreigner_child: { en: 'Foreigner Child', ar: 'Ø·ÙÙ„ Ø£Ø¬Ù†Ø¨ÙŠ' },
+    egyptian_adult: { en: 'Egyptian Adult', ar: 'بالغ مصري' },
+    egyptian_student: { en: 'Egyptian Student', ar: 'طالب مصري' },
+    egyptian_child: { en: 'Egyptian Child', ar: 'طفل مصري' },
+    foreigner_adult: { en: 'Foreigner Adult', ar: 'بالغ أجنبي' },
+    foreigner_student: { en: 'Foreigner Student', ar: 'طالب أجنبي' },
+    foreigner_child: { en: 'Foreigner Child', ar: 'طفل أجنبي' },
   };
   return isRTL ? labels[key]?.ar ?? key : labels[key]?.en ?? key.replace(/_/g, ' ');
 }
@@ -450,9 +450,9 @@ function TicketCard({
     : tk.route_title_en || tk.route_title_ar;
   const categories = visitorCategories(tk.ticket_types, isRTL);
   const tourTypeLabel = tk.tour_type === 'personalized'
-    ? (isRTL ? 'Ù…Ø®ØµØµØ©' : 'Personalized')
-    : (isRTL ? 'Ù‚ÙŠØ§Ø³ÙŠØ©' : 'Standard');
-  const visitWhen = [tk.visit_date, tk.visit_time].filter(Boolean).join(' â€¢ ');
+    ? (isRTL ? 'مخصصة' : 'Personalized')
+    : (isRTL ? 'قياسية' : 'Standard');
+  const visitWhen = [tk.visit_date, tk.visit_time].filter(Boolean).join(' • ');
   const bookingStatus = bookingDisplayStatus(tk, isRTL);
 
   return (
@@ -503,7 +503,7 @@ function TicketCard({
           aria-expanded={isExpanded}
         >
           {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          {isExpanded ? (isRTL ? 'Ø¥Ø®ÙØ§Ø¡ Ø§Ù„ØªÙØ§ØµÙŠÙ„' : 'Hide details') : (isRTL ? 'Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„' : 'View details')}
+          {isExpanded ? (isRTL ? 'إخفاء التفاصيل' : 'Hide details') : (isRTL ? 'عرض التفاصيل' : 'View details')}
         </Button>
 
         {isExpanded && (
