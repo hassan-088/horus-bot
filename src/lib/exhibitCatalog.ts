@@ -20,6 +20,7 @@ interface SharedExhibitRecord {
     };
   };
   media?: {
+    image_asset?: string | null;
     image_url?: string | null;
     alt_en?: string | null;
   };

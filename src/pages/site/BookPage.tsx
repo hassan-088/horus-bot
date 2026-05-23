@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Minus, Plus, Calendar as CalendarIcon, Clock, User as UserIcon, Mail, Lock, Phone, Flag,
@@ -38,7 +38,7 @@ type PayMethod = 'card' | 'cash';
 const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00'];
 const STANDARD_TOUR_DURATION_MIN = 45;
 const ARTIFACT_ID_PATTERN = /^artifact_\d{3}$/;
-const DURATIONS = [30, 45, 60, 90];
+const DURATIONS = [30, 45, 50, 60, 90];
 
 function todayDateInputValue() {
   const now = new Date();
@@ -76,6 +76,7 @@ export default function BookPage() {
     retry: retryExhibits,
   } = useExhibits();
   const navigate = useNavigate();
+  const bookingFormRef = useRef<HTMLDivElement | null>(null);
   const [tourType, setTourType] = useState<TourType>('standard');
 
   // ---- Step management ----
@@ -165,6 +166,7 @@ export default function BookPage() {
 
   // Date & time
   const today = todayDateInputValue();
+  const [currentMinute, setCurrentMinute] = useState(() => Date.now());
   const [date, setDate] = useState(today);
   const [time, setTime] = useState<string>('11:00');
 
@@ -195,8 +197,17 @@ export default function BookPage() {
   const totalPrice = museumPrice + tourPrice;
   const maxSelectedExhibits = maxExhibitsForDuration(duration);
   const exhibitLimitMessage = isRTL
-    ? `تدعم هذه المدة حتى ${maxSelectedExhibits} قطع. اختر مدة أطول لإضافة المزيد.`
+    ? `تدعم هذه المدة حتى ${maxSelectedExhibits} معروضات. اختر مدة أطول لإضافة المزيد.`
     : `This duration supports up to ${maxSelectedExhibits} exhibits. Choose a longer duration to add more.`;
+  const exhibitCountHelper = isRTL
+    ? `تم اختيار ${selectedExhibits.length}/${maxSelectedExhibits} معروضات لهذه المدة.`
+    : `Selected ${selectedExhibits.length}/${maxSelectedExhibits} exhibits for this duration.`;
+  const exhibitOverLimitWarning = isRTL
+    ? 'لقد اخترت معروضات أكثر مما تسمح به هذه المدة. احذف بعض المعروضات أو اختر مدة أطول.'
+    : 'You selected more exhibits than this duration supports. Remove some exhibits or choose a longer duration.';
+  const routeDurationMismatchMessage = isRTL
+    ? 'يحتاج هذا المسار إلى مدة جولة أطول.'
+    : 'This route needs a longer tour duration.';
   const activeRecommendedRoutes = routeRows.filter((route) => route.is_active);
   const selectedRecommendedRoute =
     activeRecommendedRoutes.find((route) => route.id === selectedRouteId) ?? null;
@@ -223,16 +234,22 @@ export default function BookPage() {
   }, []);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const id = window.setInterval(() => setCurrentMinute(Date.now()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    bookingFormRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
   }, [currentStep]);
 
   useEffect(() => {
-    if (time && isFutureVisitTime(date, time)) return;
-    const nextSlot = TIME_SLOTS.find((slot) => isFutureVisitTime(date, slot));
+    const now = new Date(currentMinute);
+    if (time && isFutureVisitTime(date, time, now)) return;
+    const nextSlot = TIME_SLOTS.find((slot) => isFutureVisitTime(date, slot, now));
     if (nextSlot && nextSlot !== time) {
       setTime(nextSlot);
     }
-  }, [date, time]);
+  }, [currentMinute, date, time]);
 
   // ---- Handlers ----
   const visitorLimitMessage = isRTL
@@ -259,9 +276,10 @@ export default function BookPage() {
   const noRemainingVisitTimesMessage = isRTL
     ? 'لا توجد مواعيد زيارة متاحة اليوم. يرجى اختيار تاريخ آخر.'
     : 'No remaining visit times are available today. Please choose another date.';
-  const availableTimeSlots = TIME_SLOTS.filter((slot) => isFutureVisitTime(date, slot));
+  const currentTime = new Date(currentMinute);
+  const availableTimeSlots = TIME_SLOTS.filter((slot) => isFutureVisitTime(date, slot, currentTime));
   const hasNoRemainingSlotsToday = date === today && availableTimeSlots.length === 0;
-  const isSelectedVisitTimeFuture = isFutureVisitTime(date, time);
+  const isSelectedVisitTimeFuture = isFutureVisitTime(date, time, currentTime);
   const visitTimeErrorMessage = hasNoRemainingSlotsToday
     ? noRemainingVisitTimesMessage
     : date === today
@@ -371,7 +389,7 @@ export default function BookPage() {
       return;
     }
     if (tourLanguage === 'other' && !tourLanguageOther.trim()) {
-      toast.error(isRTL ? 'أدخل اللغة المفضلة للجولة.' : 'Enter preferred language.');
+      toast.error(isRTL ? 'يرجى كتابة اللغة التي تفضلها.' : 'Please type your preferred language.');
       return;
     }
     goNext();
@@ -382,6 +400,10 @@ export default function BookPage() {
 
   const applyRecommendedRoute = (route: RecommendedRoute) => {
     const validArtifactIds = route.artifact_ids.filter((id) => ARTIFACT_ID_PATTERN.test(id));
+    if (validArtifactIds.length > maxExhibitsForDuration(route.duration_min)) {
+      toast.error(routeDurationMismatchMessage);
+      return;
+    }
     setSelectedRouteId(route.id);
     setInterests(route.theme ? [route.theme] : route.recommended_for);
     setDuration(route.duration_min || STANDARD_TOUR_DURATION_MIN);
@@ -416,6 +438,13 @@ export default function BookPage() {
       toast.error(standardRouteRequiredMessage);
       return;
     }
+    if (tourType === 'standard' && selectedRecommendedRoute) {
+      const routeArtifactCount = selectedRecommendedRoute.artifact_ids.filter((id) => ARTIFACT_ID_PATTERN.test(id)).length;
+      if (routeArtifactCount > maxExhibitsForDuration(selectedRecommendedRoute.duration_min)) {
+        toast.error(routeDurationMismatchMessage);
+        return;
+      }
+    }
     goNext();
   };
 
@@ -425,7 +454,7 @@ export default function BookPage() {
       return;
     }
     if (selectedExhibits.length > maxSelectedExhibits) {
-      toast.error(exhibitLimitMessage);
+      toast.error(exhibitOverLimitWarning);
       return;
     }
     goNext();
@@ -456,7 +485,7 @@ export default function BookPage() {
       return;
     }
     if (tourLanguage === 'other' && !tourLanguageOther.trim()) {
-      toast.error(isRTL ? 'أدخل اللغة المفضلة للجولة.' : 'Enter preferred language.');
+      toast.error(isRTL ? 'يرجى كتابة اللغة التي تفضلها.' : 'Please type your preferred language.');
       return;
     }
     const routeArtifactIds = tourType === 'standard'
@@ -478,9 +507,11 @@ export default function BookPage() {
     const effectiveDuration = selectedRecommendedRoute?.duration_min ?? (effectiveTourType === 'personalized' ? duration : STANDARD_TOUR_DURATION_MIN);
     const maxForDuration = maxExhibitsForDuration(effectiveDuration);
     if (selectedExhibitIds.length > maxForDuration) {
-      toast.error(isRTL
-        ? `تدعم هذه المدة حتى ${maxForDuration} قطع. اختر مدة أطول لإضافة المزيد.`
-        : `This duration supports up to ${maxForDuration} exhibits. Choose a longer duration to add more.`);
+      toast.error(effectiveTourType === 'standard'
+        ? routeDurationMismatchMessage
+        : (isRTL
+          ? `تدعم هذه المدة حتى ${maxForDuration} معروضات. اختر مدة أطول لإضافة المزيد.`
+          : `This duration supports up to ${maxForDuration} exhibits. Choose a longer duration to add more.`));
       return;
     }
     setBusy(true);
@@ -500,7 +531,6 @@ export default function BookPage() {
       preferred_language: tourLanguage,
       preferred_language_other: tourLanguage === 'other' ? tourLanguageOther.trim() : undefined,
       pace: effectiveTourType === 'personalized' ? pace : 'normal',
-      kids_mode: false,
       photo_spots: effectiveTourType === 'personalized' ? photoSpots : false,
       notes: notes || undefined,
       route_id: effectiveTourType === 'standard' ? selectedRecommendedRoute?.id : undefined,
@@ -585,9 +615,12 @@ export default function BookPage() {
         </div>
       </section>
 
-      <div className="relative w-full max-w-full overflow-x-clip bg-background">
+      <div className="relative w-full max-w-full bg-background">
 
-      <section className="relative mx-auto mb-16 w-full max-w-7xl overflow-visible px-4 pt-6 sm:px-6 md:mb-20 md:pt-8 lg:px-8">
+      <section
+        ref={bookingFormRef}
+        className="relative mx-auto mb-16 w-full max-w-7xl scroll-mt-28 overflow-visible px-4 pt-6 sm:px-6 md:mb-20 md:scroll-mt-32 md:pt-8 lg:px-8"
+      >
         <div className="grid min-w-0 items-start gap-8 overflow-visible lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-6">
         <div className="rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
@@ -992,7 +1025,8 @@ export default function BookPage() {
               )}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {TIME_SLOTS.map((slot) => {
-                  const isAvailable = isFutureVisitTime(date, slot);
+                  const isAvailable = isFutureVisitTime(date, slot, currentTime);
+                  const isSelected = time === slot && isAvailable;
                   return (
                     <button
                       key={slot}
@@ -1006,14 +1040,19 @@ export default function BookPage() {
                       }}
                       aria-disabled={!isAvailable}
                       className={cn(
-                        'h-11 rounded-xl border text-sm font-medium transition-colors',
-                        time === slot && isAvailable
+                        'min-h-11 rounded-xl border px-2 py-2 text-sm font-medium transition-colors',
+                        isSelected
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-primary/10 bg-background/75 hover:border-primary/50',
-                        !isAvailable && 'cursor-not-allowed opacity-45 hover:border-primary/10',
+                        !isAvailable && 'cursor-not-allowed border-primary/10 bg-muted/40 text-muted-foreground opacity-60 hover:border-primary/10 hover:bg-muted/40',
                       )}
                     >
-                      {slot}
+                      <span className="block leading-tight">{slot}</span>
+                      {!isAvailable && (
+                        <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          {date === today ? (isRTL ? 'مرّ' : 'Passed') : (isRTL ? 'غير متاح' : 'Unavailable')}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -1062,13 +1101,13 @@ export default function BookPage() {
             {tourLanguage === 'other' && (
               <div className="space-y-2">
                 <Label htmlFor="tour-language-other">
-                  {isRTL ? 'أدخل اللغة المفضلة' : 'Enter preferred language'}
+                  {isRTL ? 'لغة أخرى' : 'Other language'}
                 </Label>
                 <Input
                   id="tour-language-other"
                   value={tourLanguageOther}
                   onChange={(e) => setTourLanguageOther(e.target.value)}
-                  placeholder={isRTL ? 'مثال: البرتغالية' : 'e.g. Portuguese'}
+                  placeholder={isRTL ? 'اكتب اللغة التي تفضلها' : 'Type your preferred language'}
                 />
               </div>
             )}
@@ -1121,7 +1160,7 @@ export default function BookPage() {
                     ))}
                   </div>
                   {selectedExhibits.length > maxSelectedExhibits && (
-                    <p className="text-sm text-destructive">{exhibitLimitMessage}</p>
+                    <p className="text-sm text-destructive">{exhibitOverLimitWarning}</p>
                   )}
                 </div>
 
@@ -1189,7 +1228,12 @@ export default function BookPage() {
                         );
                       })}
                       </div>
-                      <p className="text-xs text-muted-foreground">{exhibitLimitMessage}</p>
+                      <p className={cn(
+                        'text-xs',
+                        selectedExhibits.length > maxSelectedExhibits ? 'text-destructive' : 'text-muted-foreground',
+                      )}>
+                        {selectedExhibits.length > maxSelectedExhibits ? exhibitOverLimitWarning : exhibitCountHelper}
+                      </p>
                     </>
                   )}
                 </div>
@@ -1356,7 +1400,7 @@ export default function BookPage() {
         </div>
 
         <aside className="hidden self-start lg:block">
-          <div className="sticky top-24">
+          <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pr-1">
             <BookingSummaryPanel
               isRTL={isRTL}
               totalTickets={totalTickets}
@@ -1425,7 +1469,7 @@ function BookingSummaryPanel({
 }) {
   return (
     <div className="space-y-4">
-      <Card className="max-h-[calc(100vh-7rem)] overflow-y-auto rounded-[2rem] border-primary/30 bg-card/90 p-5 shadow-[0_24px_70px_-34px_hsl(var(--primary)/0.7)] backdrop-blur">
+      <Card className="rounded-[2rem] border-primary/30 bg-card/90 p-5 shadow-[0_24px_70px_-34px_hsl(var(--primary)/0.7)] backdrop-blur">
         <div className="mb-5">
           <div className="section-label mb-2">{isRTL ? '\u0645\u0644\u062e\u0635 \u0627\u0644\u0632\u064a\u0627\u0631\u0629' : 'Visit Summary'}</div>
           <h2 className="font-serif text-2xl">{isRTL ? '\u0632\u064a\u0627\u0631\u062a\u0643 \u0625\u0644\u0649 \u0627\u0644\u0645\u062a\u062d\u0641' : 'Your museum visit'}</h2>

@@ -1,0 +1,21 @@
+{
+  "name": "Horus-Bot",
+  "short_name": "Horus-Bot",
+  "icons": [
+    {
+      "src": "/horus-eye-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/horus-eye-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#d9a521",
+  "background_color": "#f7efe2",
+  "display": "standalone"
+}

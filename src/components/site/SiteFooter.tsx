@@ -23,7 +23,7 @@ export function SiteFooter() {
             <div>
               <div className="mb-5 flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
-                  <span className="font-serif text-2xl font-bold text-primary">H</span>
+                  <img src="/horus-eye.png" alt="" className="h-8 w-8 object-contain" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="font-serif text-2xl leading-tight text-foreground">Horus-Bot</p>

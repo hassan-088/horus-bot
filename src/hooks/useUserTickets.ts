@@ -67,7 +67,6 @@ export interface UserTicket {
   accessibility?: string[] | null;
   preferred_language?: string | null;
   preferred_language_other?: string | null;
-  kids_mode?: boolean | null;
   photo_spots?: boolean | null;
   notes?: string | null;
   route_id?: string | null;
@@ -206,7 +205,6 @@ function toUserTicket(
     accessibility: asStringArray(robotTourTicket?.accessibility),
     preferred_language: (robotTourTicket?.preferred_language as string) ?? null,
     preferred_language_other: (robotTourTicket?.preferred_language_other as string) ?? null,
-    kids_mode: (robotTourTicket?.kids_mode as boolean) ?? null,
     photo_spots: (robotTourTicket?.photo_spots as boolean) ?? null,
     notes: (robotTourTicket?.notes as string) ?? null,
     route_id: (robotTourTicket?.route_id as string) ?? null,
@@ -334,7 +332,6 @@ export function useUserTickets() {
             interests: input.interests ?? [],
             selected_exhibits: input.selected_exhibits ?? [],
             accessibility: input.accessibility ?? [],
-            kids_mode: input.kids_mode ?? false,
             photo_spots: input.photo_spots ?? false,
             notes: input.notes ?? null,
             route_id: input.route_id ?? null,

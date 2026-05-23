@@ -29,7 +29,6 @@ export interface CreateBookingInput {
   interests?: string[];
   selected_exhibits?: string[];
   accessibility?: string[];
-  kids_mode?: boolean;
   photo_spots?: boolean;
   notes?: string;
   route_id?: string;
@@ -121,6 +120,9 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
   }
   const selectedExhibitCount = input.selected_exhibits?.length ?? 0;
   const maxSelectedExhibits = maxExhibitsForDuration(input.tour_duration_min);
+  if ((input.tour_type ?? 'standard') === 'standard' && selectedExhibitCount > maxSelectedExhibits) {
+    throw new Error('standard-route-duration-mismatch');
+  }
   if (selectedExhibitCount > maxSelectedExhibits) {
     throw new Error(`too-many-exhibits-for-duration-${maxSelectedExhibits}`);
   }
@@ -198,7 +200,6 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
     interests: input.interests ?? [],
     selected_exhibits: input.selected_exhibits ?? [],
     accessibility: input.accessibility ?? [],
-    kids_mode: false,
     photo_spots: input.photo_spots ?? false,
     notes: input.notes ?? null,
     route_id: input.route_id ?? null,

@@ -30,6 +30,18 @@ function asRouteOrder(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+function exhibitImageUrl(media: Record<string, unknown>): string | null {
+  const imageUrl = media.image_url;
+  if (typeof imageUrl === 'string' && imageUrl.trim()) return imageUrl.trim();
+
+  const imageAsset = media.image_asset;
+  if (typeof imageAsset === 'string' && imageAsset.trim()) {
+    return `/${imageAsset.trim().replace(/^\/+/, '')}`;
+  }
+
+  return null;
+}
+
 function fromFirestore(id: string, data: Record<string, unknown>): WebsiteExhibit {
   const media = (data.media && typeof data.media === 'object')
     ? data.media as Record<string, unknown>
@@ -49,7 +61,7 @@ function fromFirestore(id: string, data: Record<string, unknown>): WebsiteExhibi
     routeOrder: asRouteOrder(data.route_order),
     themes: asStringArray(data.themes),
     tags: asStringArray(data.tags),
-    imageUrl: (media.image_url as string | null | undefined) ?? null,
+    imageUrl: exhibitImageUrl(media),
     altEn: (media.alt_en as string | undefined) ?? titleEn,
     isActive: data.is_active !== false,
     source: 'firestore',
@@ -65,7 +77,7 @@ function fallbackRows(): WebsiteExhibit[] {
     routeOrder: asRouteOrder(exhibit.route_order),
     themes: asStringArray(exhibit.themes),
     tags: asStringArray(exhibit.tags),
-    imageUrl: exhibit.media?.image_url ?? null,
+    imageUrl: exhibitImageUrl(exhibit.media ?? {}),
     altEn: exhibit.media?.alt_en ?? exhibit.title_en ?? exhibit.id,
     isActive: exhibit.is_active !== false,
     source: 'fallback',
