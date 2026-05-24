@@ -11,7 +11,6 @@ export interface RecommendedRoute {
   recommended_for: string[];
   duration_min: number;
   pace: string;
-  kids_friendly: boolean;
   photo_spots: boolean;
   cover_image: string;
   artifact_ids: string[];

@@ -96,6 +96,8 @@ export default function FaqPage() {
             ? 'اعرف أين تحجز، وكيف تستخدم التذاكر، ومتى يبدأ دور تطبيق الهاتف.'
             : 'Understand booking, tickets, payment, cancellation, and the handoff to the mobile app.'
         }
+        bleedBehindNav
+        atmosphereContinuity
       />
 
       <section className="mx-auto max-w-3xl px-4 md:px-8 pb-16">

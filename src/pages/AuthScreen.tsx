@@ -16,7 +16,8 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { PASSWORD_RULES, firstPasswordError, isValidPhone } from '@/lib/passwordRules';
 import { cn } from '@/lib/utils';
-import ankhLogo from '@/assets/ankh.png';
+
+const horusEyeSrc = '/horus-eye.svg';
 
 const emailSchema = z.string().trim().email();
 
@@ -169,11 +170,13 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-primary/10 via-background/80 to-background" />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[min(720px,100%)] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-[calc(env(safe-area-inset-top)+6.5rem)]">
         <div className="mb-8 animate-fade-in-up">
           <div className="flex h-16 w-16 items-center justify-center">
-            <img src={ankhLogo} alt="Horus-Bot" className="w-12 h-12" />
+            <img src={horusEyeSrc} alt="Horus-Bot" className="w-12 h-12" />
           </div>
         </div>
 

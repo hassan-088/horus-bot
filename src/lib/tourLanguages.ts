@@ -32,7 +32,11 @@ export function tourNarrationLanguageLabel(
   otherValue?: string | null,
 ) {
   const normalized = normalizeTourNarrationLanguage(value);
-  if (normalized === 'other' && otherValue?.trim()) return otherValue.trim();
+  if (normalized === 'other') {
+    const customLanguage = otherValue?.trim();
+    const otherLabel = isArabic ? 'لغة أخرى' : 'Other';
+    return customLanguage ? `${otherLabel}: ${customLanguage}` : otherLabel;
+  }
   const language = TOUR_NARRATION_LANGUAGES.find((item) => item.id === normalized);
   if (!language) return isArabic ? 'اللغة المختارة' : 'Selected language';
   return isArabic ? language.ar : language.en;

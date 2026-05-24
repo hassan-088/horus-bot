@@ -126,6 +126,8 @@ export default function AccountPage() {
           subtitle={isRTL ? ar.signInSubtitle : 'Log in to access your profile and tickets.'}
           backgroundImage={gemImage}
           backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
+          bleedBehindNav
+          atmosphereContinuity
           className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
         />
         <section className="relative z-10 mx-auto max-w-3xl px-4 pb-24 -mt-10 md:px-8">
@@ -203,6 +205,8 @@ export default function AccountPage() {
         subtitle={isRTL ? ar.heroSubtitle : 'Keep your visit details, preferences, and Horus-Bot tickets ready in one place.'}
         backgroundImage={gemImage}
         backgroundAlt={isRTL ? 'قاعة متحف هادئة' : 'Quiet museum hall'}
+        bleedBehindNav
+        atmosphereContinuity
         className="after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-24 after:bg-gradient-to-t after:from-background after:to-transparent"
       />
 

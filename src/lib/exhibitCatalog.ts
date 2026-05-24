@@ -21,6 +21,7 @@ interface SharedExhibitRecord {
   };
   media?: {
     image_url?: string | null;
+    image_asset?: string | null;
     alt_en?: string | null;
   };
   is_active?: boolean;

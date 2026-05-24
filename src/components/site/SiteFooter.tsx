@@ -12,6 +12,8 @@ const exploreLinks = [
   { to: '/contact', en: 'Contact', ar: 'تواصل' },
 ];
 
+const horusEyeSrc = '/horus-eye.svg';
+
 export function SiteFooter() {
   const { isRTL } = useApp();
 
@@ -23,7 +25,7 @@ export function SiteFooter() {
             <div>
               <div className="mb-5 flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
-                  <span className="font-serif text-2xl font-bold text-primary">H</span>
+                  <img src={horusEyeSrc} alt="Horus-Bot" className="h-9 w-9" />
                 </div>
                 <div>
                   <p className="font-serif text-2xl leading-tight text-foreground">Horus-Bot</p>
@@ -74,9 +76,9 @@ export function SiteFooter() {
                     <Mail className="h-4 w-4 shrink-0 text-primary" />
                     tourguiderobot@gmail.com
                   </a>
-                  <a className="flex items-center gap-2 hover:text-primary transition-colors" href="mailto:museums@horus-bot.com">
+                  <a className="flex items-center gap-2 hover:text-primary transition-colors" href="mailto:tourguiderobot@gmail.com">
                     <Briefcase className="h-4 w-4 shrink-0 text-primary" />
-                    museums@horus-bot.com
+                    tourguiderobot@gmail.com
                   </a>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 shrink-0 text-primary" />

@@ -16,6 +16,8 @@ const navItems = [
   { to: '/faq', labelEn: 'FAQ', labelAr: 'الأسئلة' },
 ];
 
+const horusEyeSrc = '/horus-eye.svg';
+
 export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();
   const { user, signOut, syncPreferredLanguage } = useAuth();
@@ -91,7 +93,7 @@ export function SiteHeader() {
         >
           <Link to="/" className="flex min-w-0 items-center gap-2">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
-              <span className="font-serif text-lg font-bold text-primary">H</span>
+              <img src={horusEyeSrc} alt="Horus-Bot" className="h-7 w-7" />
             </div>
             <span className="truncate font-serif text-lg tracking-wide text-foreground">Horus-Bot</span>
           </Link>
@@ -184,7 +186,7 @@ export function SiteHeader() {
             <div className="flex h-16 items-center justify-between border-b border-primary/15 px-4">
               <Link to="/" onClick={() => setOpen(false)} className="flex min-w-0 items-center gap-2">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
-                  <span className="font-serif text-lg font-bold text-primary">H</span>
+                  <img src={horusEyeSrc} alt="Horus-Bot" className="h-7 w-7" />
                 </div>
                 <span className="truncate font-serif text-lg tracking-wide text-foreground">Horus-Bot</span>
               </Link>

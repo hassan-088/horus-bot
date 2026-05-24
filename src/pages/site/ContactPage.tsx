@@ -53,7 +53,7 @@ export default function ContactPage() {
         form.message,
       ].join('\n'));
       window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-      toast.success(isRTL ? 'سيفتح تطبيق البريد لإرسال الرسالة.' : 'Your email app will open to send the message.');
+      toast.success(isRTL ? 'تم تجهيز رسالة البريد الإلكتروني في تطبيق البريد لديك.' : 'Your email app is ready with the message.');
     } catch {
       toast.error(contactSendErrorMessage(isRTL));
     } finally {
@@ -67,6 +67,8 @@ export default function ContactPage() {
         label={isRTL ? 'تواصل' : 'Contact'}
         title={isRTL ? 'تواصل مع الفريق المناسب' : 'Reach the Right Team'}
         subtitle={isRTL ? 'فريقنا هنا لمساعدتك قبل زيارتك وأثناءها وبعدها.' : 'Our team is here to help before, during, and after your visit.'}
+        bleedBehindNav
+        atmosphereContinuity
       />
 
       <section className="mx-auto max-w-6xl px-4 md:px-8 pt-4 pb-20">
@@ -81,7 +83,7 @@ export default function ContactPage() {
             <Card className="p-6">
               <Briefcase className="h-5 w-5 text-primary mb-3" />
               <h3 className="font-serif text-base mb-1">{isRTL ? 'شراكات المتاحف' : 'Museum Partnerships'}</h3>
-              <p className="text-sm text-muted-foreground">museums@horus-bot.com</p>
+              <p className="text-sm text-muted-foreground">{CONTACT_EMAIL}</p>
               <p className="text-xs text-muted-foreground mt-2">{isRTL ? 'للمتاحف الراغبة في إدخال حورس-بوت إلى تجربة الزائر.' : 'For museums interested in bringing Horus-Bot into their visitor experience.'}</p>
             </Card>
             <Card className="p-6">

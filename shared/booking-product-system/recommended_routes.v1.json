@@ -13,7 +13,6 @@
     ],
     "duration_min": 45,
     "pace": "normal",
-    "kids_friendly": false,
     "photo_spots": false,
     "cover_image": "assets/artifacts/artifact_030_golden_burial_mask_of_tutankhamun.jpg",
     "artifact_ids": [
@@ -42,7 +41,6 @@
     ],
     "duration_min": 60,
     "pace": "normal",
-    "kids_friendly": false,
     "photo_spots": true,
     "cover_image": "assets/artifacts/artifact_018_golden_throne_of_tutankhamun.jpg",
     "artifact_ids": [
@@ -72,7 +70,6 @@
     ],
     "duration_min": 50,
     "pace": "normal",
-    "kids_friendly": false,
     "photo_spots": false,
     "cover_image": "assets/artifacts/artifact_001_colossal_statue_of_ramesses_ii.jpg",
     "artifact_ids": [
@@ -101,7 +98,6 @@
     ],
     "duration_min": 55,
     "pace": "normal",
-    "kids_friendly": false,
     "photo_spots": false,
     "cover_image": "assets/artifacts/artifact_006_anubis_on_a_chest.jpg",
     "artifact_ids": [
@@ -118,20 +114,18 @@
     "route_order": 4
   },
   {
-    "id": "family_highlights",
-    "title_en": "Family Highlights",
-    "title_ar": "أبرز المعروضات للعائلة",
-    "description_en": "A relaxed family-friendly route with memorable shapes, animals, bright royal objects, and short stories that are easy for younger visitors to follow.",
-    "description_ar": "مسار عائلي هادئ يضم أشكالا مميزة وحيوانات وقطعا ملكية لامعة وقصصا قصيرة يسهل على الزوار الصغار متابعتها.",
-    "theme": "family_highlights",
+    "id": "gentle_highlights",
+    "title_en": "Gentle Highlights",
+    "title_ar": "أبرز المعروضات الهادئة",
+    "description_en": "A relaxed highlights route with memorable shapes, animals, bright royal objects, and short stories for a calm visit.",
+    "description_ar": "مسار هادئ يضم أشكالا مميزة وحيوانات وقطعا ملكية لامعة وقصصا قصيرة لزيارة مريحة.",
+    "theme": "gentle_highlights",
     "recommended_for": [
-      "kids",
       "first_time_visitors",
       "quick_visit"
     ],
     "duration_min": 40,
     "pace": "relaxed",
-    "kids_friendly": true,
     "photo_spots": false,
     "cover_image": "assets/artifacts/artifact_024_lotus_cup_of_tutankhamun.jpg",
     "artifact_ids": [
@@ -160,7 +154,6 @@
     ],
     "duration_min": 45,
     "pace": "normal",
-    "kids_friendly": false,
     "photo_spots": true,
     "cover_image": "assets/artifacts/artifact_030_golden_burial_mask_of_tutankhamun.jpg",
     "artifact_ids": [
@@ -190,7 +183,6 @@
     ],
     "duration_min": 50,
     "pace": "normal",
-    "kids_friendly": false,
     "photo_spots": false,
     "cover_image": "assets/artifacts/artifact_029_royal_diadem_of_tutankhamun.jpg",
     "artifact_ids": [

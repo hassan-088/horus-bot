@@ -29,7 +29,6 @@ export interface CreateBookingInput {
   interests?: string[];
   selected_exhibits?: string[];
   accessibility?: string[];
-  kids_mode?: boolean;
   photo_spots?: boolean;
   notes?: string;
   route_id?: string;
@@ -198,7 +197,6 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
     interests: input.interests ?? [],
     selected_exhibits: input.selected_exhibits ?? [],
     accessibility: input.accessibility ?? [],
-    kids_mode: false,
     photo_spots: input.photo_spots ?? false,
     notes: input.notes ?? null,
     route_id: input.route_id ?? null,

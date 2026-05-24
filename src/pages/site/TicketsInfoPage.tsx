@@ -94,6 +94,8 @@ export default function TicketsInfoPage() {
         label={isRTL ? 'التذاكر' : 'Tickets'}
         title={isRTL ? 'خطط لزيارتك في دقائق' : 'Plan Your Visit in Minutes'}
         subtitle={isRTL ? 'اختر تذكرتك، حدد موعد زيارتك، خصص جولتك، واستعد لتجربة موجهة مع Horus-Bot.' : 'Choose your ticket, schedule your visit, personalize your tour, and get ready for a guided experience with Horus-Bot.'}
+        bleedBehindNav
+        atmosphereContinuity
       />
 
       <div className="mx-auto max-w-5xl px-4 md:px-8 -mt-6 mb-8">

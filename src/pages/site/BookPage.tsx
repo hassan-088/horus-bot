@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Minus, Plus, Calendar as CalendarIcon, Clock, User as UserIcon, Mail, Lock, Phone, Flag,
@@ -69,6 +69,8 @@ export default function BookPage() {
   const { isRTL } = useApp();
   const { user, signIn, signUp } = useAuth();
   const { createBooking } = useUserTickets();
+  const bookingFormRef = useRef<HTMLElement | null>(null);
+  const hasMountedStepRef = useRef(false);
   const {
     exhibits,
     loading: exhibitsLoading,
@@ -136,6 +138,10 @@ export default function BookPage() {
     '[&_textarea::placeholder]:text-muted-foreground/55 [&_textarea:focus-visible]:ring-primary/25',
     '[&_[role=combobox]]:h-11 [&_[role=combobox]]:rounded-xl [&_[role=combobox]]:border-primary/20 [&_[role=combobox]]:bg-background/90 [&_[role=combobox]:focus]:ring-primary/25',
   ].join(' ');
+  const actionRowClass = 'mt-2 flex flex-col gap-3 border-t border-primary/10 pt-5 pb-1 sm:flex-row sm:items-center sm:justify-between';
+  const actionRowEndClass = 'mt-2 flex flex-col gap-3 border-t border-primary/10 pt-5 pb-1 sm:flex-row sm:justify-end';
+  const actionButtonClass = 'h-12 w-full px-6 sm:w-auto';
+  const backButtonClass = 'w-full justify-center sm:w-auto';
 
   const goNext = () => setStepIdx((i) => Math.min(i + 1, allSteps.length - 1));
   const goBack = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -223,7 +229,11 @@ export default function BookPage() {
   }, []);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!hasMountedStepRef.current) {
+      hasMountedStepRef.current = true;
+      return;
+    }
+    bookingFormRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
   }, [currentStep]);
 
   useEffect(() => {
@@ -500,7 +510,6 @@ export default function BookPage() {
       preferred_language: tourLanguage,
       preferred_language_other: tourLanguage === 'other' ? tourLanguageOther.trim() : undefined,
       pace: effectiveTourType === 'personalized' ? pace : 'normal',
-      kids_mode: false,
       photo_spots: effectiveTourType === 'personalized' ? photoSpots : false,
       notes: notes || undefined,
       route_id: effectiveTourType === 'standard' ? selectedRecommendedRoute?.id : undefined,
@@ -587,7 +596,7 @@ export default function BookPage() {
 
       <div className="relative w-full max-w-full overflow-x-clip bg-background">
 
-      <section className="relative mx-auto mb-16 w-full max-w-7xl overflow-visible px-4 pt-6 sm:px-6 md:mb-20 md:pt-8 lg:px-8">
+      <section ref={bookingFormRef} className="relative mx-auto mb-16 w-full max-w-7xl scroll-mt-28 overflow-visible px-4 pt-6 sm:px-6 md:mb-20 md:scroll-mt-32 md:pt-8 lg:px-8">
         <div className="grid min-w-0 items-start gap-8 overflow-visible lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-6">
         <div className="rounded-[2rem] border border-primary/20 bg-card/70 p-4 shadow-soft backdrop-blur md:p-5">
@@ -774,13 +783,15 @@ export default function BookPage() {
                 </>
               )}
 
-              <Button type="submit" className="w-full h-12" disabled={authBusy}>
+              <div className={actionRowEndClass}>
+                <Button type="submit" className="h-12 w-full" disabled={authBusy}>
                 {authBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
                   authMode === 'signup'
                     ? (isRTL ? 'إنشاء حساب ومتابعة' : 'Create account & continue')
                     : (isRTL ? 'تسجيل الدخول ومتابعة' : 'Log in & continue')
                 )}
-              </Button>
+                </Button>
+              </div>
             </form>
           </Card>
         )}
@@ -845,8 +856,8 @@ export default function BookPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2">
-              <Button onClick={proceedFromTickets} className="h-12 px-6">
+            <div className={actionRowEndClass}>
+              <Button onClick={proceedFromTickets} className={actionButtonClass}>
                 {isRTL ? 'متابعة' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
@@ -961,9 +972,9 @@ export default function BookPage() {
               </div>
             )}
 
-            <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
-              <Button onClick={proceedFromTour} className="h-12 px-6">
+            <div className={actionRowClass}>
+              <Button variant="ghost" onClick={goBack} className={backButtonClass}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
+              <Button onClick={proceedFromTour} className={actionButtonClass}>
                 {isRTL ? 'متابعة' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
@@ -993,6 +1004,10 @@ export default function BookPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {TIME_SLOTS.map((slot) => {
                   const isAvailable = isFutureVisitTime(date, slot);
+                  const isPassed = date === today && !isAvailable;
+                  const unavailableLabel = isPassed
+                    ? (isRTL ? 'مرّ' : 'Passed')
+                    : (isRTL ? 'غير متاح' : 'Unavailable');
                   return (
                     <button
                       key={slot}
@@ -1006,23 +1021,30 @@ export default function BookPage() {
                       }}
                       aria-disabled={!isAvailable}
                       className={cn(
-                        'h-11 rounded-xl border text-sm font-medium transition-colors',
+                        'min-h-11 rounded-xl border px-3 py-2 text-sm font-medium transition-colors',
                         time === slot && isAvailable
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-primary/10 bg-background/75 hover:border-primary/50',
-                        !isAvailable && 'cursor-not-allowed opacity-45 hover:border-primary/10',
+                        !isAvailable && 'cursor-not-allowed opacity-50 hover:border-primary/10 hover:bg-background/75',
                       )}
                     >
-                      {slot}
+                      <span className="flex flex-col items-center gap-1 leading-none">
+                        <span>{slot}</span>
+                        {!isAvailable && (
+                          <span className="rounded-full border border-primary/10 bg-background/65 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                            {unavailableLabel}
+                          </span>
+                        )}
+                      </span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
-              <Button onClick={proceedFromDatetime} className="h-12 px-6">
+            <div className={actionRowClass}>
+              <Button variant="ghost" onClick={goBack} className={backButtonClass}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
+              <Button onClick={proceedFromDatetime} className={actionButtonClass}>
                 {isRTL ? 'متابعة' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
@@ -1073,12 +1095,12 @@ export default function BookPage() {
               </div>
             )}
 
-            <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
-              <Button onClick={proceedFromLanguage} className="h-12 px-6">
+            <div className={actionRowClass}>
+              <Button variant="ghost" onClick={goBack} className={backButtonClass}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
+              <Button onClick={proceedFromLanguage} className={actionButtonClass}>
                 {tourType === 'personalized'
-                  ? (isRTL ? 'متابعة إلى التخصيص' : 'Continue')
-                  : (isRTL ? 'متابعة إلى الدفع' : 'Continue')}
+                  ? (isRTL ? 'متابعة' : 'Continue')
+                  : (isRTL ? 'متابعة' : 'Continue')}
                 <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
@@ -1276,10 +1298,10 @@ export default function BookPage() {
               />
             </div>
 
-            <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
-              <Button onClick={proceedFromPersonalize} className="h-12 px-6">
-                {isRTL ? 'متابعة إلى الدفع' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+            <div className={actionRowClass}>
+              <Button variant="ghost" onClick={goBack} className={backButtonClass}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
+              <Button onClick={proceedFromPersonalize} className={actionButtonClass}>
+                {isRTL ? 'متابعة' : 'Continue'} <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Button>
             </div>
           </Card>
@@ -1342,13 +1364,13 @@ export default function BookPage() {
               {isRTL ? 'ستُحفظ تذكرتك في حسابك وتظهر في تطبيق Horus-Bot.' : 'Your ticket will be saved to your account and appear in the Horus-Bot app.'}
             </div>
 
-            <div className="flex justify-between gap-2">
-              <Button variant="ghost" onClick={goBack}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
-              <Button onClick={confirmAndPay} disabled={busy} className="h-12 px-6">
+            <div className={actionRowClass}>
+              <Button variant="ghost" onClick={goBack} className={backButtonClass}><ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {isRTL ? 'رجوع' : 'Back'}</Button>
+              <Button onClick={confirmAndPay} disabled={busy} className={actionButtonClass}>
                 {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                 {busy
                   ? (isRTL ? '\u062c\u0627\u0631\u064a \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u062c\u0632...' : 'Creating booking...')
-                  : (isRTL ? '\u062a\u0623\u0643\u064a\u062f \u0627\u0644\u062d\u062c\u0632' : 'Confirm booking')}
+                  : (isRTL ? '\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u062c\u0632' : 'Confirm booking')}
               </Button>
             </div>
           </Card>
