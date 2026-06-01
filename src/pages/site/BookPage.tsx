@@ -961,12 +961,12 @@ export default function BookPage() {
               </p>
             </div>
 
-            <div className="min-w-0 space-y-2">
+            <div className="min-w-0 max-w-full space-y-2 overflow-hidden">
               <Label className="flex items-center gap-2"><CalendarIcon className="h-4 w-4 text-primary" /> {isRTL ? 'تاريخ الزيارة' : 'Visit date'}</Label>
-              <Input className="w-full min-w-0" type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} />
+              <Input className="block w-full min-w-0 max-w-full box-border overflow-hidden" type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
 
-            <div className="min-w-0 space-y-2">
+            <div className="min-w-0 max-w-full space-y-2 overflow-hidden">
               <Label className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {isRTL ? 'الوقت' : 'Time slot'}</Label>
               {hasNoRemainingSlotsToday && (
                 <p className="text-sm text-muted-foreground">{noRemainingVisitTimesMessage}</p>
@@ -1095,16 +1095,16 @@ export default function BookPage() {
 
             {tourType === 'personalized' && (
               <>
-                <div className="hidden">
+                <div className="min-w-0 space-y-2">
                   <Label>{isRTL ? 'مدة الجولة' : 'Tour duration'}</Label>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-4">
                     {DURATIONS.map((d) => (
                       <button
                         key={d}
                         type="button"
                         onClick={() => setDuration(d)}
                         className={cn(
-                          'h-11 rounded-xl border text-sm font-medium transition-colors',
+                          'h-11 min-w-0 rounded-xl border px-2 text-sm font-medium transition-colors',
                           duration === d ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                         )}
                       >
@@ -1117,7 +1117,7 @@ export default function BookPage() {
                   )}
                 </div>
 
-                <div className="hidden">
+                <div className="min-w-0 space-y-2">
                   <Label>{isRTL ? 'القطع المختارة' : 'Selected exhibits'}</Label>
                   {exhibitsLoading && exhibits.length === 0 ? (
                     <div className="flex items-center gap-2 rounded-2xl border border-primary/10 bg-background/75 p-3 text-sm text-muted-foreground">
@@ -1138,7 +1138,7 @@ export default function BookPage() {
                           {productMessage('savedContent', isRTL)}
                         </div>
                       )}
-                      <div className="grid sm:grid-cols-2 gap-2">
+                      <div className="grid min-w-0 gap-2 sm:grid-cols-2">
                         {exhibits.map((exhibit) => {
                         const active = selectedExhibits.includes(exhibit.id);
                         const blockedByLimit = !active && selectedExhibits.length >= maxSelectedExhibits;
@@ -1155,7 +1155,7 @@ export default function BookPage() {
                             }}
                             aria-disabled={blockedByLimit}
                             className={cn(
-                              'min-h-16 rounded-2xl border p-3 text-left transition-colors rtl:text-right',
+                              'min-h-16 min-w-0 rounded-2xl border p-3 text-left transition-colors rtl:text-right',
                               active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/10 bg-background/75 hover:border-primary/50',
                               blockedByLimit && 'cursor-not-allowed opacity-50 hover:border-primary/10',
                             )}
@@ -1168,7 +1168,7 @@ export default function BookPage() {
                               )}>
                                 {active && <Check className="h-3 w-3" />}
                               </span>
-                              <span>
+                              <span className="min-w-0">
                                 <span className="block text-sm font-medium">{isRTL && exhibit.titleAr ? exhibit.titleAr : exhibit.titleEn}</span>
                                 {exhibit.summary && (
                                   <span className="block text-xs text-muted-foreground mt-1 line-clamp-1">
