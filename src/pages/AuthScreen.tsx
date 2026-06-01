@@ -17,7 +17,7 @@ import { z } from 'zod';
 import { PASSWORD_RULES, firstPasswordError, isValidPhone } from '@/lib/passwordRules';
 import { cn } from '@/lib/utils';
 
-const horusEyeSrc = '/horus-eye.svg';
+const horusEyeSrc = '/horus-eye.png';
 
 const emailSchema = z.string().trim().email();
 

@@ -125,7 +125,7 @@ export default function BookPage() {
       : 'Choose the story language Horus-Bot will use during the tour.',
     personalize: isRTL
       ? '\u0627\u0634\u0643\u0644 \u0627\u0644\u0631\u062d\u0644\u0629 \u062d\u0648\u0644 \u0648\u0642\u062a\u0643 \u0648\u0627\u0647\u062a\u0645\u0627\u0645\u0627\u062a\u0643.'
-      : 'Shape the visit around your time, pace, and interests.',
+      : 'Shape the visit around your time and selected exhibits.',
     payment: isRTL
       ? '\u0623\u0643\u062f \u0627\u0644\u062d\u062c\u0632 \u0627\u0644\u0622\u0646 \u0648\u0627\u062f\u0641\u0639 \u0628\u0647\u062f\u0648\u0621 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
       : 'Confirm now and pay calmly at the museum counter.',
@@ -138,10 +138,10 @@ export default function BookPage() {
     '[&_textarea::placeholder]:text-muted-foreground/55 [&_textarea:focus-visible]:ring-primary/25',
     '[&_[role=combobox]]:h-11 [&_[role=combobox]]:rounded-xl [&_[role=combobox]]:border-primary/20 [&_[role=combobox]]:bg-background/90 [&_[role=combobox]:focus]:ring-primary/25',
   ].join(' ');
-  const actionRowClass = 'mt-2 flex flex-col gap-3 border-t border-primary/10 pt-5 pb-1 sm:flex-row sm:items-center sm:justify-between';
-  const actionRowEndClass = 'mt-2 flex flex-col gap-3 border-t border-primary/10 pt-5 pb-1 sm:flex-row sm:justify-end';
-  const actionButtonClass = 'h-12 w-full px-6 sm:w-auto';
-  const backButtonClass = 'w-full justify-center sm:w-auto';
+  const actionRowClass = 'mt-2 flex flex-row items-center gap-3 border-t border-primary/10 pt-5 pb-1 sm:justify-between';
+  const actionRowEndClass = 'mt-2 flex flex-row items-center justify-end gap-3 border-t border-primary/10 pt-5 pb-1';
+  const actionButtonClass = 'h-12 min-w-0 flex-1 px-4 sm:flex-none sm:px-6';
+  const backButtonClass = 'h-12 shrink-0 px-4 justify-center sm:w-auto';
 
   const goNext = () => setStepIdx((i) => Math.min(i + 1, allSteps.length - 1));
   const goBack = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -177,11 +177,8 @@ export default function BookPage() {
   // Personalize
   const [duration, setDuration] = useState<number>(STANDARD_TOUR_DURATION_MIN);
   const [selectedExhibits, setSelectedExhibits] = useState<string[]>([]);
-  const [interests, setInterests] = useState<string[]>([]);
-  const [accessibility, setAccessibility] = useState<string[]>([]);
   const [tourLanguage, setTourLanguage] = useState<string>('english');
   const [tourLanguageOther, setTourLanguageOther] = useState('');
-  const [pace, setPace] = useState<string>('normal');
   const [photoSpots, setPhotoSpots] = useState(false);
   const [notes, setNotes] = useState('');
   const [selectedRouteId, setSelectedRouteId] = useState<string>('');
@@ -393,9 +390,7 @@ export default function BookPage() {
   const applyRecommendedRoute = (route: RecommendedRoute) => {
     const validArtifactIds = route.artifact_ids.filter((id) => ARTIFACT_ID_PATTERN.test(id));
     setSelectedRouteId(route.id);
-    setInterests(route.theme ? [route.theme] : route.recommended_for);
     setDuration(route.duration_min || STANDARD_TOUR_DURATION_MIN);
-    setPace(route.pace || 'normal');
     setPhotoSpots(route.photo_spots);
     setTourType('standard');
     const recommendedLanguage = normalizeTourNarrationLanguage(route.recommended_language);
@@ -414,9 +409,7 @@ export default function BookPage() {
       setSelectedExhibits([]);
     } else {
       setSelectedRouteId('');
-      setInterests([]);
       setDuration(STANDARD_TOUR_DURATION_MIN);
-      setPace('normal');
       setPhotoSpots(false);
     }
   };
@@ -504,12 +497,9 @@ export default function BookPage() {
       robot_tour_price: tourPrice,
       tour_type: effectiveTourType,
       tour_duration_min: effectiveDuration,
-      interests: effectiveTourType === 'personalized' ? interests : [],
       selected_exhibits: selectedExhibitIds,
-      accessibility: effectiveTourType === 'personalized' ? accessibility : [],
       preferred_language: tourLanguage,
       preferred_language_other: tourLanguage === 'other' ? tourLanguageOther.trim() : undefined,
-      pace: effectiveTourType === 'personalized' ? pace : 'normal',
       photo_spots: effectiveTourType === 'personalized' ? photoSpots : false,
       notes: notes || undefined,
       route_id: effectiveTourType === 'standard' ? selectedRecommendedRoute?.id : undefined,
@@ -525,26 +515,6 @@ export default function BookPage() {
   };
 
   // ---- Option lists ----
-  const interestOptions = [
-    { id: 'ancient-egypt', en: 'Ancient Egypt', ar: 'مصر القديمة' },
-    { id: 'royal-artifacts', en: 'Royal artifacts', ar: 'القطع الملكية' },
-    { id: 'statues', en: 'Statues', ar: 'التماثيل' },
-    { id: 'mummies', en: 'Mummies', ar: 'المومياوات' },
-    { id: 'daily-life', en: 'Daily life', ar: 'الحياة اليومية' },
-    { id: 'architecture', en: 'Architecture', ar: 'العمارة' },
-    { id: 'highlights-only', en: 'Highlights only', ar: 'أبرز المعروضات فقط' },
-  ];
-  const accessibilityOptions = [
-    { id: 'step-free', en: 'Step-free route', ar: 'مسار بدون درج' },
-    { id: 'larger-text', en: 'Larger text in app', ar: 'حجم نص أكبر في التطبيق' },
-    { id: 'extended-audio', en: 'Extended audio description', ar: 'وصف صوتي موسَّع' },
-    { id: 'slower-pace', en: 'Slower tour pace', ar: 'إيقاع جولة أبطأ' },
-  ];
-  const paces = [
-    { id: 'relaxed', en: 'Relaxed', ar: 'مريح' },
-    { id: 'normal', en: 'Normal', ar: 'عادي' },
-    { id: 'fast', en: 'Fast', ar: 'سريع' },
-  ];
   const accountLanguages = [
     { id: 'arabic', en: 'Arabic', ar: 'العربية' },
     { id: 'english', en: 'English', ar: 'الإنجليزية' },
@@ -991,17 +961,17 @@ export default function BookPage() {
               </p>
             </div>
 
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <Label className="flex items-center gap-2"><CalendarIcon className="h-4 w-4 text-primary" /> {isRTL ? 'تاريخ الزيارة' : 'Visit date'}</Label>
-              <Input type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} />
+              <Input className="w-full min-w-0" type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
 
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <Label className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {isRTL ? 'الوقت' : 'Time slot'}</Label>
               {hasNoRemainingSlotsToday && (
                 <p className="text-sm text-muted-foreground">{noRemainingVisitTimesMessage}</p>
               )}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-4">
                 {TIME_SLOTS.map((slot) => {
                   const isAvailable = isFutureVisitTime(date, slot);
                   const isPassed = date === today && !isAvailable;
@@ -1021,15 +991,15 @@ export default function BookPage() {
                       }}
                       aria-disabled={!isAvailable}
                       className={cn(
-                        'min-h-11 rounded-xl border px-3 py-2 text-sm font-medium transition-colors',
+                        'min-h-11 min-w-0 rounded-xl border px-3 py-2 text-sm font-medium transition-colors',
                         time === slot && isAvailable
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-primary/10 bg-background/75 hover:border-primary/50',
-                        !isAvailable && 'cursor-not-allowed opacity-50 hover:border-primary/10 hover:bg-background/75',
+                        !isAvailable && 'cursor-not-allowed border-dashed opacity-55 hover:border-primary/10 hover:bg-background/75',
                       )}
                     >
                       <span className="flex flex-col items-center gap-1 leading-none">
-                        <span>{slot}</span>
+                        <span className={cn(isPassed && 'line-through decoration-2 decoration-muted-foreground/70')}>{slot}</span>
                         {!isAvailable && (
                           <span className="rounded-full border border-primary/10 bg-background/65 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                             {unavailableLabel}
@@ -1125,7 +1095,7 @@ export default function BookPage() {
 
             {tourType === 'personalized' && (
               <>
-                <div className="space-y-2">
+                <div className="hidden">
                   <Label>{isRTL ? 'مدة الجولة' : 'Tour duration'}</Label>
                   <div className="grid grid-cols-4 gap-2">
                     {DURATIONS.map((d) => (
@@ -1147,7 +1117,7 @@ export default function BookPage() {
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="hidden">
                   <Label>{isRTL ? 'القطع المختارة' : 'Selected exhibits'}</Label>
                   {exhibitsLoading && exhibits.length === 0 ? (
                     <div className="flex items-center gap-2 rounded-2xl border border-primary/10 bg-background/75 p-3 text-sm text-muted-foreground">
@@ -1216,62 +1186,7 @@ export default function BookPage() {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label>{isRTL ? 'اهتماماتك' : 'Interests / themes'}</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {interestOptions.map((opt) => {
-                      const active = interests.includes(opt.id);
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setInterests((arr) => toggleInArray(arr, opt.id))}
-                          className={cn(
-                            'rounded-full border px-4 py-2 text-sm transition-colors flex items-center gap-1.5',
-                            active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/15 bg-background/75 hover:border-primary/50',
-                          )}
-                        >
-                          {active && <Check className="h-3.5 w-3.5" />}
-                          {isRTL ? opt.ar : opt.en}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{isRTL ? 'احتياجات الوصول' : 'Accessibility'}</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {accessibilityOptions.map((opt) => {
-                      const active = accessibility.includes(opt.id);
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setAccessibility((arr) => toggleInArray(arr, opt.id))}
-                          className={cn(
-                            'rounded-full border px-4 py-2 text-sm transition-colors flex items-center gap-1.5',
-                            active ? 'border-primary bg-primary/10 text-primary' : 'border-primary/15 bg-background/75 hover:border-primary/50',
-                          )}
-                        >
-                          {active && <Check className="h-3.5 w-3.5" />}
-                          {isRTL ? opt.ar : opt.en}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>{isRTL ? 'الإيقاع' : 'Pace'}</Label>
-                    <Select value={pace} onValueChange={setPace}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {paces.map((p) => <SelectItem key={p.id} value={p.id}>{isRTL ? p.ar : p.en}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div className="flex items-center justify-between rounded-xl border border-primary/10 bg-background/75 p-3">
                     <span className="text-sm">{isRTL ? 'محطات تصوير' : 'Photo spots'}</span>
                     <button

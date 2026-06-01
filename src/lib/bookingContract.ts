@@ -25,10 +25,7 @@ export interface CreateBookingInput {
   tour_duration_min?: number;
   preferred_language?: string;
   preferred_language_other?: string;
-  pace?: string;
-  interests?: string[];
   selected_exhibits?: string[];
-  accessibility?: string[];
   photo_spots?: boolean;
   notes?: string;
   route_id?: string;
@@ -193,10 +190,7 @@ export async function createBooking(db: Firestore, input: CreateBookingInput): P
     tour_duration_min: input.tour_duration_min ?? null,
     preferred_language: narrationLanguage,
     preferred_language_other: narrationLanguage === 'other' ? input.preferred_language_other?.trim() ?? null : null,
-    pace: input.pace ?? null,
-    interests: input.interests ?? [],
     selected_exhibits: input.selected_exhibits ?? [],
-    accessibility: input.accessibility ?? [],
     photo_spots: input.photo_spots ?? false,
     notes: input.notes ?? null,
     route_id: input.route_id ?? null,

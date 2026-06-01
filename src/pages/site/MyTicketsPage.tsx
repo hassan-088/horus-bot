@@ -118,6 +118,7 @@ export default function MyTicketsPage() {
   const [confirmTk, setConfirmTk] = useState<UserTicket | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [expandedBookingIds, setExpandedBookingIds] = useState<Set<string>>(() => new Set());
+  const [showPastTickets, setShowPastTickets] = useState(false);
 
   const active = tickets.filter((t) => ['active', 'paired', 'in_progress'].includes(t.display_status));
   const past = tickets.filter((t) => !['active', 'paired', 'in_progress'].includes(t.display_status));
@@ -229,15 +230,30 @@ export default function MyTicketsPage() {
         )}
 
         {user && past.length > 0 && (
-          <TicketSection
-            title={isRTL ? ar.bookingHistory : 'Booking history'}
-            tickets={past}
-            isRTL={isRTL}
-            exhibits={exhibits}
-            cancellingId={cancellingId}
-            expandedBookingIds={expandedBookingIds}
-            onToggleExpanded={toggleExpanded}
-          />
+          <div className="space-y-4">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => setShowPastTickets((value) => !value)}
+            >
+              {showPastTickets
+                ? (isRTL ? 'إخفاء السابقة والملغاة' : 'Hide past & cancelled')
+                : (isRTL ? 'عرض السابقة والملغاة' : 'View past & cancelled')}
+            </Button>
+            {showPastTickets && (
+              <TicketSection
+                title={isRTL ? ar.bookingHistory : 'Booking history'}
+                tickets={past}
+                isRTL={isRTL}
+                exhibits={exhibits}
+                cancellingId={cancellingId}
+                expandedBookingIds={expandedBookingIds}
+                onToggleExpanded={toggleExpanded}
+              />
+            )}
+          </div>
         )}
       </section>
 

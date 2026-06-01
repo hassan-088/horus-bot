@@ -16,7 +16,7 @@ const navItems = [
   { to: '/faq', labelEn: 'FAQ', labelAr: 'الأسئلة' },
 ];
 
-const horusEyeSrc = '/horus-eye.svg';
+const horusEyeSrc = '/horus-eye.png';
 
 export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();

@@ -12,7 +12,7 @@ const exploreLinks = [
   { to: '/contact', en: 'Contact', ar: 'تواصل' },
 ];
 
-const horusEyeSrc = '/horus-eye.svg';
+const horusEyeSrc = '/horus-eye.png';
 
 export function SiteFooter() {
   const { isRTL } = useApp();
