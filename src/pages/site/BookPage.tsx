@@ -38,7 +38,7 @@ type PayMethod = 'card' | 'cash';
 const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00'];
 const STANDARD_TOUR_DURATION_MIN = 45;
 const ARTIFACT_ID_PATTERN = /^artifact_\d{3}$/;
-const DURATIONS = [30, 45, 60, 90];
+const DURATIONS = [30, 45, 50, 60, 90];
 
 function todayDateInputValue() {
   const now = new Date();
@@ -1119,6 +1119,11 @@ export default function BookPage() {
 
                 <div className="min-w-0 space-y-2">
                   <Label>{isRTL ? 'القطع المختارة' : 'Selected exhibits'}</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {isRTL
+                      ? `${selectedExhibits.length}/${maxSelectedExhibits} \u0645\u062e\u062a\u0627\u0631\u0629`
+                      : `Selected ${selectedExhibits.length}/${maxSelectedExhibits}`}
+                  </p>
                   {exhibitsLoading && exhibits.length === 0 ? (
                     <div className="flex items-center gap-2 rounded-2xl border border-primary/10 bg-background/75 p-3 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
