@@ -24,9 +24,17 @@ export type { TourType } from '@/lib/bookingContract';
 
 export type TicketStatus =
   | 'active'
+  | 'valid'
+  | 'confirmed'
   | 'cancelled'
+  | 'canceled'
+  | 'declined'
+  | 'rejected'
   | 'completed'
   | 'expired'
+  | 'archived'
+  | 'inactive'
+  | 'disabled'
   | 'paired'
   | 'in_progress'
   | 'pending'
@@ -92,19 +100,56 @@ function asStringArray(v: unknown): string[] {
 }
 
 function normalizeStatus(value: unknown): TicketStatus {
-  const raw = String(value ?? '').trim().toLowerCase();
+  const raw = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
   switch (raw) {
+    case 'active':
+    case 'valid':
+    case 'confirmed':
     case 'cancelled':
+    case 'canceled':
+    case 'declined':
+    case 'rejected':
     case 'completed':
     case 'expired':
+    case 'archived':
+    case 'inactive':
+    case 'disabled':
     case 'paired':
     case 'in_progress':
     case 'pending':
     case 'used':
       return raw;
     default:
-      return 'active';
+      return 'pending';
   }
+}
+
+function isUsableStatus(status: TicketStatus): boolean {
+  return status === 'active' || status === 'valid' || status === 'confirmed';
+}
+
+function isCancelledStatus(status: TicketStatus): boolean {
+  return status === 'cancelled' || status === 'canceled';
+}
+
+function isClosedStatus(status: TicketStatus): boolean {
+  return (
+    isCancelledStatus(status) ||
+    status === 'declined' ||
+    status === 'rejected' ||
+    status === 'archived' ||
+    status === 'inactive' ||
+    status === 'disabled'
+  );
+}
+
+function isExpiredVisitDate(visitDate: string): boolean {
+  const startsAt = visitStartsAt(visitDate, '00:00');
+  if (!startsAt) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  startsAt.setHours(0, 0, 0, 0);
+  return startsAt.getTime() < today.getTime();
 }
 
 const STATUS_PRIORITY: Record<TicketDisplayStatus, number> = {
@@ -116,23 +161,38 @@ const STATUS_PRIORITY: Record<TicketDisplayStatus, number> = {
   cancelled: 5,
   expired: 5,
   pending: 6,
+  valid: 1,
+  confirmed: 1,
+  canceled: 5,
+  declined: 5,
+  rejected: 5,
+  archived: 5,
+  inactive: 5,
+  disabled: 5,
   partial: 6,
 };
 
-export function deriveTicketDisplayStatus(ticket: Pick<UserTicket, 'status' | 'museum_status' | 'robot_status'>): TicketDisplayStatus {
+export function deriveTicketDisplayStatus(
+  ticket: Pick<UserTicket, 'status' | 'museum_status' | 'robot_status' | 'visit_date'>,
+): TicketDisplayStatus {
   const { status, museum_status: museumStatus, robot_status: robotStatus } = ticket;
 
-  if (status === 'cancelled' || (museumStatus === 'cancelled' && robotStatus === 'cancelled')) {
+  if (isClosedStatus(status) || isClosedStatus(museumStatus) || isClosedStatus(robotStatus)) {
     return 'cancelled';
   }
-  if (museumStatus === 'expired' || robotStatus === 'expired' || status === 'expired') {
+  if (
+    museumStatus === 'expired' ||
+    robotStatus === 'expired' ||
+    status === 'expired' ||
+    isExpiredVisitDate(ticket.visit_date ?? '')
+  ) {
     return 'expired';
   }
   if (robotStatus === 'in_progress') return 'in_progress';
   if (robotStatus === 'paired') return 'paired';
   if (robotStatus === 'completed' || status === 'completed') return 'completed';
   if (museumStatus === 'used' || status === 'used') return 'used';
-  if (status === 'active' && museumStatus === 'active' && robotStatus === 'active') {
+  if (isUsableStatus(status) && isUsableStatus(museumStatus) && isUsableStatus(robotStatus)) {
     return 'active';
   }
   if (status === 'pending' || museumStatus === 'pending' || robotStatus === 'pending') {
@@ -376,14 +436,16 @@ export function useUserTickets() {
         batch.update(doc(db, 'museumTickets', tk.museum_ticket_id), update);
         batch.update(doc(db, 'robotTourTickets', tk.robot_tour_ticket_id), update);
         await batch.commit();
+        const cancelledStatus: TicketStatus = 'cancelled';
+        const cancelledDisplayStatus: TicketDisplayStatus = 'cancelled';
         setTickets((prev) =>
           prev.map((t) => (t.booking_id === tk.booking_id
             ? {
               ...t,
-              status: 'cancelled',
-              museum_status: 'cancelled',
-              robot_status: 'cancelled',
-              display_status: 'cancelled',
+              status: cancelledStatus,
+              museum_status: cancelledStatus,
+              robot_status: cancelledStatus,
+              display_status: cancelledDisplayStatus,
             }
             : t)).sort(compareUserTickets),
         );
@@ -406,9 +468,17 @@ export function useUserTickets() {
 }
 
 export function canCancelUserTicket(ticket: UserTicket): boolean {
-  if (ticket.status !== 'active') return false;
-  if (['used', 'cancelled', 'expired'].includes(ticket.museum_status)) return false;
-  if (['paired', 'in_progress', 'completed', 'cancelled', 'expired'].includes(ticket.robot_status)) {
+  if (!isUsableStatus(ticket.status)) return false;
+  if (
+    ['used', 'cancelled', 'canceled', 'declined', 'rejected', 'archived', 'inactive', 'disabled', 'expired'].includes(
+      ticket.museum_status,
+    )
+  ) return false;
+  if (
+    ['paired', 'in_progress', 'completed', 'cancelled', 'canceled', 'declined', 'rejected', 'archived', 'inactive', 'disabled', 'expired'].includes(
+      ticket.robot_status,
+    )
+  ) {
     return false;
   }
   return !isWithinCancellationDeadline(ticket);

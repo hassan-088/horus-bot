@@ -655,8 +655,17 @@ function TicketCard({
 }
 
 function statusBadgeClass(status: TicketDisplayStatus) {
-  if (status === 'active') return 'shrink-0 bg-primary/10 text-primary border-0';
-  if (status === 'cancelled' || status === 'expired') return 'shrink-0 bg-muted text-muted-foreground border-0';
+  if (status === 'active' || status === 'valid' || status === 'confirmed') return 'shrink-0 bg-primary/10 text-primary border-0';
+  if (
+    status === 'cancelled' ||
+    status === 'canceled' ||
+    status === 'declined' ||
+    status === 'rejected' ||
+    status === 'archived' ||
+    status === 'inactive' ||
+    status === 'disabled' ||
+    status === 'expired'
+  ) return 'shrink-0 bg-muted text-muted-foreground border-0';
   if (status === 'completed' || status === 'used') return 'shrink-0 bg-emerald-500/15 text-emerald-700 border-0';
   return 'shrink-0 bg-amber-500/15 text-amber-700 border-0';
 }
@@ -679,7 +688,15 @@ function bookingDisplayStatus(ticket: UserTicket, isRTL: boolean) {
 function statusLabel(status: TicketStatus | TicketDisplayStatus, isRTL: boolean) {
   const labels: Record<TicketStatus, { en: string; ar: string }> = {
     active: { en: 'Active', ar: ar.statuses.active },
+    valid: { en: 'Active', ar: ar.statuses.active },
+    confirmed: { en: 'Active', ar: ar.statuses.active },
     cancelled: { en: 'Cancelled', ar: ar.statuses.cancelled },
+    canceled: { en: 'Cancelled', ar: ar.statuses.cancelled },
+    declined: { en: 'Declined', ar: 'مرفوضة' },
+    rejected: { en: 'Declined', ar: 'مرفوضة' },
+    archived: { en: 'Archived', ar: 'مؤرشفة' },
+    inactive: { en: 'Inactive', ar: 'غير نشطة' },
+    disabled: { en: 'Inactive', ar: 'غير نشطة' },
     completed: { en: 'Completed', ar: ar.statuses.completed },
     expired: { en: 'Expired', ar: ar.statuses.expired },
     paired: { en: 'Ready to start', ar: ar.statuses.paired },
