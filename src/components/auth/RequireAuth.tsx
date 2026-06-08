@@ -22,7 +22,22 @@ export function RequireAuth() {
     return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
   }
 
+  if (!profile) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
   if (isStaffRole(profile?.role) && location.pathname !== '/admin/payments') {
+    console.info('[Horus-Bot auth] staff protected-route redirect', {
+      uid: user.id,
+      email: user.email,
+      role: profile?.role,
+      from: location.pathname,
+      destination: '/admin/payments',
+    });
     return <Navigate to="/admin/payments" replace />;
   }
 

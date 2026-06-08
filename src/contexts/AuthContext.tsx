@@ -86,6 +86,11 @@ function toAppUser(fu: FirebaseUser | null): AppUser | null {
   return { id: fu.uid, email: fu.email };
 }
 
+function normalizeRole(value: unknown): string | null {
+  const role = String(value ?? '').trim().toLowerCase();
+  return role === 'admin' || role === 'cashier' ? role : null;
+}
+
 const tsToIso = (v: unknown): string => {
   if (!v) return new Date().toISOString();
   if (typeof v === 'object' && v !== null && 'toDate' in v) {
@@ -160,12 +165,21 @@ async function ensureProfileDoc(fu: FirebaseUser, extras?: SignUpExtras): Promis
     avatar_url: (d.avatar_url as string | null) ?? fu.photoURL ?? null,
     accessibility_defaults: (d.accessibility_defaults as Record<string, unknown>) ?? {},
     marketing_opt_in: (d.marketing_opt_in as boolean) ?? false,
-    role: (d.role as string | null) ?? null,
+    role: normalizeRole(d.role),
   };
   await setDoc(
     ref,
     {
-      ...merged,
+      uid: merged.uid,
+      email: merged.email,
+      full_name: merged.full_name,
+      display_name: merged.display_name,
+      phone_number: merged.phone_number,
+      nationality: merged.nationality,
+      preferred_language: merged.preferred_language,
+      avatar_url: merged.avatar_url,
+      accessibility_defaults: merged.accessibility_defaults,
+      marketing_opt_in: merged.marketing_opt_in,
       created_at: d.created_at ?? serverTimestamp(),
       last_seen_at: serverTimestamp(),
     },
@@ -207,6 +221,11 @@ export function AuthProvider({
     setProfileLoadError(null);
     try {
       const p = await ensureProfileDoc(fu);
+      console.info('[Horus-Bot auth] profile loaded', {
+        uid: fu.uid,
+        email: fu.email,
+        role: p.role,
+      });
       setProfile(p);
       onPreferredLanguageLoaded?.(accountLanguageToUi(p.preferred_language));
     } catch (e) {
@@ -218,6 +237,11 @@ export function AuthProvider({
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fu) => {
+      setIsLoading(true);
+      console.info('[Horus-Bot auth] auth state changed', {
+        uid: fu?.uid ?? null,
+        email: fu?.email ?? null,
+      });
       setUser(toAppUser(fu));
       if (fu) {
         await loadProfile(fu);
@@ -254,9 +278,18 @@ export function AuthProvider({
 
   const signIn: AuthContextType['signIn'] = async (email, password) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      setIsLoading(true);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      console.info('[Horus-Bot auth] sign in completed', {
+        uid: cred.user.uid,
+        email: cred.user.email,
+      });
+      setUser(toAppUser(cred.user));
+      await loadProfile(cred.user);
+      setIsLoading(false);
       return { error: null };
     } catch (e) {
+      setIsLoading(false);
       console.error('[Horus-Bot] Sign in failed', e);
       return {
         error: friendlyAuthResultError(e),

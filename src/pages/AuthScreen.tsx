@@ -56,8 +56,16 @@ export default function AuthScreen() {
 
   useEffect(() => {
     if (!user || isLoading) return;
-    navigate(isStaffRole(profile?.role) ? '/admin/payments' : '/account', { replace: true });
-  }, [user, profile?.role, isLoading, navigate]);
+    if (!profile) return;
+    const destination = isStaffRole(profile.role) ? '/admin/payments' : '/account';
+    console.info('[Horus-Bot auth] login redirect decision', {
+      uid: user.id,
+      email: user.email,
+      role: profile.role,
+      destination,
+    });
+    navigate(destination, { replace: true });
+  }, [user, profile, isLoading, navigate]);
 
   const validateForm = () => {
     const e: typeof errors = {};

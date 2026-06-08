@@ -19,7 +19,14 @@ export function VisitorOnlyRoute({ children }: { children: ReactNode }) {
   const { user, profile, isLoading } = useAuth();
 
   if (isLoading) return <LoadingRoute />;
+  if (user && !profile) return <LoadingRoute />;
   if (user && isStaffRole(profile?.role)) {
+    console.info('[Horus-Bot auth] staff visitor-route redirect', {
+      uid: user.id,
+      email: user.email,
+      role: profile?.role,
+      destination: '/admin/payments',
+    });
     return <Navigate to="/admin/payments" replace />;
   }
 
@@ -31,7 +38,14 @@ export function StaffHomeRedirect({ children }: { children: ReactNode }) {
   const location = useLocation();
 
   if (isLoading) return <LoadingRoute />;
+  if (user && !profile) return <LoadingRoute />;
   if (location.pathname === '/' && user && isStaffRole(profile?.role)) {
+    console.info('[Horus-Bot auth] staff home redirect', {
+      uid: user.id,
+      email: user.email,
+      role: profile?.role,
+      destination: '/admin/payments',
+    });
     return <Navigate to="/admin/payments" replace />;
   }
 
