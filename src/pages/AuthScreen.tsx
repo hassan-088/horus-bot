@@ -81,7 +81,9 @@ export default function AuthScreen() {
       } else if (confirm !== password) {
         e.confirm = isArabic ? 'كلمتا المرور غير متطابقتين.' : 'Passwords do not match.';
       }
-      if (phone.trim() && !isValidPhone(phone)) {
+      if (!phone.trim()) {
+        e.phone = isArabic ? 'يرجى إدخال رقم الهاتف.' : 'Phone number is required.';
+      } else if (!isValidPhone(phone)) {
         e.phone = isArabic ? 'يرجى إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
       }
     }
@@ -97,7 +99,7 @@ export default function AuthScreen() {
       if (isSignUp) {
         const { error } = await signUp(email.trim(), password, {
           fullName: fullName.trim(),
-          phoneNumber: phone.trim() || undefined,
+          phoneNumber: phone.trim(),
           nationality: nationality || undefined,
           preferredLanguage,
         });
@@ -153,7 +155,7 @@ export default function AuthScreen() {
     email: isArabic ? 'البريد الإلكتروني' : 'Email',
     password: isArabic ? 'كلمة المرور' : 'Password',
     confirm: isArabic ? 'تأكيد كلمة المرور' : 'Confirm password',
-    phone: isArabic ? 'رقم الهاتف (اختياري)' : 'Phone number (optional)',
+    phone: isArabic ? 'رقم الهاتف (اختياري)' : 'Phone number',
     nationality: isArabic ? 'الجنسية (اختياري)' : 'Nationality (optional)',
     prefLang: isArabic ? 'لغة الواجهة (اختياري)' : 'UI language (optional)',
     submit: isSignUp

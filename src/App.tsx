@@ -23,6 +23,7 @@ import BookPage from './pages/site/BookPage';
 import PrivacyPage from './pages/site/PrivacyPage';
 import TermsPage from './pages/site/TermsPage';
 import AccountPage from './pages/site/AccountPage';
+import AdminPaymentsPage from './pages/admin/AdminPaymentsPage';
 import AuthScreen from './pages/AuthScreen';
 import NotFound from './pages/NotFound';
 
@@ -65,6 +66,7 @@ const App = () => (
                 <Route element={<RequireAuth />}>
                   <Route path="/account" element={<AccountPage />} />
                   <Route path="/tickets-mine" element={<MyTicketsPage />} />
+                  <Route path="/admin/payments" element={<AdminPaymentsPage />} />
                 </Route>
 
                 {/* Legacy redirects from removed app prototype routes. */}

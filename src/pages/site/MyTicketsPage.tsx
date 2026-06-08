@@ -414,8 +414,45 @@ function resolveExhibitNames(ids: string[], exhibits: WebsiteExhibit[], isRTL: b
   });
 }
 
-function paymentStatusLabel(isRTL: boolean) {
-  return isRTL ? ar.payAtCounter : 'Pay at Counter';
+function normalizedPaymentStatus(status: string) {
+  return status.trim().toLowerCase().replace(/-/g, '_');
+}
+
+function isPaymentConfirmed(status: string) {
+  const normalized = normalizedPaymentStatus(status);
+  return normalized === 'paid' || normalized === 'confirmed';
+}
+
+function isTicketQrAvailable(ticket: UserTicket) {
+  const displayStatus = ticket.display_status ?? deriveTicketDisplayStatus(ticket);
+  return (
+    ['active', 'valid', 'confirmed'].includes(ticket.status) &&
+    ['active', 'valid', 'confirmed'].includes(ticket.museum_status) &&
+    displayStatus === 'active' &&
+    isPaymentConfirmed(ticket.payment_status) &&
+    !hasVisitTimePassed(ticket)
+  );
+}
+
+function hasVisitTimePassed(ticket: UserTicket) {
+  if (!ticket.visit_date) return true;
+  const rawTime = ticket.visit_time?.split(' - ')[0]?.trim() || '00:00';
+  const startsAt = new Date(`${ticket.visit_date}T${rawTime}`);
+  if (Number.isNaN(startsAt.getTime())) {
+    const dateOnly = new Date(`${ticket.visit_date}T00:00`);
+    return Number.isNaN(dateOnly.getTime()) || dateOnly.getTime() < Date.now();
+  }
+  return startsAt.getTime() < Date.now();
+}
+
+function paymentStatusLabel(status: string, isRTL: boolean) {
+  const normalized = normalizedPaymentStatus(status);
+  if (normalized === 'pay_at_counter') return isRTL ? ar.payAtCounter : 'Payment Pending / Pay at counter';
+  if (normalized === 'pending' || normalized === 'unpaid' || normalized === 'awaiting_payment') {
+    return isRTL ? 'بانتظار الدفع' : 'Payment Pending';
+  }
+  if (isPaymentConfirmed(status)) return isRTL ? 'تم التأكيد' : 'Payment Confirmed';
+  return status;
 }
 
 function visitorCategoryLabel(key: string, isRTL: boolean) {
@@ -470,6 +507,7 @@ function TicketCard({
     : (isRTL ? 'قياسية' : 'Standard');
   const visitWhen = [tk.visit_date, tk.visit_time].filter(Boolean).join(' • ');
   const bookingStatus = bookingDisplayStatus(tk, isRTL);
+  const ticketQrAvailable = isTicketQrAvailable(tk);
 
   return (
     <Card className={cn('overflow-hidden rounded-[2rem] border-primary/20 bg-card/90 p-0 shadow-soft backdrop-blur', inactive && 'opacity-75')}>
@@ -497,7 +535,7 @@ function TicketCard({
               {bookingStatus.label}
             </Badge>
             <Badge variant="secondary" className="border-0 bg-background/65 text-primary">
-              {paymentStatusLabel(isRTL)}
+              {paymentStatusLabel(tk.payment_status, isRTL)}
             </Badge>
           </div>
         </div>
@@ -508,7 +546,7 @@ function TicketCard({
           <InfoBox label={isRTL ? ar.tourType : 'Tour type'} value={tourTypeLabel} />
           <InfoBox label={isRTL ? ar.total : 'Total'} value={`${tk.total_price} ${tk.currency}`} />
           <InfoBox label={isRTL ? ar.visitors : 'Visitors'} value={`${tk.total_tickets}`} />
-          <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
+          <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(tk.payment_status, isRTL)} />
         </div>
 
         <Button
@@ -535,29 +573,47 @@ function TicketCard({
               title={isRTL ? ar.museumTicket : 'Museum Entry Ticket'}
               status={statusLabel(tk.museum_status, isRTL)}
             >
-              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
-                <div className="mb-3 flex items-center gap-2">
-                  <QrCode className="h-4 w-4 text-primary" />
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                    {isRTL ? ar.entryQr : 'Gate Entry Code'}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-background/75">
-                    <QrCode className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="break-all font-mono text-sm font-semibold text-foreground">{tk.qr_value}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {isRTL ? ar.entryQrBody : 'Show this code at the museum entrance.'}
+              {ticketQrAvailable ? (
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                  <div className="mb-3 flex items-center gap-2">
+                    <QrCode className="h-4 w-4 text-primary" />
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                      {isRTL ? ar.entryQr : 'Gate Entry Code'}
                     </p>
                   </div>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-background/75">
+                      <QrCode className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="break-all font-mono text-sm font-semibold text-foreground">{tk.qr_value}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        {isRTL ? ar.entryQrBody : 'Show this code at the museum entrance.'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-background/75">
+                      <QrCode className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground">
+                        {isRTL ? 'سيظهر رمز QR بعد تأكيد الدفع من الكاشير.' : 'QR becomes available after counter confirmation.'}
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        {isRTL ? 'يرجى إتمام الدفع عند الشباك لتفعيل هذه التذكرة.' : 'Please pay at the museum counter to activate your QR code and Horus-Bot tour.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="grid gap-2 text-sm sm:grid-cols-3">
                 <InfoBox label={isRTL ? ar.tickets : 'Tickets'} value={`${tk.total_tickets}`} />
                 <InfoBox label={isRTL ? ar.price : 'Price'} value={`${tk.museum_entry_total} ${tk.currency}`} />
-                <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
+                <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(tk.payment_status, isRTL)} />
               </div>
               {categories.length > 0 && (
                 <div className="space-y-1.5">
@@ -586,7 +642,7 @@ function TicketCard({
                 <InfoBox label={isRTL ? ar.tourType : 'Tour type'} value={tourTypeLabel} />
                 <InfoBox label={isRTL ? ar.duration : 'Duration'} value={`${tk.tour_duration ?? 45} min`} />
                 <InfoBox label={isRTL ? ar.price : 'Price'} value={`${tk.robot_tour_price} ${tk.currency}`} />
-                <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(isRTL)} />
+                <InfoBox label={isRTL ? ar.paymentStatus : 'Payment status'} value={paymentStatusLabel(tk.payment_status, isRTL)} />
               </div>
               {exhibitNames.length > 0 ? (
                 <div className="space-y-1.5">

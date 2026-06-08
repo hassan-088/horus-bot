@@ -28,6 +28,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserTickets } from '@/hooks/useUserTickets';
 import { productMessage } from '@/lib/productMessages';
+import { isValidPhone } from '@/lib/passwordRules';
 import { toast } from 'sonner';
 import gemImage from '@/assets/gem.jpg';
 
@@ -143,11 +144,19 @@ export default function AccountPage() {
   }
 
   const handleSave = async () => {
+    if (!phone.trim()) {
+      toast.error(isRTL ? 'يرجى إدخال رقم الهاتف.' : 'Phone number is required.');
+      return;
+    }
+    if (!isValidPhone(phone)) {
+      toast.error(isRTL ? 'يرجى إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.');
+      return;
+    }
     setBusy(true);
     const { error } = await updateProfile({
       full_name: fullName.trim() || null,
       display_name: displayName.trim() || fullName.trim() || null,
-      phone_number: phone.trim() || null,
+      phone_number: phone.trim(),
       nationality: nationality.trim() || null,
       preferred_language: prefLang,
       avatar_url: avatarUrl.trim() || null,

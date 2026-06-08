@@ -35,11 +35,10 @@ export interface CreateBookingInput {
 
 export function maxExhibitsForDuration(durationMin: number | null | undefined): number {
   const duration = Number(durationMin ?? 45);
-  if (duration <= 30) return 4;
-  if (duration <= 45) return 6;
-  if (duration <= 50) return 7;
-  if (duration <= 60) return 8;
-  return 12;
+  if (duration <= 30) return 6;
+  if (duration <= 45) return 9;
+  if (duration <= 60) return 12;
+  return 18;
 }
 
 export interface CreatedBookingRefs {

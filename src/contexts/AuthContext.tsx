@@ -39,6 +39,7 @@ interface Profile {
   avatar_url: string | null;
   accessibility_defaults: Record<string, unknown>;
   marketing_opt_in: boolean;
+  role: string | null;
   created_at: string;
   updated_at: string;
   last_seen_at: string;
@@ -138,6 +139,7 @@ async function ensureProfileDoc(fu: FirebaseUser, extras?: SignUpExtras): Promis
       avatar_url: initial.avatar_url,
       accessibility_defaults: initial.accessibility_defaults,
       marketing_opt_in: initial.marketing_opt_in,
+      role: null,
       created_at: nowIso,
       updated_at: nowIso,
       last_seen_at: nowIso,
@@ -158,6 +160,7 @@ async function ensureProfileDoc(fu: FirebaseUser, extras?: SignUpExtras): Promis
     avatar_url: (d.avatar_url as string | null) ?? fu.photoURL ?? null,
     accessibility_defaults: (d.accessibility_defaults as Record<string, unknown>) ?? {},
     marketing_opt_in: (d.marketing_opt_in as boolean) ?? false,
+    role: (d.role as string | null) ?? null,
   };
   await setDoc(
     ref,
@@ -180,6 +183,7 @@ async function ensureProfileDoc(fu: FirebaseUser, extras?: SignUpExtras): Promis
     avatar_url: merged.avatar_url,
     accessibility_defaults: merged.accessibility_defaults,
     marketing_opt_in: merged.marketing_opt_in,
+    role: merged.role,
     created_at: tsToIso(d.created_at),
     updated_at: tsToIso(d.updated_at),
     last_seen_at: nowIso,

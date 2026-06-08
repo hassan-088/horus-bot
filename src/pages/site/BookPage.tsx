@@ -38,7 +38,7 @@ type PayMethod = 'card' | 'cash';
 const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00'];
 const STANDARD_TOUR_DURATION_MIN = 45;
 const ARTIFACT_ID_PATTERN = /^artifact_\d{3}$/;
-const DURATIONS = [30, 45, 50, 60, 90];
+const DURATIONS = [30, 45, 60, 90];
 
 function todayDateInputValue() {
   const now = new Date();
@@ -199,7 +199,7 @@ export default function BookPage() {
   const maxSelectedExhibits = maxExhibitsForDuration(duration);
   const exhibitLimitMessage = isRTL
     ? `تدعم هذه المدة حتى ${maxSelectedExhibits} قطع. اختر مدة أطول لإضافة المزيد.`
-    : `This duration supports up to ${maxSelectedExhibits} exhibits. Choose a longer duration to add more.`;
+    : `This duration supports up to ${maxSelectedExhibits} stops. Choose a longer duration to add more.`;
   const activeRecommendedRoutes = routeRows.filter((route) => route.is_active);
   const selectedRecommendedRoute =
     activeRecommendedRoutes.find((route) => route.id === selectedRouteId) ?? null;
@@ -314,7 +314,9 @@ export default function BookPage() {
     if (authMode === 'signup') {
       if (!confirm) e.confirm = isRTL ? 'الرجاء تأكيد كلمة المرور.' : 'Please confirm your password.';
       else if (confirm !== password) e.confirm = isRTL ? 'كلمتا المرور غير متطابقتين.' : 'Passwords do not match.';
-      if (phone.trim() && !isValidPhone(phone)) {
+      if (!phone.trim()) {
+        e.phone = isRTL ? 'الرجاء إدخال رقم الهاتف.' : 'Phone number is required.';
+      } else if (!isValidPhone(phone)) {
         e.phone = isRTL ? 'الرجاء إدخال رقم هاتف صحيح.' : 'Please enter a valid phone number.';
       }
     }
@@ -330,7 +332,7 @@ export default function BookPage() {
       if (authMode === 'signup') {
         const { error } = await signUp(email.trim(), password, {
           fullName: fullName.trim(),
-          phoneNumber: phone.trim() || undefined,
+          phoneNumber: phone.trim(),
           nationality: nationality.trim() || undefined,
           preferredLanguage: signupLanguage,
         });
@@ -483,7 +485,7 @@ export default function BookPage() {
     if (selectedExhibitIds.length > maxForDuration) {
       toast.error(isRTL
         ? `تدعم هذه المدة حتى ${maxForDuration} قطع. اختر مدة أطول لإضافة المزيد.`
-        : `This duration supports up to ${maxForDuration} exhibits. Choose a longer duration to add more.`);
+        : `This duration supports up to ${maxForDuration} stops. Choose a longer duration to add more.`);
       return;
     }
     setBusy(true);
@@ -713,7 +715,7 @@ export default function BookPage() {
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="bp-phone">{isRTL ? 'رقم الهاتف (اختياري)' : 'Phone number (optional)'}</Label>
+                      <Label htmlFor="bp-phone">{isRTL ? 'رقم الهاتف (اختياري)' : 'Phone number'}</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
                         <Input
@@ -1235,7 +1237,7 @@ export default function BookPage() {
               <p className="text-sm text-muted-foreground">
                 {isRTL
                   ? '\u0627\u0644\u062f\u0641\u0639 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u062d\u0627\u0644\u064a\u0627\u064b. \u0633\u064a\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u062d\u062c\u0632\u0643 \u0648\u062a\u062f\u0641\u0639 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641.'
-                  : 'Your booking is confirmed here. Payment happens calmly at the museum counter when you arrive.'}
+                  : 'Your booking will be created now. Please pay at the museum counter to activate your QR code and Horus-Bot tour.'}
               </p>
             </div>
 
@@ -1323,12 +1325,12 @@ export default function BookPage() {
             <DialogTitle className="text-2xl">
               {isRTL
                 ? '\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u0627\u0644\u062d\u062c\u0632'
-                : 'Booking confirmed'}
+                : 'Booking created successfully'}
             </DialogTitle>
             <DialogDescription>
               {isRTL
                 ? '\u062a\u0645 \u062a\u0623\u0643\u064a\u062f \u0627\u0644\u062d\u062c\u0632. \u064a\u0631\u062c\u0649 \u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0634\u0628\u0627\u0643 \u0627\u0644\u0645\u062a\u062d\u0641. \u062a\u0630\u0627\u0643\u0631\u0643 \u0645\u062a\u0627\u062d\u0629 \u0627\u0644\u0622\u0646 \u0641\u064a \u062a\u0630\u0627\u0643\u0631\u064a.'
-                : 'Booking confirmed. Pay at Counter. Your tickets are now available in My Tickets.'}
+                : 'Booking created successfully. Please pay at the museum counter to activate your QR code and Horus-Bot tour.'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center">

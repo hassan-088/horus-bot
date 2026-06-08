@@ -128,6 +128,22 @@ function isUsableStatus(status: TicketStatus): boolean {
   return status === 'active' || status === 'valid' || status === 'confirmed';
 }
 
+function isClosedOrPendingStatus(status: TicketStatus): boolean {
+  return [
+    'pending',
+    'used',
+    'completed',
+    'cancelled',
+    'canceled',
+    'declined',
+    'rejected',
+    'archived',
+    'inactive',
+    'disabled',
+    'expired',
+  ].includes(status);
+}
+
 function isCancelledStatus(status: TicketStatus): boolean {
   return status === 'cancelled' || status === 'canceled';
 }
@@ -471,15 +487,13 @@ export function useUserTickets() {
 
 export function canCancelUserTicket(ticket: UserTicket): boolean {
   if (!isUsableStatus(ticket.status)) return false;
+  if (isClosedOrPendingStatus(ticket.museum_status)) return false;
   if (
-    ['used', 'cancelled', 'canceled', 'declined', 'rejected', 'archived', 'inactive', 'disabled', 'expired'].includes(
-      ticket.museum_status,
-    )
-  ) return false;
-  if (
-    ['paired', 'in_progress', 'completed', 'cancelled', 'canceled', 'declined', 'rejected', 'archived', 'inactive', 'disabled', 'expired'].includes(
-      ticket.robot_status,
-    )
+    isClosedOrPendingStatus(ticket.robot_status) ||
+    ticket.robot_status === 'paired' ||
+    ticket.robot_status === 'in_progress' ||
+    !!ticket.paired_robot_id ||
+    !!ticket.session_id
   ) {
     return false;
   }
