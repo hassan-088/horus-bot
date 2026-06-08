@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Globe, Loader2, LogIn, LogOut, Menu, Ticket as TicketIcon, User as UserIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { isStaffRole } from '@/components/auth/StaffRouteGuards';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { productMessage } from '@/lib/productMessages';
@@ -20,13 +21,14 @@ const horusEyeSrc = '/horus-eye.png';
 
 export function SiteHeader() {
   const { language, setLanguage, isRTL } = useApp();
-  const { user, signOut, syncPreferredLanguage } = useAuth();
+  const { user, profile, signOut, syncPreferredLanguage } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [logoutBusy, setLogoutBusy] = useState(false);
   const [languageBusy, setLanguageBusy] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const isStaff = !!user && isStaffRole(profile?.role);
 
   const handleLogout = async () => {
     if (logoutBusy) return;
@@ -45,7 +47,7 @@ export function SiteHeader() {
   };
 
   const handleLanguageToggle = async () => {
-    if (languageBusy) return;
+    if (languageBusy || isStaff) return;
     const next = language === 'en' ? 'ar' : 'en';
     setLanguage(next);
     setLanguageBusy(true);
@@ -91,7 +93,7 @@ export function SiteHeader() {
               : 'border-primary/10 bg-card/45 backdrop-blur-lg',
           )}
         >
-          <Link to="/" className="flex min-w-0 items-center gap-2">
+          <Link to={isStaff ? '/admin/payments' : '/'} className="flex min-w-0 items-center gap-2">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
               <img src={horusEyeSrc} alt="Horus-Bot" className="h-7 w-7" />
             </div>
@@ -99,69 +101,79 @@ export function SiteHeader() {
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) =>
-                  cn(
-                    'rounded-full px-3 py-2 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'text-primary'
-                      : 'text-muted-foreground hover:text-foreground',
-                  )
-                }
-              >
-                {isRTL ? item.labelAr : item.labelEn}
-              </NavLink>
-            ))}
+            {isStaff ? (
+              <StaffNavLink />
+            ) : (
+              navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  className={({ isActive }) =>
+                    cn(
+                      'rounded-full px-3 py-2 text-sm font-medium transition-colors',
+                      isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+                    )
+                  }
+                >
+                  {isRTL ? item.labelAr : item.labelEn}
+                </NavLink>
+              ))
+            )}
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLanguageToggle}
-              disabled={languageBusy}
-              className="gap-1.5"
-            >
-              {languageBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
-              {language === 'en' ? 'EN' : 'ع'}
-            </Button>
-            {user ? (
+            {isStaff ? (
+              <SignOutButton logoutBusy={logoutBusy} onClick={handleLogout} />
+            ) : (
               <>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/tickets-mine')} className="gap-1.5">
-                  <TicketIcon className="h-4 w-4" />
-                  {isRTL ? 'تذاكري' : 'My Tickets'}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLanguageToggle}
+                  disabled={languageBusy}
+                  className="gap-1.5"
+                >
+                  {languageBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
+                  {language === 'en' ? 'EN' : 'ع'}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/account')} className="gap-1.5">
-                  <UserIcon className="h-4 w-4" />
-                  {isRTL ? 'حسابي' : 'My Account'}
+                {user ? (
+                  <>
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/tickets-mine')} className="gap-1.5">
+                      <TicketIcon className="h-4 w-4" />
+                      {isRTL ? 'تذاكري' : 'My Tickets'}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/account')} className="gap-1.5">
+                      <UserIcon className="h-4 w-4" />
+                      {isRTL ? 'حسابي' : 'My Account'}
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="gap-1.5">
+                    <LogIn className="h-4 w-4" />
+                    {isRTL ? 'تسجيل الدخول' : 'Log in'}
+                  </Button>
+                )}
+                <Button size="sm" onClick={() => navigate('/book')} className="shadow-soft">
+                  {isRTL ? 'احجز زيارتك' : 'Book Visit'}
                 </Button>
               </>
-            ) : (
-              <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="gap-1.5">
-                <LogIn className="h-4 w-4" />
-                {isRTL ? 'تسجيل الدخول' : 'Log in'}
-              </Button>
             )}
-            <Button size="sm" onClick={() => navigate('/book')} className="shadow-soft">
-              {isRTL ? 'احجز زيارتك' : 'Book Visit'}
-            </Button>
           </div>
 
           <div className="flex items-center gap-1.5 lg:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLanguageToggle}
-              disabled={languageBusy}
-              aria-label={isRTL ? 'تغيير اللغة' : 'Change language'}
-              className="h-9 w-9 rounded-full"
-            >
-              {languageBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
-            </Button>
+            {!isStaff && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLanguageToggle}
+                disabled={languageBusy}
+                aria-label={isRTL ? 'تغيير اللغة' : 'Change language'}
+                className="h-9 w-9 rounded-full"
+              >
+                {languageBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
+              </Button>
+            )}
             <button
               type="button"
               className="flex h-9 w-9 items-center justify-center rounded-full text-foreground"
@@ -184,7 +196,7 @@ export function SiteHeader() {
           />
           <div className="absolute inset-x-3 top-3 max-h-[calc(100vh-1.5rem)] max-w-full overflow-y-auto rounded-[2rem] border border-primary/20 bg-card/95 shadow-2xl backdrop-blur-xl animate-slide-in-right">
             <div className="flex h-16 items-center justify-between border-b border-primary/15 px-4">
-              <Link to="/" onClick={() => setOpen(false)} className="flex min-w-0 items-center gap-2">
+              <Link to={isStaff ? '/admin/payments' : '/'} onClick={() => setOpen(false)} className="flex min-w-0 items-center gap-2">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/30">
                   <img src={horusEyeSrc} alt="Horus-Bot" className="h-7 w-7" />
                 </div>
@@ -201,26 +213,30 @@ export function SiteHeader() {
             </div>
 
             <nav className="flex flex-col gap-1 p-4">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.to === '/'}
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    cn(
-                      'rounded-2xl px-4 py-3 text-base font-medium',
-                      isActive
-                        ? 'bg-primary/15 text-primary'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                    )
-                  }
-                >
-                  {isRTL ? item.labelAr : item.labelEn}
-                </NavLink>
-              ))}
+              {isStaff ? (
+                <StaffNavLink onClick={() => setOpen(false)} />
+              ) : (
+                navItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === '/'}
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) =>
+                      cn(
+                        'rounded-2xl px-4 py-3 text-base font-medium',
+                        isActive ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                      )
+                    }
+                  >
+                    {isRTL ? item.labelAr : item.labelEn}
+                  </NavLink>
+                ))
+              )}
               <div className="mt-4 flex flex-col gap-2 border-t border-primary/15 pt-4">
-                {user ? (
+                {isStaff ? (
+                  <SignOutButton logoutBusy={logoutBusy} onClick={handleLogout} mobile />
+                ) : user ? (
                   <>
                     <Button variant="ghost" onClick={() => { setOpen(false); navigate('/tickets-mine'); }} className="justify-start gap-1.5">
                       <TicketIcon className="h-4 w-4" />
@@ -236,14 +252,8 @@ export function SiteHeader() {
                       disabled={logoutBusy}
                       className="justify-start gap-1.5"
                     >
-                      {logoutBusy ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <LogOut className="h-4 w-4" />
-                      )}
-                      {logoutBusy
-                        ? (isRTL ? 'جاري تسجيل الخروج...' : 'Logging out...')
-                        : (isRTL ? 'تسجيل الخروج' : 'Log out')}
+                      {logoutBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+                      {logoutBusy ? (isRTL ? 'جاري تسجيل الخروج...' : 'Logging out...') : (isRTL ? 'تسجيل الخروج' : 'Log out')}
                     </Button>
                   </>
                 ) : (
@@ -252,14 +262,56 @@ export function SiteHeader() {
                     {isRTL ? 'تسجيل الدخول' : 'Log in'}
                   </Button>
                 )}
-                <Button onClick={() => { setOpen(false); navigate('/book'); }} className="mt-1">
-                  {isRTL ? 'احجز زيارتك' : 'Book Visit'}
-                </Button>
+                {!isStaff && (
+                  <Button onClick={() => { setOpen(false); navigate('/book'); }} className="mt-1">
+                    {isRTL ? 'احجز زيارتك' : 'Book Visit'}
+                  </Button>
+                )}
               </div>
             </nav>
           </div>
         </div>
       )}
     </header>
+  );
+}
+
+function StaffNavLink({ onClick }: { onClick?: () => void }) {
+  return (
+    <NavLink
+      to="/admin/payments"
+      onClick={onClick}
+      className={({ isActive }) =>
+        cn(
+          'rounded-full px-3 py-2 text-sm font-medium transition-colors lg:rounded-full',
+          isActive ? 'bg-primary/15 text-primary lg:bg-transparent' : 'text-muted-foreground hover:text-foreground',
+        )
+      }
+    >
+      Payment Confirmation
+    </NavLink>
+  );
+}
+
+function SignOutButton({
+  logoutBusy,
+  onClick,
+  mobile = false,
+}: {
+  logoutBusy: boolean;
+  onClick: () => void;
+  mobile?: boolean;
+}) {
+  return (
+    <Button
+      variant="ghost"
+      size={mobile ? undefined : 'sm'}
+      onClick={onClick}
+      disabled={logoutBusy}
+      className={cn('gap-1.5', mobile && 'justify-start')}
+    >
+      {logoutBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+      {logoutBusy ? 'Signing out...' : 'Sign Out'}
+    </Button>
   );
 }

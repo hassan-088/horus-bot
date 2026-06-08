@@ -27,6 +27,7 @@ const atmosphericTopRoutes = new Set([
 export function SiteLayout() {
   const { pathname } = useLocation();
   const hasAtmosphericTop = atmosphericTopRoutes.has(pathname);
+  const isAdminRoute = pathname.startsWith('/admin');
 
   return (
     <div className="relative flex min-h-screen w-full max-w-full flex-col overflow-x-clip bg-background">
@@ -39,7 +40,7 @@ export function SiteLayout() {
       >
         <Outlet />
       </main>
-      <SiteFooter />
+      {!isAdminRoute && <SiteFooter />}
     </div>
   );
 }

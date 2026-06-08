@@ -10,7 +10,8 @@ import {
   writeBatch,
   type DocumentData,
 } from 'firebase/firestore';
-import { CheckCircle2, Loader2, Search, ShieldAlert } from 'lucide-react';
+import { CheckCircle2, Loader2, LogOut, Search, ShieldAlert } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -86,12 +87,14 @@ function canAccess(role: unknown) {
 }
 
 export default function AdminPaymentsPage() {
-  const { user, profile, isLoading } = useAuth();
+  const { user, profile, isLoading, signOut } = useAuth();
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState<PendingBooking[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
   const allowed = canAccess(profile?.role);
 
   useEffect(() => {
@@ -180,6 +183,20 @@ export default function AdminPaymentsPage() {
     }
   };
 
+  const handleSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOut();
+      navigate('/', { replace: true });
+    } catch (err) {
+      console.error('[Horus-Bot] Staff sign out failed', err);
+      toast.error('Unable to sign out.');
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <section className="mx-auto max-w-6xl px-4 py-24 md:px-8">
@@ -211,14 +228,20 @@ export default function AdminPaymentsPage() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 md:px-8">
-      <div className="mb-8">
-        <Badge variant="secondary" className="mb-3 border-0 bg-primary/10 text-primary">
-          Staff
-        </Badge>
-        <h1 className="font-serif text-4xl">Counter Payment Confirmation</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Confirm visitor payments before QR and robot pairing become available.
-        </p>
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <Badge variant="secondary" className="mb-3 border-0 bg-primary/10 text-primary">
+            Horus-Bot Staff Cashier Portal
+          </Badge>
+          <h1 className="font-serif text-4xl">Counter Payment Confirmation</h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Confirm visitor payments before QR and robot pairing become available.
+          </p>
+        </div>
+        <Button variant="outline" onClick={handleSignOut} disabled={signingOut} className="shrink-0">
+          {signingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
+          Sign Out
+        </Button>
       </div>
 
       <div className="mb-5 flex max-w-xl items-center gap-2 rounded-2xl border border-primary/15 bg-background px-3">

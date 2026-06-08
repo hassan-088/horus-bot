@@ -9,6 +9,7 @@ import { useApp } from '@/contexts/AppContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SiteLayout } from '@/components/layout/SiteLayout';
 import { RequireAuth } from '@/components/auth/RequireAuth';
+import { StaffHomeRedirect, VisitorOnlyRoute } from '@/components/auth/StaffRouteGuards';
 import { ScrollToTop } from '@/components/site/ScrollToTop';
 
 import HomePage from './pages/site/HomePage';
@@ -50,22 +51,22 @@ const App = () => (
             <Routes>
               {/* Every public route shares the marketing site layout. */}
               <Route element={<SiteLayout />}>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<StaffHomeRedirect><HomePage /></StaffHomeRedirect>} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/experience" element={<ExperiencePage />} />
                 <Route path="/tickets-info" element={<TicketsInfoPage />} />
                 <Route path="/app" element={<AppPage />} />
                 <Route path="/faq" element={<FaqPage />} />
                 <Route path="/contact" element={<ContactPage />} />
-                <Route path="/book" element={<BookPage />} />
+                <Route path="/book" element={<VisitorOnlyRoute><BookPage /></VisitorOnlyRoute>} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/auth" element={<AuthScreen />} />
 
                 {/* Authenticated-only pages. */}
                 <Route element={<RequireAuth />}>
-                  <Route path="/account" element={<AccountPage />} />
-                  <Route path="/tickets-mine" element={<MyTicketsPage />} />
+                  <Route path="/account" element={<VisitorOnlyRoute><AccountPage /></VisitorOnlyRoute>} />
+                  <Route path="/tickets-mine" element={<VisitorOnlyRoute><MyTicketsPage /></VisitorOnlyRoute>} />
                   <Route path="/admin/payments" element={<AdminPaymentsPage />} />
                 </Route>
 

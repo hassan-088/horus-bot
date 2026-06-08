@@ -11,6 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { useAuth, friendlyAuthError } from '@/contexts/AuthContext';
+import { isStaffRole } from '@/components/auth/StaffRouteGuards';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -43,7 +44,7 @@ export default function AuthScreen() {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotBusy, setForgotBusy] = useState(false);
 
-  const { signIn, signUp, user, resetPassword } = useAuth();
+  const { signIn, signUp, user, profile, isLoading, resetPassword } = useAuth();
   const { language } = useApp();
   const navigate = useNavigate();
 
@@ -54,8 +55,9 @@ export default function AuthScreen() {
   }, [language]);
 
   useEffect(() => {
-    if (user) navigate('/account', { replace: true });
-  }, [user, navigate]);
+    if (!user || isLoading) return;
+    navigate(isStaffRole(profile?.role) ? '/admin/payments' : '/account', { replace: true });
+  }, [user, profile?.role, isLoading, navigate]);
 
   const validateForm = () => {
     const e: typeof errors = {};
@@ -107,7 +109,6 @@ export default function AuthScreen() {
           toast.error(friendlyAuthError(error, isArabic));
         } else {
           toast.success(isArabic ? 'تم إنشاء الحساب بنجاح!' : 'Account created successfully!');
-          navigate('/account', { replace: true });
         }
       } else {
         const { error } = await signIn(email.trim(), password);
@@ -115,7 +116,6 @@ export default function AuthScreen() {
           toast.error(friendlyAuthError(error, isArabic));
         } else {
           toast.success(isArabic ? 'مرحبا بعودتك!' : 'Welcome back!');
-          navigate('/account', { replace: true });
         }
       }
     } finally {
