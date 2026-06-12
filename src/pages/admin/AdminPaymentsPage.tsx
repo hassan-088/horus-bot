@@ -40,6 +40,13 @@ const CLOSED_STATUSES = new Set([
   'used',
 ]);
 
+const OPEN_PAYMENT_RECORD_STATUSES = new Set([
+  'active',
+  'valid',
+  'confirmed',
+  'pending',
+]);
+
 type Primitive = string | number;
 
 type PendingBooking = {
@@ -128,12 +135,33 @@ function isClosedRecord(data: DocumentData | undefined) {
   return !!status && CLOSED_STATUSES.has(status);
 }
 
+function isOpenPaymentRecord(data: DocumentData | undefined) {
+  const status = recordStatus(data);
+  return !status || OPEN_PAYMENT_RECORD_STATUSES.has(status);
+}
+
 function isConfirmedPayment(data: DocumentData | undefined) {
   return CONFIRMED_PAYMENT_STATUSES.has(paymentStatus(data));
 }
 
+function visitDateIsPast(data: DocumentData | undefined) {
+  const rawDate = textAny(data, ['visit_date', 'visitDate']);
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(rawDate);
+  if (!match) return false;
+  const visitDate = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return visitDate.getTime() < today.getTime();
+}
+
 function shouldShowRecord(data: DocumentData | undefined) {
-  return isPendingCounterPayment(data) && !isClosedRecord(data) && !isConfirmedPayment(data);
+  return (
+    isPendingCounterPayment(data) &&
+    isOpenPaymentRecord(data) &&
+    !isClosedRecord(data) &&
+    !isConfirmedPayment(data) &&
+    !visitDateIsPast(data)
+  );
 }
 
 function bookingKey(row: RowDoc) {
