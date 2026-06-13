@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   collection,
   doc,
+  getDoc,
   onSnapshot,
   serverTimestamp,
   writeBatch,
@@ -15,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { db } from '@/integrations/firebase/client';
+import { app, db } from '@/integrations/firebase/client';
 import { toast } from 'sonner';
 
 const PENDING_PAYMENT_STATUSES = new Set([
@@ -87,12 +88,28 @@ type AdminPaymentDiagnostics = {
   filteredPendingLikeRecords: number;
 };
 
+type AdminIdentityDiagnostics = {
+  checked: boolean;
+  userDocExists: boolean | null;
+  roleValue: string;
+  isAdminOrCashier: boolean;
+  readError: string | null;
+};
+
 const emptyDiagnostics: AdminPaymentDiagnostics = {
   bookings: 0,
   museumTickets: 0,
   robotTourTickets: 0,
   pendingLikeRecords: 0,
   filteredPendingLikeRecords: 0,
+};
+
+const emptyIdentityDiagnostics: AdminIdentityDiagnostics = {
+  checked: false,
+  userDocExists: null,
+  roleValue: '',
+  isAdminOrCashier: false,
+  readError: null,
 };
 
 function normalize(value: unknown) {
@@ -369,23 +386,31 @@ export default function AdminPaymentsPage() {
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
   const [diagnostics, setDiagnostics] = useState<AdminPaymentDiagnostics>(emptyDiagnostics);
-  const allowed = canAccess(profile?.role);
+  const [identityDiagnostics, setIdentityDiagnostics] =
+    useState<AdminIdentityDiagnostics>(emptyIdentityDiagnostics);
+  const projectId = String(app.options.projectId ?? 'unknown');
 
   useEffect(() => {
-    if (!user || !allowed) {
+    if (!user) {
       setBookings([]);
       setDiagnostics(emptyDiagnostics);
+      setIdentityDiagnostics(emptyIdentityDiagnostics);
       setLoading(false);
       return undefined;
     }
 
     setLoading(true);
     setError(null);
+    setBookings([]);
+    setDiagnostics(emptyDiagnostics);
+    setIdentityDiagnostics(emptyIdentityDiagnostics);
     console.info('[Horus-Bot] Admin payment loader start', {
       adminUid: user.id,
       adminEmail: user.email,
       loadedRole: profile?.role,
+      projectId,
       queriesAttempted: [
+        `users/${user.id}`,
         'bookings collection scan',
         'museumTickets collection scan',
         'robotTourTickets collection scan',
@@ -403,7 +428,13 @@ export default function AdminPaymentsPage() {
       robotTourTickets: false,
     };
 
+    let cancelled = false;
+    let unsubBookings: (() => void) | undefined;
+    let unsubMuseum: (() => void) | undefined;
+    let unsubRobot: (() => void) | undefined;
+
     const recompute = () => {
+      if (cancelled) return;
       const rows = buildPendingRows(state.bookings, state.museumTickets, state.robotTourTickets);
       const allRows = [...state.bookings, ...state.museumTickets, ...state.robotTourTickets];
       const pendingLikeRecords = allRows.filter((row) => isPendingCounterPayment(row.data)).length;
@@ -424,6 +455,7 @@ export default function AdminPaymentsPage() {
     };
 
     const fail = (queryAttempted: string, err: FirestoreError) => {
+      if (cancelled) return;
       logAdminPaymentError(queryAttempted, err, user, profile?.role);
       setError(
         err.code === 'permission-denied'
@@ -433,42 +465,90 @@ export default function AdminPaymentsPage() {
       setLoading(false);
     };
 
-    const unsubBookings = onSnapshot(
-      collection(db, 'bookings'),
-      (snapshot) => {
-        state.bookings = snapshot.docs.map((row) => ({ id: row.id, data: row.data() }));
-        loaded.bookings = true;
-        recompute();
-      },
-      (err) => fail('bookings collection scan', err),
-    );
+    const startCollectionListeners = () => {
+      unsubBookings = onSnapshot(
+        collection(db, 'bookings'),
+        (snapshot) => {
+          state.bookings = snapshot.docs.map((row) => ({ id: row.id, data: row.data() }));
+          loaded.bookings = true;
+          recompute();
+        },
+        (err) => fail('bookings collection scan', err),
+      );
 
-    const unsubMuseum = onSnapshot(
-      collection(db, 'museumTickets'),
-      (snapshot) => {
-        state.museumTickets = snapshot.docs.map((row) => ({ id: row.id, data: row.data() }));
-        loaded.museumTickets = true;
-        recompute();
-      },
-      (err) => fail('museumTickets collection scan', err),
-    );
+      unsubMuseum = onSnapshot(
+        collection(db, 'museumTickets'),
+        (snapshot) => {
+          state.museumTickets = snapshot.docs.map((row) => ({ id: row.id, data: row.data() }));
+          loaded.museumTickets = true;
+          recompute();
+        },
+        (err) => fail('museumTickets collection scan', err),
+      );
 
-    const unsubRobot = onSnapshot(
-      collection(db, 'robotTourTickets'),
-      (snapshot) => {
-        state.robotTourTickets = snapshot.docs.map((row) => ({ id: row.id, data: row.data() }));
-        loaded.robotTourTickets = true;
-        recompute();
-      },
-      (err) => fail('robotTourTickets collection scan', err),
-    );
+      unsubRobot = onSnapshot(
+        collection(db, 'robotTourTickets'),
+        (snapshot) => {
+          state.robotTourTickets = snapshot.docs.map((row) => ({ id: row.id, data: row.data() }));
+          loaded.robotTourTickets = true;
+          recompute();
+        },
+        (err) => fail('robotTourTickets collection scan', err),
+      );
+    };
+
+    getDoc(doc(db, 'users', user.id))
+      .then((snapshot) => {
+        if (cancelled) return;
+        const roleValue = snapshot.exists() ? String(snapshot.data().role ?? '') : '';
+        const isAdminOrCashier = canAccess(roleValue);
+        setIdentityDiagnostics({
+          checked: true,
+          userDocExists: snapshot.exists(),
+          roleValue,
+          isAdminOrCashier,
+          readError: null,
+        });
+        if (!snapshot.exists()) {
+          setError(`Admin user document is missing. Create users/${user.id} with role admin or cashier.`);
+          setLoading(false);
+          return;
+        }
+        if (!isAdminOrCashier) {
+          setError(`Current role is: ${roleValue || 'missing'}. Required role: admin or cashier.`);
+          setLoading(false);
+          return;
+        }
+        startCollectionListeners();
+      })
+      .catch((err: FirestoreError) => {
+        if (cancelled) return;
+        logAdminPaymentError(`users/${user.id} preflight read`, err, user, profile?.role);
+        setIdentityDiagnostics({
+          checked: true,
+          userDocExists: null,
+          roleValue: '',
+          isAdminOrCashier: false,
+          readError:
+            err.code === 'permission-denied'
+              ? 'Permission denied while reading the current admin user document.'
+              : 'Unable to read the current admin user document.',
+        });
+        setError(
+          err.code === 'permission-denied'
+            ? 'Firestore permission denied while reading users/{uid}. Confirm Firestore rules are deployed and this account can read its own user document.'
+            : 'Unable to verify admin role. Please check connection and Firestore access.',
+        );
+        setLoading(false);
+      });
 
     return () => {
-      unsubBookings();
-      unsubMuseum();
-      unsubRobot();
+      cancelled = true;
+      unsubBookings?.();
+      unsubMuseum?.();
+      unsubRobot?.();
     };
-  }, [allowed, profile?.role, user]);
+  }, [profile?.role, projectId, user]);
 
   const filteredBookings = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -549,7 +629,7 @@ export default function AdminPaymentsPage() {
     );
   }
 
-  if (!user || !allowed) {
+  if (!user) {
     return (
       <section className="mx-auto max-w-3xl px-4 py-24 md:px-8">
         <Card className="rounded-2xl border-primary/20 p-8 text-center shadow-soft">
@@ -558,9 +638,7 @@ export default function AdminPaymentsPage() {
           </div>
           <h1 className="font-serif text-3xl">Access Denied</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            You are not admin/cashier. Counter payment confirmation is available only to accounts whose
-            Firestore document <span className="font-mono">users/{user?.id ?? 'uid'}</span> has
-            <span className="font-mono"> role = admin</span> or <span className="font-mono">role = cashier</span>.
+            Sign in with an admin or cashier account to use counter payment confirmation.
           </p>
         </Card>
       </section>
@@ -584,6 +662,14 @@ export default function AdminPaymentsPage() {
           Sign Out
         </Button>
       </div>
+
+      <AdminSetupDiagnosticsCard
+        uid={user.id}
+        email={user.email}
+        profileRole={profile?.role ?? null}
+        projectId={projectId}
+        diagnostics={identityDiagnostics}
+      />
 
       <div className="mb-5 flex max-w-xl items-center gap-2 rounded-2xl border border-primary/15 bg-background px-3">
         <Search className="h-4 w-4 text-muted-foreground" />
@@ -723,5 +809,97 @@ function Info({ label, value, mono = false }: { label: string; value: Primitive 
         {String(value || '-')}
       </div>
     </div>
+  );
+}
+
+function AdminSetupDiagnosticsCard({
+  uid,
+  email,
+  profileRole,
+  projectId,
+  diagnostics,
+}: {
+  uid: string;
+  email: string | null;
+  profileRole: string | null;
+  projectId: string;
+  diagnostics: AdminIdentityDiagnostics;
+}) {
+  const roleValue = diagnostics.roleValue || 'missing';
+  const docState = diagnostics.checked
+    ? diagnostics.userDocExists === true
+      ? 'exists'
+      : diagnostics.userDocExists === false
+        ? 'missing'
+        : 'unknown'
+    : 'checking';
+  const roleMessage =
+    diagnostics.checked && diagnostics.userDocExists === false
+      ? `Admin user document is missing. Create users/${uid} with role admin or cashier.`
+      : diagnostics.checked && !diagnostics.isAdminOrCashier
+        ? `Current role is: ${roleValue}. Required role: admin or cashier.`
+        : diagnostics.checked
+          ? 'Role check passed. Collection scans can start.'
+          : 'Checking users/{uid} before scanning payment collections.';
+
+  return (
+    <Card className="mb-5 rounded-2xl border-primary/20 p-4 text-sm shadow-soft">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <div className="font-semibold">Admin account diagnostics</div>
+          <p className="mt-1 text-muted-foreground">{roleMessage}</p>
+          {diagnostics.readError && (
+            <p className="mt-2 text-destructive">{diagnostics.readError}</p>
+          )}
+        </div>
+        <Badge
+          variant="secondary"
+          className={
+            diagnostics.isAdminOrCashier
+              ? 'shrink-0 border-0 bg-primary/10 text-primary'
+              : 'shrink-0 border-0 bg-destructive/10 text-destructive'
+          }
+        >
+          {diagnostics.isAdminOrCashier ? 'admin/cashier verified' : 'admin/cashier not verified'}
+        </Badge>
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+        <Info label="Firebase project ID" value={projectId} mono />
+        <Info label="Current UID" value={uid} mono />
+        <Info label="Current email" value={email ?? '-'} />
+        <Info label="Auth profile role" value={profileRole ?? 'missing'} />
+        <Info label={`users/${uid} document`} value={docState} />
+        <Info label="users/{uid}.role" value={roleValue} />
+        <Info label="Role accepted?" value={diagnostics.isAdminOrCashier ? 'yes' : 'no'} />
+        <Info label="Rules deployment" value="deploy local rules if Console still denies reads" />
+      </div>
+
+      <div className="mt-4 rounded-xl bg-muted/45 p-3">
+        <div className="text-xs font-semibold uppercase text-muted-foreground">Temporary admin setup note</div>
+        <p className="mt-2 text-sm text-muted-foreground">
+          To activate this admin account, create or update this document from Firebase Console or trusted admin tooling.
+          Do not add an in-app self-service role assignment flow.
+        </p>
+        <pre className="mt-3 overflow-x-auto rounded-lg bg-background p-3 text-xs">
+{`users/${uid}
+{
+  role: "admin",
+  email: "${email ?? ''}",
+  uid: "${uid}"
+}`}
+        </pre>
+      </div>
+
+      <div className="mt-4 rounded-xl bg-muted/45 p-3 text-sm text-muted-foreground">
+        Local <span className="font-mono">firestore.rules</span> allow admin/cashier reads of
+        <span className="font-mono"> bookings</span>, <span className="font-mono">museumTickets</span>, and
+        <span className="font-mono"> robotTourTickets</span> through
+        <span className="font-mono"> isAdminOrCashier()</span>, which checks
+        <span className="font-mono"> users/{uid}.role in ["admin", "cashier"]</span>. If the Firebase Console rules
+        are older than this local file, deploy with
+        <span className="font-mono"> firebase deploy --only firestore:rules</span>.
+      </div>
+    </Card>
   );
 }
