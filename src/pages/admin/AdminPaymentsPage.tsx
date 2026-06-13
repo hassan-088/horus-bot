@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   collection,
   doc,
@@ -50,6 +50,7 @@ const OPEN_PAYMENT_RECORD_STATUSES = new Set([
 
 type Primitive = string | number;
 type PaymentLifecycleFilter = 'pending' | 'confirmed' | 'cancelled' | 'completed';
+type PendingRecordCategory = 'ready' | 'expired' | 'incomplete';
 
 type PendingBooking = {
   id: string;
@@ -73,6 +74,9 @@ type PendingBooking = {
   payment_status: string;
   status: string;
   qr_value: string;
+  source_debug: string;
+  pending_category: PendingRecordCategory;
+  is_entry_only: boolean;
 };
 
 type RowDoc = {
@@ -188,6 +192,70 @@ function visitDateIsPast(data: DocumentData | undefined) {
   return visitDate.getTime() < today.getTime();
 }
 
+function parseVisitStartsAt(visitDate: string, visitTime: string): Date | null {
+  const dateMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(visitDate);
+  if (!dateMatch) return null;
+  const timeMatch = /^(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(
+    visitTime.trim().split(' - ')[0] ?? '',
+  );
+  let hour = 0;
+  let minute = 0;
+  if (timeMatch) {
+    hour = Number(timeMatch[1]);
+    minute = Number(timeMatch[2]);
+    const period = timeMatch[3]?.toUpperCase();
+    if (period === 'PM' && hour !== 12) hour += 12;
+    if (period === 'AM' && hour === 12) hour = 0;
+  }
+  return new Date(
+    Number(dateMatch[1]),
+    Number(dateMatch[2]) - 1,
+    Number(dateMatch[3]),
+    hour,
+    minute,
+  );
+}
+
+function hasValue(value: unknown) {
+  const textValue = String(value ?? '').trim();
+  return textValue !== '' && textValue !== '-';
+}
+
+function isPendingPaymentValue(value: unknown) {
+  return PENDING_PAYMENT_STATUSES.has(normalize(value));
+}
+
+function pendingCategoryForRow(row: PendingBooking): PendingRecordCategory {
+  if (!isPendingPaymentValue(row.payment_status)) return 'ready';
+  const hasVisitDate = hasValue(row.visit_date);
+  const hasVisitTime = hasValue(row.visit_time);
+  const hasBooking = hasValue(row.booking_doc_id);
+  const hasMuseumTicket = hasValue(row.museum_ticket_id) && row.sources.includes('museum ticket');
+  const hasRobotTicketId = hasValue(row.robot_tour_ticket_id);
+  const robotRequired = !row.is_entry_only;
+  const hasRobotTicket = !robotRequired || row.sources.includes('robot ticket');
+  if (
+    !hasVisitDate ||
+    !hasVisitTime ||
+    !hasBooking ||
+    !hasMuseumTicket ||
+    (robotRequired && (!hasRobotTicketId || !hasRobotTicket))
+  ) {
+    return 'incomplete';
+  }
+  const startsAt = parseVisitStartsAt(row.visit_date, row.visit_time);
+  if (!startsAt) return 'incomplete';
+  return startsAt.getTime() < Date.now() ? 'expired' : 'ready';
+}
+
+function sourceDebugLabel(sources: string[], category: PendingRecordCategory) {
+  if (category === 'incomplete') return 'incomplete/legacy';
+  if (sources.includes('booking')) return 'booking';
+  if (sources.includes('museum ticket')) return 'museum ticket';
+  if (sources.includes('robot ticket')) return 'robot ticket';
+  return 'incomplete/legacy';
+}
+
 function shouldShowRecord(data: DocumentData | undefined) {
   return (
     isPendingCounterPayment(data) &&
@@ -268,6 +336,18 @@ function buildPendingRows(
 
     const museumTotal = amountAny(bookingData, ['museum_entry_total', 'museumEntryTotal']);
     const robotTotal = amountAny(bookingData, ['robot_tour_price', 'robotTourPrice']);
+    const robotTotalNumber = numberAny(bookingData, ['robot_tour_price', 'robotTourPrice']);
+    const bookingKind = normalize(
+      bookingData?.booking_type ??
+      bookingData?.bookingType ??
+      bookingData?.ticket_kind ??
+      bookingData?.ticketKind,
+    );
+    const isEntryOnly =
+      bookingKind === 'entry_only' ||
+      bookingKind === 'museum_entry' ||
+      bookingKind === 'museum_only' ||
+      (!hasValue(robotIdFromBooking) && robotTotalNumber === 0);
     const fallbackTotal =
       typeof museumTotal === 'number' && typeof robotTotal === 'number'
         ? museumTotal + robotTotal
@@ -279,7 +359,7 @@ function buildPendingRows(
       sourceLabel(robot, 'robot ticket'),
     ].filter(Boolean);
 
-    return {
+    const row: PendingBooking = {
       id: booking?.id ?? key,
       booking_doc_id: booking?.id ?? '',
       booking_id: firstValue([bookingData?.booking_id, bookingData?.bookingId, key], key),
@@ -323,6 +403,15 @@ function buildPendingRows(
       payment_status: firstValue([bookingData?.payment_status, bookingData?.paymentStatus, museumData?.payment_status, robotData?.payment_status], '-'),
       status: firstValue([bookingData?.status, museumData?.status, robotData?.status], '-'),
       qr_value: firstValue([bookingData?.qr_value, museumData?.qr_value, robotData?.qr_value]),
+      source_debug: 'incomplete/legacy',
+      pending_category: 'incomplete',
+      is_entry_only: isEntryOnly,
+    };
+    const pendingCategory = pendingCategoryForRow(row);
+    return {
+      ...row,
+      pending_category: pendingCategory,
+      source_debug: sourceDebugLabel(sources, pendingCategory),
     };
   });
 
@@ -349,6 +438,17 @@ const lifecycleFilterLabels: Record<PaymentLifecycleFilter, string> = {
   confirmed: 'Confirmed',
   cancelled: 'Cancelled',
   completed: 'Completed',
+};
+
+const pendingCategoryLabels: Record<PendingRecordCategory, string> = {
+  ready: 'Ready to Confirm',
+  expired: 'Expired / Past Visit',
+  incomplete: 'Incomplete / Legacy',
+};
+
+const pendingCategoryMessages: Record<Exclude<PendingRecordCategory, 'ready'>, string> = {
+  expired: 'This visit date has passed. Payment confirmation is disabled.',
+  incomplete: 'This record is missing required booking/ticket links and cannot be confirmed safely.',
 };
 
 function canAccess(role: unknown) {
@@ -567,9 +667,29 @@ export default function AdminPaymentsPage() {
     );
   }, [bookings, lifecycleFilter, search]);
 
+  const pendingSections = useMemo(() => {
+    const sections: Record<PendingRecordCategory, PendingBooking[]> = {
+      ready: [],
+      expired: [],
+      incomplete: [],
+    };
+    filteredBookings.forEach((booking) => {
+      sections[booking.pending_category].push(booking);
+    });
+    return sections;
+  }, [filteredBookings]);
+
   const confirmPayment = async (booking: PendingBooking) => {
     if (!user || confirmingId) return;
-    if (!booking.booking_doc_id && !booking.museum_ticket_id && !booking.robot_tour_ticket_id) {
+    if (booking.pending_category !== 'ready') {
+      toast.error(
+        booking.pending_category === 'expired'
+          ? pendingCategoryMessages.expired
+          : pendingCategoryMessages.incomplete,
+      );
+      return;
+    }
+    if (!hasValue(booking.booking_doc_id) && !hasValue(booking.museum_ticket_id) && !hasValue(booking.robot_tour_ticket_id)) {
       toast.error('This payment record has no linked booking or ticket documents.');
       return;
     }
@@ -583,9 +703,9 @@ export default function AdminPaymentsPage() {
         payment_confirmed_by: user.id,
         updated_at: serverTimestamp(),
       };
-      if (booking.booking_doc_id) batch.update(doc(db, 'bookings', booking.booking_doc_id), update);
-      if (booking.museum_ticket_id) batch.update(doc(db, 'museumTickets', booking.museum_ticket_id), update);
-      if (booking.robot_tour_ticket_id) batch.update(doc(db, 'robotTourTickets', booking.robot_tour_ticket_id), update);
+      if (hasValue(booking.booking_doc_id)) batch.update(doc(db, 'bookings', booking.booking_doc_id), update);
+      if (hasValue(booking.museum_ticket_id)) batch.update(doc(db, 'museumTickets', booking.museum_ticket_id), update);
+      if (hasValue(booking.robot_tour_ticket_id)) batch.update(doc(db, 'robotTourTickets', booking.robot_tour_ticket_id), update);
       await batch.commit();
       toast.success('Payment confirmed.');
     } catch (err) {
@@ -614,6 +734,75 @@ export default function AdminPaymentsPage() {
     } finally {
       setSigningOut(false);
     }
+  };
+
+  const renderPaymentCard = (booking: PendingBooking) => {
+    const lifecycle = lifecycleFilterForRow(booking);
+    const isPendingTab = lifecycleFilter === 'pending';
+    const canConfirm = isPendingTab && booking.pending_category === 'ready';
+    const disabledMessage =
+      isPendingTab && booking.pending_category !== 'ready'
+        ? pendingCategoryMessages[booking.pending_category]
+        : null;
+
+    return (
+      <Card key={`${booking.booking_id}-${booking.id}`} className="rounded-2xl border-primary/20 p-5 shadow-soft">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <div className="text-xs uppercase text-muted-foreground">Booking ID</div>
+            <div className="break-all font-mono text-sm font-semibold">{booking.booking_id}</div>
+            <div className="mt-2 text-sm text-muted-foreground">
+              {booking.visitor_name} - {booking.visitor_email}
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Badge variant="secondary" className="border-0 bg-muted text-muted-foreground">
+                source: {booking.source_debug}
+              </Badge>
+              {booking.sources.map((source) => (
+                <Badge key={source} variant="secondary" className="border-0 bg-primary/10 text-primary">
+                  {source}
+                </Badge>
+              ))}
+            </div>
+          </div>
+          {lifecycle === 'pending' ? (
+            <Button
+              onClick={() => confirmPayment(booking)}
+              disabled={!canConfirm || confirmingId === booking.id}
+              className="shrink-0"
+            >
+              {confirmingId === booking.id && <Loader2 className="h-4 w-4 animate-spin" />}
+              Confirm Payment
+            </Button>
+          ) : (
+            <Badge variant="secondary" className="shrink-0 border-0 bg-muted text-muted-foreground">
+              {lifecycleFilterLabels[lifecycle]}
+            </Badge>
+          )}
+        </div>
+
+        {disabledMessage && (
+          <div className="mt-4 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-sm text-amber-700">
+            {disabledMessage}
+          </div>
+        )}
+
+        <div className="mt-5 grid gap-3 text-sm md:grid-cols-2 xl:grid-cols-4">
+          <Info label="Visit date" value={booking.visit_date} />
+          <Info label="Visit time" value={booking.visit_time} />
+          <Info label="Museum ticket id" value={booking.museum_ticket_id} mono />
+          <Info label="Robot tour ticket id" value={booking.robot_tour_ticket_id} mono />
+          <Info label="Visitors" value={`${booking.visitor_count} / ${booking.total_tickets}`} />
+          <Info label="Museum entry total" value={`${booking.museum_entry_total} ${booking.currency}`} />
+          <Info label="Robot tour price" value={`${booking.robot_tour_price} ${booking.currency}`} />
+          <Info label="Total price" value={`${booking.total_price} ${booking.currency}`} />
+          <Info label="Currency" value={booking.currency} />
+          <Info label="Payment method" value={booking.payment_method} />
+          <Info label="Payment status" value={booking.payment_status} />
+          <Info label="Status" value={booking.status} />
+        </div>
+      </Card>
+    );
   };
 
   if (isLoading) {
@@ -746,55 +935,18 @@ export default function AdminPaymentsPage() {
 
       {!loading && !error && filteredBookings.length > 0 && (
         <div className="space-y-4">
-          {filteredBookings.map((booking) => (
-            <Card key={`${booking.booking_id}-${booking.id}`} className="rounded-2xl border-primary/20 p-5 shadow-soft">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div className="min-w-0">
-                  <div className="text-xs uppercase text-muted-foreground">Booking ID</div>
-                  <div className="break-all font-mono text-sm font-semibold">{booking.booking_id}</div>
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    {booking.visitor_name} - {booking.visitor_email}
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {booking.sources.map((source) => (
-                      <Badge key={source} variant="secondary" className="border-0 bg-primary/10 text-primary">
-                        {source}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                {lifecycleFilterForRow(booking) === 'pending' ? (
-                  <Button
-                    onClick={() => confirmPayment(booking)}
-                    disabled={confirmingId === booking.id}
-                    className="shrink-0"
-                  >
-                    {confirmingId === booking.id && <Loader2 className="h-4 w-4 animate-spin" />}
-                    Confirm Payment
-                  </Button>
-                ) : (
-                  <Badge variant="secondary" className="shrink-0 border-0 bg-muted text-muted-foreground">
-                    {lifecycleFilterLabels[lifecycleFilterForRow(booking)]}
-                  </Badge>
-                )}
-              </div>
-
-              <div className="mt-5 grid gap-3 text-sm md:grid-cols-2 xl:grid-cols-4">
-                <Info label="Visit date" value={booking.visit_date} />
-                <Info label="Visit time" value={booking.visit_time} />
-                <Info label="Museum ticket id" value={booking.museum_ticket_id} mono />
-                <Info label="Robot tour ticket id" value={booking.robot_tour_ticket_id} mono />
-                <Info label="Visitors" value={`${booking.visitor_count} / ${booking.total_tickets}`} />
-                <Info label="Museum entry total" value={`${booking.museum_entry_total} ${booking.currency}`} />
-                <Info label="Robot tour price" value={`${booking.robot_tour_price} ${booking.currency}`} />
-                <Info label="Total price" value={`${booking.total_price} ${booking.currency}`} />
-                <Info label="Currency" value={booking.currency} />
-                <Info label="Payment method" value={booking.payment_method} />
-                <Info label="Payment status" value={booking.payment_status} />
-                <Info label="Status" value={booking.status} />
-              </div>
-            </Card>
-          ))}
+          {lifecycleFilter === 'pending' ? (
+            (['ready', 'expired', 'incomplete'] as PendingRecordCategory[]).map((category) => (
+              <PendingCategorySection
+                key={category}
+                title={`${pendingCategoryLabels[category]} (${pendingSections[category].length})`}
+                rows={pendingSections[category]}
+                renderRow={renderPaymentCard}
+              />
+            ))
+          ) : (
+            filteredBookings.map(renderPaymentCard)
+          )}
         </div>
       )}
     </section>
@@ -809,6 +961,32 @@ function Info({ label, value, mono = false }: { label: string; value: Primitive 
         {String(value || '-')}
       </div>
     </div>
+  );
+}
+
+function PendingCategorySection({
+  title,
+  rows,
+  renderRow,
+}: {
+  title: string;
+  rows: PendingBooking[];
+  renderRow: (row: PendingBooking) => ReactNode;
+}) {
+  return (
+    <section className="space-y-3">
+      <div className="flex items-center gap-3">
+        <h2 className="font-serif text-2xl">{title}</h2>
+        <div className="h-px flex-1 bg-primary/15" />
+      </div>
+      {rows.length > 0 ? (
+        rows.map(renderRow)
+      ) : (
+        <Card className="rounded-2xl border-primary/10 p-4 text-sm text-muted-foreground">
+          No records in this category.
+        </Card>
+      )}
+    </section>
   );
 }
 
