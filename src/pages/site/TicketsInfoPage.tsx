@@ -194,7 +194,7 @@ export default function TicketsInfoPage() {
           <div className="grid gap-5 sm:grid-cols-3 text-start">
             <Card className="p-6">
               <Calendar className="h-5 w-5 text-primary mb-3" />
-              <h3 className="font-serif text-base mb-1">{isRTL ? 'إلغاء مجاني حتى 24 ساعة قبل الزيارة' : 'Free cancellation up to 24 hours before your visit'}</h3>
+              <h3 className="font-serif text-base mb-1">{isRTL ? 'إلغاء مجاني حتى بدء الزيارة' : 'Free cancellation until your visit starts'}</h3>
               <p className="text-sm text-muted-foreground">{isRTL ? 'تحديث حالة الحجز بدون حذف التذاكر.' : 'Cancellation updates your booking status without deleting tickets.'}</p>
             </Card>
             <Card className="p-6">

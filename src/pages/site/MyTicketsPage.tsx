@@ -36,7 +36,7 @@ import { useExhibits, type WebsiteExhibit } from '@/hooks/useExhibits';
 import {
   canCancelUserTicket,
   deriveTicketDisplayStatus,
-  isWithinCancellationDeadline,
+  isVisitStartedOrPast,
   useUserTickets,
   type TicketDisplayStatus,
   type TicketStatus,
@@ -120,8 +120,8 @@ export default function MyTicketsPage() {
   const [expandedBookingIds, setExpandedBookingIds] = useState<Set<string>>(() => new Set());
   const [showPastTickets, setShowPastTickets] = useState(false);
 
-  const active = tickets.filter((t) => ['active', 'paired', 'in_progress'].includes(t.display_status));
-  const past = tickets.filter((t) => !['active', 'paired', 'in_progress'].includes(t.display_status));
+  const active = tickets.filter((t) => ['active', 'paired', 'in_progress', 'pending'].includes(t.display_status));
+  const past = tickets.filter((t) => !['active', 'paired', 'in_progress', 'pending'].includes(t.display_status));
 
   const toggleExpanded = (bookingId: string) => {
     setExpandedBookingIds((current) => {
@@ -144,7 +144,13 @@ export default function MyTicketsPage() {
       toast.error(cancellationFailureMessage(error, isRTL));
       return;
     }
-    toast.success(isRTL ? ar.cancelledSuccess : 'Booking cancelled.');
+    toast.success(
+      hasConfirmedPayment(confirmTk)
+        ? (isRTL
+            ? 'تم إلغاء حجزك. يرجى التواصل مع موظفي المتحف بخصوص سياسة الاسترداد.'
+            : 'Your booking has been cancelled. Please contact museum staff regarding refund policy.')
+        : (isRTL ? ar.cancelledSuccess : 'Booking cancelled.'),
+    );
     setConfirmTk(null);
   };
 
@@ -191,6 +197,29 @@ export default function MyTicketsPage() {
 
         {user && !loading && error && (
           <TicketsErrorState error={error} isRTL={isRTL} onRetry={refresh} />
+        )}
+
+        {user && (
+          <Card className="rounded-[2rem] border-primary/20 bg-card/90 p-5 shadow-soft backdrop-blur">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-serif text-2xl">
+                  {isRTL ? 'احجز زيارة أخرى' : 'Book Another Visit'}
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {isRTL
+                    ? 'يمكنك شراء تذاكر إضافية حتى لو كانت لديك حجوزات نشطة أو قيد الدفع.'
+                    : 'You can buy extra tickets even when you already have active or pending bookings.'}
+                </p>
+              </div>
+              <Button asChild className="shrink-0">
+                <Link to="/book">
+                  <Ticket className="h-4 w-4" />
+                  {isRTL ? 'شراء تذاكر إضافية' : 'Buy More Tickets'}
+                </Link>
+              </Button>
+            </div>
+          </Card>
         )}
 
         {user && !loading && !error && skippedBookingCount > 0 && (
@@ -264,7 +293,7 @@ export default function MyTicketsPage() {
             <DialogDescription>
               {isRTL
                 ? ar.cancelBody
-                : 'This will cancel your Museum Entry Ticket and linked Horus-Bot Tour Ticket.'}
+                : 'Are you sure you want to cancel this booking?'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:justify-end">
@@ -447,9 +476,9 @@ function hasVisitTimePassed(ticket: UserTicket) {
 
 function paymentStatusLabel(status: string, isRTL: boolean) {
   const normalized = normalizedPaymentStatus(status);
-  if (normalized === 'pay_at_counter') return isRTL ? ar.payAtCounter : 'Payment Pending / Pay at counter';
+  if (normalized === 'pay_at_counter') return isRTL ? 'بانتظار الدفع عند الشباك' : 'Pending payment at counter';
   if (normalized === 'pending' || normalized === 'unpaid' || normalized === 'awaiting_payment') {
-    return isRTL ? 'بانتظار الدفع' : 'Payment Pending';
+    return isRTL ? 'بانتظار الدفع عند الشباك' : 'Pending payment at counter';
   }
   if (isPaymentConfirmed(status)) return isRTL ? 'تم التأكيد' : 'Payment Confirmed';
   return status;
@@ -766,35 +795,51 @@ function statusLabel(status: TicketStatus | TicketDisplayStatus, isRTL: boolean)
   return isRTL ? labels[status].ar : labels[status].en;
 }
 
-function cancellationDeadlineMessage(isRTL: boolean) {
+function visitStartedMessage(isRTL: boolean) {
   return isRTL
-    ? ar.unavailable24
-    : 'Cancellation is unavailable within 24 hours of your visit.';
+    ? 'لم يعد يمكن إلغاء هذا الحجز.'
+    : 'This booking can no longer be cancelled.';
+}
+
+function tourInProgressMessage(isRTL: boolean) {
+  return isRTL
+    ? 'هذه الجولة قيد التنفيذ ولا يمكن إلغاؤها.'
+    : 'This tour is already in progress and cannot be cancelled.';
+}
+
+function completedBookingMessage(isRTL: boolean) {
+  return isRTL
+    ? 'تم إكمال هذا الحجز بالفعل.'
+    : 'This booking has already been completed.';
 }
 
 function cancellationBlockedMessage(ticket: UserTicket, isRTL: boolean): string | null {
-  if (ticket.robot_status === 'paired') {
-    return isRTL ? ar.unavailableAfterPairing : 'Cancellation is unavailable after Horus-Bot connection.';
-  }
-  if (ticket.robot_status === 'in_progress') {
-    return isRTL ? ar.unavailableInProgress : 'Cancellation is unavailable after the Live Tour has started.';
-  }
   if (ticket.robot_status === 'completed' || ticket.status === 'completed') {
-    return isRTL ? ar.unavailableCompleted : 'This visit is complete, so cancellation is no longer available.';
+    return completedBookingMessage(isRTL);
   }
   if (ticket.status === 'expired' || ticket.museum_status === 'expired' || ticket.robot_status === 'expired') {
     return isRTL ? ar.unavailableExpired : 'This booking date has passed, so cancellation is no longer available.';
   }
-  if (ticket.status === 'active' && isWithinCancellationDeadline(ticket)) {
-    return cancellationDeadlineMessage(isRTL);
+  if (ticket.status === 'used' || ticket.museum_status === 'used') {
+    return completedBookingMessage(isRTL);
+  }
+  if (isVisitStartedOrPast(ticket)) {
+    return visitStartedMessage(isRTL);
   }
   return null;
 }
 
 function cancellationFailureMessage(error: string, isRTL: boolean) {
-  if (error.includes('24 hours')) return cancellationDeadlineMessage(isRTL);
+  if (error === 'This booking can no longer be cancelled.') return visitStartedMessage(isRTL);
+  if (error === 'This tour is already in progress and cannot be cancelled.') return tourInProgressMessage(isRTL);
+  if (error === 'This booking has already been completed.') return completedBookingMessage(isRTL);
   if (error === productMessage('network')) return productMessage('network', isRTL);
   return isRTL ? ar.failureCancel : 'We could not cancel this booking. Please try again.';
+}
+
+function hasConfirmedPayment(ticket: UserTicket) {
+  const normalized = ticket.payment_status.trim().toLowerCase().replace(/-/g, '_');
+  return normalized === 'paid' || normalized === 'confirmed';
 }
 
 function InfoBox({ label, value }: { label: string; value: string }) {

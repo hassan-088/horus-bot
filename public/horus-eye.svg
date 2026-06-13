@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Horus Eye">
-  <rect width="512" height="512" rx="112" fill="#f3eadb"/>
-  <path d="M78 244c71-87 195-119 315-62 23 11 43 25 60 41-35 35-88 56-149 56-76 0-141-31-175-35-18-2-34 1-51 0Z" fill="none" stroke="#2b2117" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="285" cy="226" r="54" fill="#d9ad55" stroke="#2b2117" stroke-width="22"/>
-  <circle cx="285" cy="226" r="20" fill="#2b2117"/>
-  <path d="M155 270c23 47 72 75 128 75 68 0 114-33 142-75" fill="none" stroke="#2b2117" stroke-width="24" stroke-linecap="round"/>
-  <path d="M244 342c-9 39-30 65-65 82" fill="none" stroke="#2b2117" stroke-width="24" stroke-linecap="round"/>
-  <path d="M331 343c22 30 53 44 92 42" fill="none" stroke="#2b2117" stroke-width="24" stroke-linecap="round"/>
-</svg>

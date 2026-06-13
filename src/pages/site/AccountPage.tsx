@@ -269,7 +269,7 @@ export default function AccountPage() {
                 <Link to="/tickets-mine"><Ticket className="h-4 w-4" /> {isRTL ? ar.viewTickets : 'My Tickets'}</Link>
               </Button>
               <Button asChild>
-                <Link to="/book"><Calendar className="h-4 w-4" /> {isRTL ? ar.bookVisit : 'Book Visit'}</Link>
+                <Link to="/book"><Calendar className="h-4 w-4" /> {isRTL ? 'احجز زيارة أخرى' : 'Book Another Visit'}</Link>
               </Button>
             </div>
           </div>
@@ -383,11 +383,9 @@ export default function AccountPage() {
                     ? `${activeTickets.length} ${activeTickets.length === 1 ? ar.activeBooking : ar.activeBookings}.`
                     : `${activeTickets.length} active booking${activeTickets.length === 1 ? '' : 's'}.`)}
               </p>
-              {activeTickets.length === 0 && (
-                <Button asChild className="w-fit">
-                  <Link to="/book">{isRTL ? ar.bookVisit : 'Book Visit'}</Link>
-                </Button>
-              )}
+              <Button asChild className="w-fit">
+                <Link to="/book">{isRTL ? 'احجز زيارة أخرى' : 'Book Another Visit'}</Link>
+              </Button>
               {pastTickets.length > 0 && (
                 <p className="text-xs text-muted-foreground">
                   {isRTL

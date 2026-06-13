@@ -70,7 +70,7 @@ export default function FaqPage() {
         },
         {
           q: 'Can I cancel my booking?',
-          a: 'Yes. Eligible active bookings can be cancelled from My Tickets up to 24 hours before the visit, as long as the tickets have not been used, expired, or started as a robot tour.',
+          a: 'Yes. Eligible pending or confirmed bookings can be cancelled from My Tickets until the visit starts, as long as the tickets have not been used, completed, expired, or started as a robot tour.',
         },
         {
           q: 'Can I change the visit time?',

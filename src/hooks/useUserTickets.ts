@@ -128,20 +128,23 @@ function isUsableStatus(status: TicketStatus): boolean {
   return status === 'active' || status === 'valid' || status === 'confirmed';
 }
 
-function isClosedOrPendingStatus(status: TicketStatus): boolean {
-  return [
-    'pending',
-    'used',
-    'completed',
-    'cancelled',
-    'canceled',
-    'declined',
-    'rejected',
-    'archived',
-    'inactive',
-    'disabled',
-    'expired',
-  ].includes(status);
+function isPaymentConfirmedStatus(status: string): boolean {
+  const normalized = status.trim().toLowerCase().replace(/-/g, '_');
+  return normalized === 'paid' || normalized === 'confirmed';
+}
+
+function normalizeToken(value: unknown): string {
+  return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+}
+
+function isPendingPaymentStatus(status: string): boolean {
+  const normalized = normalizeToken(status);
+  return (
+    normalized === 'pay_at_counter' ||
+    normalized === 'pending' ||
+    normalized === 'unpaid' ||
+    normalized === 'awaiting_payment'
+  );
 }
 
 function isCancelledStatus(status: TicketStatus): boolean {
@@ -189,9 +192,9 @@ const STATUS_PRIORITY: Record<TicketDisplayStatus, number> = {
 };
 
 export function deriveTicketDisplayStatus(
-  ticket: Pick<UserTicket, 'status' | 'museum_status' | 'robot_status' | 'visit_date'>,
+  ticket: Pick<UserTicket, 'status' | 'museum_status' | 'robot_status' | 'visit_date' | 'payment_status'>,
 ): TicketDisplayStatus {
-  const { status, museum_status: museumStatus, robot_status: robotStatus } = ticket;
+  const { status, museum_status: museumStatus, robot_status: robotStatus, payment_status: paymentStatus } = ticket;
 
   if (isClosedStatus(status) || isClosedStatus(museumStatus) || isClosedStatus(robotStatus)) {
     return 'cancelled';
@@ -208,6 +211,7 @@ export function deriveTicketDisplayStatus(
   if (robotStatus === 'paired') return 'paired';
   if (robotStatus === 'completed' || status === 'completed') return 'completed';
   if (museumStatus === 'used' || status === 'used') return 'used';
+  if (!isPaymentConfirmedStatus(paymentStatus)) return 'pending';
   if (isUsableStatus(status) && isUsableStatus(museumStatus) && isUsableStatus(robotStatus)) {
     return 'active';
   }
@@ -267,7 +271,7 @@ function toUserTicket(
     total_price: (booking.total_price as number) ?? museumTotal + robotTotal,
     currency: (booking.currency as string) ?? 'EGP',
     payment_method: (booking.payment_method as string) ?? 'cash',
-    payment_status: (booking.payment_status as string) ?? 'pay_at_counter',
+    payment_status: ((booking.payment_status ?? museumTicket?.payment_status ?? robotTourTicket?.payment_status) as string) ?? 'pay_at_counter',
     status,
     museum_status: museumStatus,
     robot_status: robotStatus,
@@ -439,10 +443,32 @@ export function useUserTickets() {
         if (!tk) return { error: 'booking-not-found' };
         if (!canCancelUserTicket(tk)) {
           return {
-            error: isWithinCancellationDeadline(tk)
-              ? 'Cancellation is available up to 24 hours before your visit.'
+            error: isVisitStartedOrPast(tk)
+              ? 'This booking can no longer be cancelled.'
               : 'booking-not-cancellable',
           };
+        }
+        const [sessionSnap, robotSnap] = await Promise.all([
+          tk.session_id ? getDoc(doc(db, 'tourSessions', tk.session_id)) : Promise.resolve(null),
+          tk.paired_robot_id ? getDoc(doc(db, 'robots', tk.paired_robot_id)) : Promise.resolve(null),
+        ]);
+        const session = sessionSnap?.exists() ? sessionSnap.data() : null;
+        const robot = robotSnap?.exists() ? robotSnap.data() : null;
+        const sessionStatus = normalizeToken(session?.status);
+        const robotStatus = normalizeToken(robot?.status);
+        if (
+          tk.status === 'completed' ||
+          tk.museum_status === 'used' ||
+          tk.robot_status === 'completed' ||
+          sessionStatus === 'completed'
+        ) {
+          return { error: 'This booking has already been completed.' };
+        }
+        if ((sessionStatus === 'active' || sessionStatus === 'in_progress') && robotStatus !== 'assigned') {
+          return { error: 'This tour is already in progress and cannot be cancelled.' };
+        }
+        if (robotStatus === 'in_tour') {
+          return { error: 'This tour is already in progress and cannot be cancelled.' };
         }
         const batch = writeBatch(db);
         const update = {
@@ -453,6 +479,25 @@ export function useUserTickets() {
         batch.update(doc(db, 'bookings', tk.booking_id), update);
         batch.update(doc(db, 'museumTickets', tk.museum_ticket_id), update);
         batch.update(doc(db, 'robotTourTickets', tk.robot_tour_ticket_id), update);
+        if (sessionSnap?.exists()) {
+          batch.update(doc(db, 'tourSessions', sessionSnap.id), {
+            status: 'cancelled',
+            updated_at: serverTimestamp(),
+          });
+        }
+        if (robotSnap?.exists() && robotStatus === 'assigned') {
+          batch.update(doc(db, 'robots', robotSnap.id), {
+            status: 'available',
+            active_session_id: null,
+            activeSessionId: null,
+            active_user_id: null,
+            currentUserId: null,
+            active_robot_tour_ticket_id: null,
+            activeRobotTourTicketId: null,
+            updated_at: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+        }
         await batch.commit();
         const cancelledStatus: TicketStatus = 'cancelled';
         const cancelledDisplayStatus: TicketDisplayStatus = 'cancelled';
@@ -486,24 +531,28 @@ export function useUserTickets() {
 }
 
 export function canCancelUserTicket(ticket: UserTicket): boolean {
-  if (!isUsableStatus(ticket.status)) return false;
-  if (isClosedOrPendingStatus(ticket.museum_status)) return false;
-  if (
-    isClosedOrPendingStatus(ticket.robot_status) ||
-    ticket.robot_status === 'paired' ||
-    ticket.robot_status === 'in_progress' ||
-    !!ticket.paired_robot_id ||
-    !!ticket.session_id
-  ) {
-    return false;
-  }
-  return !isWithinCancellationDeadline(ticket);
+  if (!isCancellableTicketStatus(ticket.status)) return false;
+  if (!isCancellableTicketStatus(ticket.museum_status)) return false;
+  if (!isCancellableTicketStatus(ticket.robot_status)) return false;
+  if (isVisitStartedOrPast(ticket)) return false;
+  return isPendingPaymentStatus(ticket.payment_status) || isPaymentConfirmedStatus(ticket.payment_status);
 }
 
-export function isWithinCancellationDeadline(ticket: UserTicket): boolean {
+function isCancellableTicketStatus(status: TicketStatus): boolean {
+  return (
+    status === 'active' ||
+    status === 'valid' ||
+    status === 'confirmed' ||
+    status === 'pending' ||
+    status === 'paired' ||
+    status === 'in_progress'
+  );
+}
+
+export function isVisitStartedOrPast(ticket: UserTicket): boolean {
   const startsAt = visitStartsAt(ticket.visit_date, ticket.visit_time);
   if (!startsAt) return true;
-  return startsAt.getTime() - Date.now() <= 24 * 60 * 60 * 1000;
+  return Date.now() >= startsAt.getTime();
 }
 
 function visitStartsAt(date: string, time?: string | null): Date | null {

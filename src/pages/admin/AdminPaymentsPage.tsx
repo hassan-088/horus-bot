@@ -48,6 +48,7 @@ const OPEN_PAYMENT_RECORD_STATUSES = new Set([
 ]);
 
 type Primitive = string | number;
+type PaymentLifecycleFilter = 'pending' | 'confirmed' | 'cancelled' | 'completed';
 
 type PendingBooking = {
   id: string;
@@ -76,6 +77,22 @@ type PendingBooking = {
 type RowDoc = {
   id: string;
   data: DocumentData;
+};
+
+type AdminPaymentDiagnostics = {
+  bookings: number;
+  museumTickets: number;
+  robotTourTickets: number;
+  pendingLikeRecords: number;
+  filteredPendingLikeRecords: number;
+};
+
+const emptyDiagnostics: AdminPaymentDiagnostics = {
+  bookings: 0,
+  museumTickets: 0,
+  robotTourTickets: 0,
+  pendingLikeRecords: 0,
+  filteredPendingLikeRecords: 0,
 };
 
 function normalize(value: unknown) {
@@ -201,7 +218,7 @@ function buildPendingRows(
     const key = bookingKey(row);
     bookingsById.set(key, row);
     bookingsById.set(row.id, row);
-    if (shouldShowRecord(row.data)) keys.add(key);
+    keys.add(key);
   });
 
   museumDocs.forEach((row) => {
@@ -210,7 +227,7 @@ function buildPendingRows(
     museumById.set(id, row);
     museumById.set(row.id, row);
     if (key) museumByBooking.set(key, row);
-    if (shouldShowRecord(row.data)) keys.add(key || row.id);
+    keys.add(key || row.id);
   });
 
   robotDocs.forEach((row) => {
@@ -219,7 +236,7 @@ function buildPendingRows(
     robotById.set(id, row);
     robotById.set(row.id, row);
     if (key) robotByBooking.set(key, row);
-    if (shouldShowRecord(row.data)) keys.add(key || row.id);
+    keys.add(key || row.id);
   });
 
   const rows = Array.from(keys).map((key) => {
@@ -292,10 +309,30 @@ function buildPendingRows(
     };
   });
 
-  return rows
-    .filter((row) => !CONFIRMED_PAYMENT_STATUSES.has(normalize(row.payment_status)))
-    .sort((a, b) => a.visit_date.localeCompare(b.visit_date) || a.visit_time.localeCompare(b.visit_time));
+  return rows.sort((a, b) => a.visit_date.localeCompare(b.visit_date) || a.visit_time.localeCompare(b.visit_time));
 }
+
+function lifecycleFilterForRow(row: PendingBooking): PaymentLifecycleFilter {
+  const status = normalize(row.status);
+  const payment = normalize(row.payment_status);
+  if (['cancelled', 'canceled', 'declined', 'rejected', 'archived', 'inactive', 'disabled'].includes(status)) {
+    return 'cancelled';
+  }
+  if (['completed', 'used', 'expired'].includes(status)) {
+    return 'completed';
+  }
+  if (CONFIRMED_PAYMENT_STATUSES.has(payment)) {
+    return 'confirmed';
+  }
+  return 'pending';
+}
+
+const lifecycleFilterLabels: Record<PaymentLifecycleFilter, string> = {
+  pending: 'Pending',
+  confirmed: 'Confirmed',
+  cancelled: 'Cancelled',
+  completed: 'Completed',
+};
 
 function canAccess(role: unknown) {
   const normalized = String(role ?? '').trim().toLowerCase();
@@ -328,13 +365,16 @@ export default function AdminPaymentsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [lifecycleFilter, setLifecycleFilter] = useState<PaymentLifecycleFilter>('pending');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
+  const [diagnostics, setDiagnostics] = useState<AdminPaymentDiagnostics>(emptyDiagnostics);
   const allowed = canAccess(profile?.role);
 
   useEffect(() => {
     if (!user || !allowed) {
       setBookings([]);
+      setDiagnostics(emptyDiagnostics);
       setLoading(false);
       return undefined;
     }
@@ -364,7 +404,20 @@ export default function AdminPaymentsPage() {
     };
 
     const recompute = () => {
-      setBookings(buildPendingRows(state.bookings, state.museumTickets, state.robotTourTickets));
+      const rows = buildPendingRows(state.bookings, state.museumTickets, state.robotTourTickets);
+      const allRows = [...state.bookings, ...state.museumTickets, ...state.robotTourTickets];
+      const pendingLikeRecords = allRows.filter((row) => isPendingCounterPayment(row.data)).length;
+      const filteredPendingLikeRecords = allRows.filter(
+        (row) => isPendingCounterPayment(row.data) && !shouldShowRecord(row.data),
+      ).length;
+      setDiagnostics({
+        bookings: state.bookings.length,
+        museumTickets: state.museumTickets.length,
+        robotTourTickets: state.robotTourTickets.length,
+        pendingLikeRecords,
+        filteredPendingLikeRecords,
+      });
+      setBookings(rows);
       if (loaded.bookings && loaded.museumTickets && loaded.robotTourTickets) {
         setLoading(false);
       }
@@ -372,7 +425,11 @@ export default function AdminPaymentsPage() {
 
     const fail = (queryAttempted: string, err: FirestoreError) => {
       logAdminPaymentError(queryAttempted, err, user, profile?.role);
-      setError('Unable to load pending payments. Please check admin permissions or Firestore index.');
+      setError(
+        err.code === 'permission-denied'
+          ? 'Firestore permission denied. Confirm this account has users/{uid}.role set to admin or cashier.'
+          : 'Unable to load pending payments. Please check admin permissions or Firestore index.',
+      );
       setLoading(false);
     };
 
@@ -415,8 +472,9 @@ export default function AdminPaymentsPage() {
 
   const filteredBookings = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return bookings;
-    return bookings.filter((booking) =>
+    const byLifecycle = bookings.filter((booking) => lifecycleFilterForRow(booking) === lifecycleFilter);
+    if (!term) return byLifecycle;
+    return byLifecycle.filter((booking) =>
       [
         booking.id,
         booking.booking_id,
@@ -427,7 +485,7 @@ export default function AdminPaymentsPage() {
         booking.qr_value,
       ].some((value) => String(value).toLowerCase().includes(term)),
     );
-  }, [bookings, search]);
+  }, [bookings, lifecycleFilter, search]);
 
   const confirmPayment = async (booking: PendingBooking) => {
     if (!user || confirmingId) return;
@@ -500,7 +558,9 @@ export default function AdminPaymentsPage() {
           </div>
           <h1 className="font-serif text-3xl">Access Denied</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Counter payment confirmation is available only to admin and cashier accounts.
+            You are not admin/cashier. Counter payment confirmation is available only to accounts whose
+            Firestore document <span className="font-mono">users/{user?.id ?? 'uid'}</span> has
+            <span className="font-mono"> role = admin</span> or <span className="font-mono">role = cashier</span>.
           </p>
         </Card>
       </section>
@@ -535,11 +595,40 @@ export default function AdminPaymentsPage() {
         />
       </div>
 
+      <Card className="mb-5 rounded-2xl border-primary/20 p-4 text-sm shadow-soft">
+        <div className="font-semibold">Payment filter diagnostics</div>
+        <p className="mt-1 text-muted-foreground">
+          Accepted roles: admin, cashier. Pending payments: pay_at_counter, pending, unpaid,
+          awaiting_payment. Open statuses: active, valid, confirmed, pending.
+        </p>
+        <div className="mt-3 grid gap-2 md:grid-cols-5">
+          <Info label="Bookings scanned" value={diagnostics.bookings} />
+          <Info label="Museum tickets scanned" value={diagnostics.museumTickets} />
+          <Info label="Robot tickets scanned" value={diagnostics.robotTourTickets} />
+          <Info label="Pending-like records" value={diagnostics.pendingLikeRecords} />
+          <Info label="Filtered pending-like" value={diagnostics.filteredPendingLikeRecords} />
+        </div>
+      </Card>
+
+      <div className="mb-5 flex flex-wrap gap-2">
+        {(Object.keys(lifecycleFilterLabels) as PaymentLifecycleFilter[]).map((value) => (
+          <Button
+            key={value}
+            type="button"
+            variant={lifecycleFilter === value ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setLifecycleFilter(value)}
+          >
+            {lifecycleFilterLabels[value]}
+          </Button>
+        ))}
+      </div>
+
       {loading && (
         <Card className="rounded-2xl border-primary/20 p-6">
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            Loading pending payments...
+            Loading payment records...
           </div>
         </Card>
       )}
@@ -553,10 +642,19 @@ export default function AdminPaymentsPage() {
       {!loading && !error && filteredBookings.length === 0 && (
         <Card className="rounded-2xl border-primary/20 p-8 text-center shadow-soft">
           <CheckCircle2 className="mx-auto mb-3 h-8 w-8 text-primary" />
-          <h2 className="font-serif text-2xl">No pending counter payments</h2>
+          <h2 className="font-serif text-2xl">
+            No {lifecycleFilterLabels[lifecycleFilter].toLowerCase()} records found
+          </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            New pay-at-counter bookings will appear here automatically.
+            Switch filters to review pending payment, confirmed, cancelled, or completed bookings.
           </p>
+          {lifecycleFilter === 'pending' && diagnostics.filteredPendingLikeRecords > 0 && (
+            <p className="mt-3 text-sm text-amber-600">
+              Pending bookings exist but were filtered because of status, date, payment fields, or linked document shape.
+              Check that payment_status is pay_at_counter/pending/unpaid/awaiting_payment,
+              status is active/valid/confirmed/pending, and visit_date is not in the past.
+            </p>
+          )}
         </Card>
       )}
 
@@ -579,14 +677,20 @@ export default function AdminPaymentsPage() {
                     ))}
                   </div>
                 </div>
-                <Button
-                  onClick={() => confirmPayment(booking)}
-                  disabled={confirmingId === booking.id}
-                  className="shrink-0"
-                >
-                  {confirmingId === booking.id && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Confirm Payment
-                </Button>
+                {lifecycleFilterForRow(booking) === 'pending' ? (
+                  <Button
+                    onClick={() => confirmPayment(booking)}
+                    disabled={confirmingId === booking.id}
+                    className="shrink-0"
+                  >
+                    {confirmingId === booking.id && <Loader2 className="h-4 w-4 animate-spin" />}
+                    Confirm Payment
+                  </Button>
+                ) : (
+                  <Badge variant="secondary" className="shrink-0 border-0 bg-muted text-muted-foreground">
+                    {lifecycleFilterLabels[lifecycleFilterForRow(booking)]}
+                  </Badge>
+                )}
               </div>
 
               <div className="mt-5 grid gap-3 text-sm md:grid-cols-2 xl:grid-cols-4">

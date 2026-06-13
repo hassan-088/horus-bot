@@ -192,6 +192,9 @@ export default function BookPage() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const totalTickets = Object.values(quantities).reduce((a, b) => a + b, 0);
+  const adultTickets = quantities.egyptian_adult + quantities.foreigner_adult;
+  const childTickets = quantities.egyptian_child + quantities.foreigner_child;
+  const isChildOnlyBooking = childTickets > 0 && adultTickets === 0;
   const museumPrice = (Object.entries(quantities) as [MuseumTicketCategory, number][])
     .reduce((acc, [k, n]) => acc + n * museumTicketPrices[k], 0);
   const tourPrice = robotTourPrices[tourType];
@@ -248,6 +251,9 @@ export default function BookPage() {
   const visitorLimitHelper = isRTL
     ? `الحد الأقصى ${MAX_VISITORS_PER_BOOKING} زوار لكل حجز.`
     : `Maximum ${MAX_VISITORS_PER_BOOKING} visitors per booking.`;
+  const childRequiresAdultMessage = isRTL
+    ? 'يجب أن يكون الأطفال برفقة بالغ واحد على الأقل.'
+    : 'Children must be accompanied by at least one adult.';
   const unsupportedTourLanguageMessage = isRTL
     ? 'اختر لغة جولة مدعومة.'
     : 'Choose a supported tour language.';
@@ -363,6 +369,10 @@ export default function BookPage() {
       toast.error(visitorLimitMessage);
       return;
     }
+    if (isChildOnlyBooking) {
+      toast.error(childRequiresAdultMessage);
+      return;
+    }
     goNext();
   };
 
@@ -444,6 +454,10 @@ export default function BookPage() {
     }
     if (totalTickets > MAX_VISITORS_PER_BOOKING) {
       toast.error(visitorLimitMessage);
+      return;
+    }
+    if (isChildOnlyBooking) {
+      toast.error(childRequiresAdultMessage);
       return;
     }
     if (pay !== 'cash') {
