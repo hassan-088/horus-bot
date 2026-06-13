@@ -9,7 +9,7 @@ import {
   type DocumentData,
   type FirestoreError,
 } from 'firebase/firestore';
-import { CheckCircle2, Loader2, LogOut, Search, ShieldAlert } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp, Loader2, LogOut, Search, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,6 +52,13 @@ type Primitive = string | number;
 type PaymentLifecycleFilter = 'pending' | 'confirmed' | 'cancelled' | 'completed';
 type PendingRecordCategory = 'ready' | 'expired' | 'incomplete';
 
+type LegacyRecordReport = {
+  collection: 'bookings' | 'museumTickets' | 'robotTourTickets';
+  document_id: string;
+  reason: string;
+  safe_to_delete: boolean;
+};
+
 type PendingBooking = {
   id: string;
   booking_doc_id: string;
@@ -77,6 +84,9 @@ type PendingBooking = {
   source_debug: string;
   pending_category: PendingRecordCategory;
   is_entry_only: boolean;
+  invalid_reasons: string[];
+  legacy_records: LegacyRecordReport[];
+  sort_timestamp: number;
 };
 
 type RowDoc = {
@@ -221,31 +231,112 @@ function hasValue(value: unknown) {
   return textValue !== '' && textValue !== '-';
 }
 
+function timestampMillis(value: unknown): number | null {
+  if (!value) return null;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  if (typeof value === 'object' && value !== null) {
+    const maybeTimestamp = value as { toMillis?: () => number; toDate?: () => Date; seconds?: number };
+    if (typeof maybeTimestamp.toMillis === 'function') return maybeTimestamp.toMillis();
+    if (typeof maybeTimestamp.toDate === 'function') return maybeTimestamp.toDate().getTime();
+    if (typeof maybeTimestamp.seconds === 'number') return maybeTimestamp.seconds * 1000;
+  }
+  return null;
+}
+
+function bestTimestamp(
+  bookingData: DocumentData | undefined,
+  museumData: DocumentData | undefined,
+  robotData: DocumentData | undefined,
+  visitDate: string,
+  visitTime: string,
+) {
+  const paymentConfirmed = [
+    bookingData?.payment_confirmed_at,
+    bookingData?.paymentConfirmedAt,
+    museumData?.payment_confirmed_at,
+    museumData?.paymentConfirmedAt,
+    robotData?.payment_confirmed_at,
+    robotData?.paymentConfirmedAt,
+  ].map(timestampMillis).find((value): value is number => value !== null);
+  const confirmedPayment =
+    isConfirmedPayment(bookingData) ||
+    isConfirmedPayment(museumData) ||
+    isConfirmedPayment(robotData);
+  if (confirmedPayment && paymentConfirmed !== undefined) return paymentConfirmed;
+
+  const keys = ['created_at', 'createdAt', 'updated_at', 'updatedAt', 'payment_confirmed_at', 'paymentConfirmedAt', 'booking_date', 'bookingDate'];
+  for (const data of [bookingData, museumData, robotData]) {
+    for (const key of keys) {
+      const millis = timestampMillis(data?.[key]);
+      if (millis !== null) return millis;
+    }
+  }
+  return parseVisitStartsAt(visitDate, visitTime)?.getTime() ?? 0;
+}
+
 function isPendingPaymentValue(value: unknown) {
   return PENDING_PAYMENT_STATUSES.has(normalize(value));
 }
 
+function invalidReasonsForRow(row: PendingBooking): string[] {
+  const reasons: string[] = [];
+  const fullBooking = !row.is_entry_only;
+  if (!hasValue(row.visit_date)) reasons.push('missing visit_date');
+  if (!hasValue(row.visit_time)) reasons.push('missing visit_time');
+  if (!hasValue(row.userId)) reasons.push('missing userId');
+  if (!hasValue(row.booking_doc_id)) reasons.push('linked booking document missing');
+  if (!hasValue(row.museum_ticket_id)) reasons.push('missing museum_ticket_id');
+  if (hasValue(row.museum_ticket_id) && !row.sources.includes('museum ticket')) {
+    reasons.push('linked museum ticket document missing');
+  }
+  if (fullBooking && !hasValue(row.robot_tour_ticket_id)) reasons.push('missing robot_tour_ticket_id for full booking');
+  if (fullBooking && hasValue(row.robot_tour_ticket_id) && !row.sources.includes('robot ticket')) {
+    reasons.push('linked robot tour ticket document missing');
+  }
+  if (!row.sources.length) reasons.push('record has no linked booking or ticket documents');
+  const hasFullTotal = typeof row.total_price === 'number' || (typeof row.museum_entry_total === 'number' && (row.is_entry_only || typeof row.robot_tour_price === 'number'));
+  if (!hasFullTotal) reasons.push('missing total price');
+  if (isPendingPaymentValue(row.payment_status) && !OPEN_PAYMENT_RECORD_STATUSES.has(normalize(row.status))) {
+    reasons.push('status is not active/valid/confirmed/pending');
+  }
+  return reasons;
+}
+
 function pendingCategoryForRow(row: PendingBooking): PendingRecordCategory {
   if (!isPendingPaymentValue(row.payment_status)) return 'ready';
-  const hasVisitDate = hasValue(row.visit_date);
-  const hasVisitTime = hasValue(row.visit_time);
-  const hasBooking = hasValue(row.booking_doc_id);
-  const hasMuseumTicket = hasValue(row.museum_ticket_id) && row.sources.includes('museum ticket');
-  const hasRobotTicketId = hasValue(row.robot_tour_ticket_id);
-  const robotRequired = !row.is_entry_only;
-  const hasRobotTicket = !robotRequired || row.sources.includes('robot ticket');
-  if (
-    !hasVisitDate ||
-    !hasVisitTime ||
-    !hasBooking ||
-    !hasMuseumTicket ||
-    (robotRequired && (!hasRobotTicketId || !hasRobotTicket))
-  ) {
-    return 'incomplete';
-  }
+  if (row.invalid_reasons.length > 0) return 'incomplete';
   const startsAt = parseVisitStartsAt(row.visit_date, row.visit_time);
   if (!startsAt) return 'incomplete';
   return startsAt.getTime() < Date.now() ? 'expired' : 'ready';
+}
+
+function safeToDeleteLegacy(row: PendingBooking) {
+  if (row.pending_category !== 'incomplete') return false;
+  if (CONFIRMED_PAYMENT_STATUSES.has(normalize(row.payment_status))) return false;
+  if (['active', 'valid', 'confirmed', 'completed', 'used', 'cancelled', 'canceled'].includes(normalize(row.status))) {
+    return false;
+  }
+  return row.invalid_reasons.some((reason) => reason.includes('missing') || reason.includes('old schema') || reason.includes('no linked'));
+}
+
+function legacyRecordsForRow(
+  row: PendingBooking,
+  booking: RowDoc | undefined,
+  museum: RowDoc | undefined,
+  robot: RowDoc | undefined,
+): LegacyRecordReport[] {
+  if (row.pending_category !== 'incomplete') return [];
+  const reason = row.invalid_reasons.join('; ') || 'old schema/test document';
+  const safe_to_delete = safeToDeleteLegacy(row);
+  return [
+    booking ? { collection: 'bookings' as const, document_id: booking.id, reason, safe_to_delete } : null,
+    museum ? { collection: 'museumTickets' as const, document_id: museum.id, reason, safe_to_delete } : null,
+    robot ? { collection: 'robotTourTickets' as const, document_id: robot.id, reason, safe_to_delete } : null,
+  ].filter((item): item is LegacyRecordReport => item !== null);
 }
 
 function sourceDebugLabel(sources: string[], category: PendingRecordCategory) {
@@ -345,9 +436,10 @@ function buildPendingRows(
     );
     const isEntryOnly =
       bookingKind === 'entry_only' ||
+      bookingKind === 'add_on_entry' ||
+      bookingKind === 'entry_add_on' ||
       bookingKind === 'museum_entry' ||
-      bookingKind === 'museum_only' ||
-      (!hasValue(robotIdFromBooking) && robotTotalNumber === 0);
+      bookingKind === 'museum_only';
     const fallbackTotal =
       typeof museumTotal === 'number' && typeof robotTotal === 'number'
         ? museumTotal + robotTotal
@@ -406,16 +498,29 @@ function buildPendingRows(
       source_debug: 'incomplete/legacy',
       pending_category: 'incomplete',
       is_entry_only: isEntryOnly,
+      invalid_reasons: [],
+      legacy_records: [],
+      sort_timestamp: 0,
     };
+    row.sort_timestamp = bestTimestamp(
+      bookingData,
+      museumData,
+      robotData,
+      row.visit_date,
+      row.visit_time,
+    );
+    row.invalid_reasons = invalidReasonsForRow(row);
     const pendingCategory = pendingCategoryForRow(row);
-    return {
+    const classified = {
       ...row,
       pending_category: pendingCategory,
       source_debug: sourceDebugLabel(sources, pendingCategory),
     };
+    classified.legacy_records = legacyRecordsForRow(classified, booking, museum, robot);
+    return classified;
   });
 
-  return rows.sort((a, b) => a.visit_date.localeCompare(b.visit_date) || a.visit_time.localeCompare(b.visit_time));
+  return rows.sort((a, b) => b.sort_timestamp - a.sort_timestamp);
 }
 
 function lifecycleFilterForRow(row: PendingBooking): PaymentLifecycleFilter {
@@ -450,6 +555,24 @@ const pendingCategoryMessages: Record<Exclude<PendingRecordCategory, 'ready'>, s
   expired: 'This visit date has passed. Payment confirmation is disabled.',
   incomplete: 'This record is missing required booking/ticket links and cannot be confirmed safely.',
 };
+
+function groupedLegacyReport(rows: PendingBooking[]) {
+  const report: Record<LegacyRecordReport['collection'], LegacyRecordReport[]> = {
+    bookings: [],
+    museumTickets: [],
+    robotTourTickets: [],
+  };
+  const seen = new Set<string>();
+  rows.forEach((row) => {
+    row.legacy_records.forEach((record) => {
+      const key = `${record.collection}/${record.document_id}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      report[record.collection].push(record);
+    });
+  });
+  return report;
+}
 
 function canAccess(role: unknown) {
   const normalized = String(role ?? '').trim().toLowerCase();
@@ -488,6 +611,14 @@ export default function AdminPaymentsPage() {
   const [diagnostics, setDiagnostics] = useState<AdminPaymentDiagnostics>(emptyDiagnostics);
   const [identityDiagnostics, setIdentityDiagnostics] =
     useState<AdminIdentityDiagnostics>(emptyIdentityDiagnostics);
+  const [showAdminDiagnostics, setShowAdminDiagnostics] = useState(false);
+  const [showPaymentDiagnostics, setShowPaymentDiagnostics] = useState(false);
+  const [expandedPendingCategories, setExpandedPendingCategories] =
+    useState<Record<PendingRecordCategory, boolean>>({
+      ready: true,
+      expired: false,
+      incomplete: false,
+    });
   const projectId = String(app.options.projectId ?? 'unknown');
 
   useEffect(() => {
@@ -536,6 +667,14 @@ export default function AdminPaymentsPage() {
     const recompute = () => {
       if (cancelled) return;
       const rows = buildPendingRows(state.bookings, state.museumTickets, state.robotTourTickets);
+      const legacyReport = groupedLegacyReport(rows);
+      const legacyCount =
+        legacyReport.bookings.length +
+        legacyReport.museumTickets.length +
+        legacyReport.robotTourTickets.length;
+      if (legacyCount > 0) {
+        console.info('[Horus-Bot] Incomplete legacy payment records', legacyReport);
+      }
       const allRows = [...state.bookings, ...state.museumTickets, ...state.robotTourTickets];
       const pendingLikeRecords = allRows.filter((row) => isPendingCounterPayment(row.data)).length;
       const filteredPendingLikeRecords = allRows.filter(
@@ -858,6 +997,8 @@ export default function AdminPaymentsPage() {
         profileRole={profile?.role ?? null}
         projectId={projectId}
         diagnostics={identityDiagnostics}
+        expanded={showAdminDiagnostics}
+        onToggle={() => setShowAdminDiagnostics((value) => !value)}
       />
 
       <div className="mb-5 flex max-w-xl items-center gap-2 rounded-2xl border border-primary/15 bg-background px-3">
@@ -870,9 +1011,12 @@ export default function AdminPaymentsPage() {
         />
       </div>
 
-      <Card className="mb-5 rounded-2xl border-primary/20 p-4 text-sm shadow-soft">
-        <div className="font-semibold">Payment filter diagnostics</div>
-        <p className="mt-1 text-muted-foreground">
+      <CollapsiblePanel
+        title="Payment filter diagnostics"
+        expanded={showPaymentDiagnostics}
+        onToggle={() => setShowPaymentDiagnostics((value) => !value)}
+      >
+        <p className="text-muted-foreground">
           Accepted roles: admin, cashier. Pending payments: pay_at_counter, pending, unpaid,
           awaiting_payment. Open statuses: active, valid, confirmed, pending.
         </p>
@@ -883,7 +1027,7 @@ export default function AdminPaymentsPage() {
           <Info label="Pending-like records" value={diagnostics.pendingLikeRecords} />
           <Info label="Filtered pending-like" value={diagnostics.filteredPendingLikeRecords} />
         </div>
-      </Card>
+      </CollapsiblePanel>
 
       <div className="mb-5 flex flex-wrap gap-2">
         {(Object.keys(lifecycleFilterLabels) as PaymentLifecycleFilter[]).map((value) => (
@@ -942,6 +1086,13 @@ export default function AdminPaymentsPage() {
                 title={`${pendingCategoryLabels[category]} (${pendingSections[category].length})`}
                 rows={pendingSections[category]}
                 renderRow={renderPaymentCard}
+                expanded={expandedPendingCategories[category]}
+                onToggle={() =>
+                  setExpandedPendingCategories((current) => ({
+                    ...current,
+                    [category]: !current[category],
+                  }))
+                }
               />
             ))
           ) : (
@@ -968,25 +1119,62 @@ function PendingCategorySection({
   title,
   rows,
   renderRow,
+  expanded,
+  onToggle,
 }: {
   title: string;
   rows: PendingBooking[];
   renderRow: (row: PendingBooking) => ReactNode;
+  expanded: boolean;
+  onToggle: () => void;
 }) {
   return (
     <section className="space-y-3">
-      <div className="flex items-center gap-3">
+      <button
+        type="button"
+        className="flex w-full items-center gap-3 text-left"
+        onClick={onToggle}
+      >
         <h2 className="font-serif text-2xl">{title}</h2>
         <div className="h-px flex-1 bg-primary/15" />
-      </div>
-      {rows.length > 0 ? (
-        rows.map(renderRow)
-      ) : (
-        <Card className="rounded-2xl border-primary/10 p-4 text-sm text-muted-foreground">
-          No records in this category.
-        </Card>
+        {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+      </button>
+      {expanded && (
+        rows.length > 0 ? (
+          rows.map(renderRow)
+        ) : (
+          <Card className="rounded-2xl border-primary/10 p-4 text-sm text-muted-foreground">
+            No records in this category.
+          </Card>
+        )
       )}
     </section>
+  );
+}
+
+function CollapsiblePanel({
+  title,
+  expanded,
+  onToggle,
+  children,
+}: {
+  title: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <Card className="mb-5 rounded-2xl border-primary/20 p-4 text-sm shadow-soft">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between gap-3 text-left font-semibold"
+        onClick={onToggle}
+      >
+        <span>{title}</span>
+        {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+      </button>
+      {expanded && <div className="mt-3">{children}</div>}
+    </Card>
   );
 }
 
@@ -996,12 +1184,16 @@ function AdminSetupDiagnosticsCard({
   profileRole,
   projectId,
   diagnostics,
+  expanded,
+  onToggle,
 }: {
   uid: string;
   email: string | null;
   profileRole: string | null;
   projectId: string;
   diagnostics: AdminIdentityDiagnostics;
+  expanded: boolean;
+  onToggle: () => void;
 }) {
   const roleValue = diagnostics.roleValue || 'missing';
   const docState = diagnostics.checked
@@ -1020,8 +1212,10 @@ function AdminSetupDiagnosticsCard({
           ? 'Role check passed. Collection scans can start.'
           : 'Checking users/{uid} before scanning payment collections.';
 
+  const showSetupNote = expanded || (diagnostics.checked && !diagnostics.isAdminOrCashier);
+
   return (
-    <Card className="mb-5 rounded-2xl border-primary/20 p-4 text-sm shadow-soft">
+    <CollapsiblePanel title="Admin diagnostics" expanded={expanded} onToggle={onToggle}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="font-semibold">Admin account diagnostics</div>
@@ -1053,21 +1247,23 @@ function AdminSetupDiagnosticsCard({
         <Info label="Rules deployment" value="deploy local rules if Console still denies reads" />
       </div>
 
-      <div className="mt-4 rounded-xl bg-muted/45 p-3">
-        <div className="text-xs font-semibold uppercase text-muted-foreground">Temporary admin setup note</div>
-        <p className="mt-2 text-sm text-muted-foreground">
-          To activate this admin account, create or update this document from Firebase Console or trusted admin tooling.
-          Do not add an in-app self-service role assignment flow.
-        </p>
-        <pre className="mt-3 overflow-x-auto rounded-lg bg-background p-3 text-xs">
+      {showSetupNote && (
+        <div className="mt-4 rounded-xl bg-muted/45 p-3">
+          <div className="text-xs font-semibold uppercase text-muted-foreground">Temporary admin setup note</div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            To activate this admin account, create or update this document from Firebase Console or trusted admin tooling.
+            Do not add an in-app self-service role assignment flow.
+          </p>
+          <pre className="mt-3 overflow-x-auto rounded-lg bg-background p-3 text-xs">
 {`users/${uid}
 {
   role: "admin",
   email: "${email ?? ''}",
   uid: "${uid}"
 }`}
-        </pre>
-      </div>
+          </pre>
+        </div>
+      )}
 
       <div className="mt-4 rounded-xl bg-muted/45 p-3 text-sm text-muted-foreground">
         Local <span className="font-mono">firestore.rules</span> allow admin/cashier reads of
@@ -1078,6 +1274,6 @@ function AdminSetupDiagnosticsCard({
         are older than this local file, deploy with
         <span className="font-mono"> firebase deploy --only firestore:rules</span>.
       </div>
-    </Card>
+    </CollapsiblePanel>
   );
 }
